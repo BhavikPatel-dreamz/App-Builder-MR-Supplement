@@ -828,6 +828,7 @@ export default function AppSettings() {
         </s-stack>
       </s-section>
 
+                {/*
       <s-section heading="Background Music">
         <s-stack direction="block" gap="base">
           <s-paragraph>
@@ -1966,7 +1967,7 @@ export default function AppSettings() {
             </div>
           ) : null}
         </s-stack>
-      </s-section>
+      </s-section> */}
     </s-page>
   );
 }
