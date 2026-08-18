@@ -1,0 +1,143 @@
+/* Shared Riyasat UI tokens */
+:root {
+  --riyasat-accent: #6b6b6b;
+  --riyasat-accent-hover: #555555;
+  --riyasat-field-border: #9ca3af;
+  --riyasat-pagination-active: #b3024a;
+  --riyasat-pagination-inactive: rgba(179, 2, 74, 0.28);
+}
+
+/* Horizontal scroll tracks — hide scrollbar, smooth snap scroll like Product Scroller */
+/* .riyasat-product-scroller__track,
+.riyasat-image-slider__track,
+.riyasat-categories-scroller__track {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.riyasat-product-scroller__track::-webkit-scrollbar,
+.riyasat-image-slider__track::-webkit-scrollbar,
+.riyasat-categories-scroller__track::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+} */
+
+/* InnerBlocks editor tracks — same flex + snap layout as Product Scroller */
+[class$="-editor"]:not(.riyasat-image-carousel-editor) [class*="__track"] .block-editor-inner-blocks {
+  min-width: 0;
+}
+
+[class$="-editor"]:not(.riyasat-image-carousel-editor) [class*="__track"] .block-editor-block-list__layout {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 20px;
+  width: max-content;
+  min-width: 100%;
+  align-items: stretch;
+}
+
+[class$="-editor"]:not(.riyasat-image-carousel-editor) [class*="__track"] .block-editor-block-list__layout > *,
+[class$="-editor"]:not(.riyasat-image-carousel-editor) [class*="__track"] .block-editor-block-list__block {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.riyasat-product-scroller__card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Pagination row */
+.riyasat-pagination,
+.riyasat-image-slider__pagination,
+.riyasat-product-scroller__pagination,
+.riyasat-image-carousel__pagination,
+.riyasat-categories-scroller__pagination {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+/* Dot buttons — inactive circle, active pill (see reference design) */
+.riyasat-pagination__dot,
+.riyasat-image-slider__dot,
+.riyasat-product-scroller__pagination-dot,
+.riyasat-image-carousel__dot,
+.riyasat-categories-scroller__dot {
+  cursor: pointer;
+  border: none;
+  padding: 9px 4px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  flex-shrink: 0;
+  width: auto;
+  height: auto;
+}
+
+.riyasat-pagination__dot::after,
+.riyasat-image-slider__dot::after,
+.riyasat-product-scroller__pagination-dot::after,
+.riyasat-image-carousel__dot::after,
+.riyasat-categories-scroller__dot::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--riyasat-pagination-inactive);
+  transition:
+    width 0.25s ease,
+    border-radius 0.25s ease,
+    background 0.25s ease;
+}
+
+.riyasat-pagination__dot.is-active::after,
+.riyasat-image-slider__dot.is-active::after,
+.riyasat-product-scroller__pagination-dot.is-active::after,
+.riyasat-image-carousel__dot.is-active::after,
+.riyasat-categories-scroller__dot.is-active::after {
+  width: 22px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--riyasat-pagination-active);
+}
+
+/* Hero carousel editor — dots sit over the slide */
+.riyasat-image-carousel__pagination {
+  margin-top: 0;
+}
+
+.riyasat-image-carousel__pagination--preview {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  pointer-events: auto;
+}
+
+/* Editor field underlines (was Gutenberg blue) */
+.riyasat-image-slider-item-editor__label {
+  border-bottom-color: var(--riyasat-field-border) !important;
+}
+
+.builder-wrapper .editor-canvas-wrapper .block-editor-block-list__layout {
+  overflow-x: hidden !important;
+}

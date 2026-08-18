@@ -1,0 +1,165 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model Page {
+  id             String   @id @default(cuid())
+  shop           String
+  title          String
+  slug           String
+  html           String   @db.Text
+  json           String   @db.Text
+  status         String   @default("draft")
+  // "page" | "header" | "footer" — headers and footers reuse the same builder
+  // and are attached to pages via headerId / footerId.
+  type           String   @default("page")
+  // Layout settings consumed by the mobile app via the App Proxy.
+  hideHeader      Boolean @default(false)
+  showPageTitle   Boolean @default(true)
+  backgroundColor String  @default("#ffffff")
+  // "normal" | "scrollView" | "flatList"
+  renderingType   String  @default("normal")
+  // Optional references to header/footer-type pages (same shop).
+  headerId       String?
+  footerId       String?
+  // Sticky (pinned) slots also reference reusable header/footer-type pages,
+  // so a component can be built once and reused across pages. The legacy
+  // inline `stickyHeader`/`stickyFooter` JSON columns are kept as a fallback
+  // for any page saved before the switch to references.
+  stickyHeaderId String?
+  stickyFooterId String?
+  stickyHeader   String   @default("[]") @db.Text
+  stickyFooter   String   @default("[]") @db.Text
+  description    String?  @db.Text
+  seoTitle       String?
+  seoDescription String?  @db.Text
+  ogImage        String?
+  keywords       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([shop, slug])
+  @@index([shop])
+  @@index([shop, type])
+}
+
+model Media {
+  id            String   @id @default(cuid())
+  shop          String
+  shopifyFileId String?
+  url           String
+  alt           String?
+  title         String?
+  mimeType      String?
+  createdAt     DateTime @default(now())
+
+  @@index([shop])
+}
+
+model ShopSettings {
+  id                        String   @id @default(cuid())
+  shop                      String   @unique
+  androidAppVersion         String   @default("")
+  androidPlayStoreUrl       String   @default("")
+  androidForceUpdateEnabled Boolean  @default(false)
+  iosAppVersion             String   @default("")
+  iosAppStoreUrl            String   @default("")
+  iosForceUpdateEnabled     Boolean  @default(false)
+  backgroundMusicFileUrl    String   @default("")
+  backgroundMusicUrl        String   @default("")
+  productsTabCollection     Json     @default("{}")
+  coursesTabCollection      Json     @default("{}")
+  yagnasTabCollection       Json     @default("{}")
+  yagnasTabProduct          Json     @default("{}")
+  // Today's Meditation schedule: default fallback image + dated entries.
+  todaysMeditationDefaultImageUrl String @default("")
+  todaysMeditationEntries         Json   @default("[]")
+  // Today's Affirmation schedule: default fallback image + dated entries (no audio).
+  todaysAffirmationDefaultImageUrl String @default("")
+  todaysAffirmationEntries         Json   @default("[]")
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+  bundles                   Bundles[]
+  bundlePatches             Bundle_patches[]
+}
+
+model Bundles {
+  id                      String   @id
+  shop                    String
+  platform                String
+  should_force_update     Boolean
+  enabled                 Boolean
+  file_hash               String
+  git_commit_hash         String?
+  message                 String?
+  channel                 String   @default("production")
+  storage_uri             String
+  target_app_version      String?
+  fingerprint_hash        String?
+  metadata                Json     @default("{}")
+  rollout_cohort_count    Int      @default(1000)
+  target_cohorts          Json?
+  manifest_storage_uri    String?
+  manifest_file_hash      String?
+  asset_base_storage_uri  String?
+  patches                 Bundle_patches[] @relation("Bundles")
+  basePatches             Bundle_patches[] @relation("BaseBundles")
+  shopSettings            ShopSettings?    @relation(fields: [shop], references: [shop])
+
+  @@unique([shop, id])
+  @@index([shop])
+  @@index([target_app_version])
+  @@index([fingerprint_hash])
+  @@index([channel])
+  @@index([rollout_cohort_count])
+}
+
+model Bundle_patches {
+  id                String  @id
+  shop              String
+  bundle_id         String
+  base_bundle_id    String
+  base_file_hash    String
+  patch_file_hash   String
+  patch_storage_uri String
+  order_index       Int     @default(0)
+  bundle            Bundles @relation("Bundles", fields: [shop, bundle_id], references: [shop, id], onDelete: Cascade)
+  baseBundle        Bundles @relation("BaseBundles", fields: [shop, base_bundle_id], references: [shop, id], onDelete: Cascade)
+  shopSettings      ShopSettings? @relation(fields: [shop], references: [shop])
+
+  @@unique([shop, id])
+  @@index([shop])
+  @@index([bundle_id])
+  @@index([base_bundle_id])
+}

@@ -1,0 +1,479 @@
+.cms-editor-shell {
+  min-height: calc(100vh - 4rem);
+}
+
+/* Page switcher — centered in the editor header toolbar. */
+.cms-editor-shell .builder-wrapper .editor-header {
+  position: relative;
+  z-index: 30;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 360px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 0 12px;
+  background: #f6f7f9;
+  border-bottom: 1px solid #e4e7ec;
+  overflow: visible;
+}
+
+.cms-editor-shell .builder-wrapper .fp-editor-title-row {
+  grid-column: 1;
+  justify-self: start;
+  min-width: 0;
+}
+
+.cms-editor-shell .builder-wrapper .header-center {
+  grid-column: 2;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cms-editor-shell .builder-wrapper .header-actions {
+  grid-column: 3;
+  justify-self: end;
+  min-width: 0;
+}
+
+.cms-editor-shell .builder-wrapper .page-title-input {
+  display: none !important;
+}
+
+/* Remove "+" inserter toggle — blocks list is always visible in the left panel. */
+.cms-editor-shell .toolbar-inserter-btn,
+.cms-editor-shell .builder-wrapper .toolbar-inserter-btn {
+  display: none !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  clip: rect(0, 0, 0, 0) !important;
+}
+
+/* Hide inserter close button so the widget list cannot be dismissed. */
+.cms-editor-shell
+  .builder-wrapper
+  .gbk-inserter-panel
+  .block-editor-inserter-sidebar__header
+  button {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+/* Keep the left blocks panel docked open (kit uses .left-open for layout width). */
+.cms-editor-shell .builder-wrapper .editor-layout:not(.left-open) {
+  grid-template-columns: 340px minmax(0, 1fr) 360px !important;
+}
+
+.cms-editor-shell .builder-wrapper .editor-layout:not(.left-open).split-closed {
+  grid-template-columns: 340px minmax(0, 1fr) !important;
+}
+
+.cms-page-switcher {
+  width: 100%;
+  max-width: 360px;
+}
+
+.cms-page-switcher__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #e4e7ec;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  cursor: pointer;
+  font: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.cms-page-switcher__trigger:hover,
+.cms-page-switcher.is-open .cms-page-switcher__trigger {
+  border-color: #c7d2fe;
+  background: #fff;
+  box-shadow:
+    0 4px 16px rgba(56, 88, 233, 0.1),
+    0 0 0 3px rgba(56, 88, 233, 0.08);
+}
+
+.cms-page-switcher__trigger-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cms-page-switcher__trigger-label {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #667085;
+}
+
+.cms-page-switcher__trigger-sep {
+  flex: none;
+  color: #d0d5dd;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.cms-page-switcher__trigger-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.cms-page-switcher__chevron {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  color: #667085;
+  transition: transform 0.15s ease;
+}
+
+.cms-page-switcher.is-open .cms-page-switcher__chevron {
+  transform: rotate(180deg);
+}
+
+.cms-page-switcher__menu {
+  display: flex;
+  flex-direction: column;
+  max-height: min(420px, calc(100vh - 96px));
+  border: 1px solid rgba(16, 24, 40, 0.1);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 18px 48px rgba(16, 24, 40, 0.16),
+    0 2px 8px rgba(16, 24, 40, 0.06);
+  overflow: hidden;
+  animation: cms-page-switcher-in 0.16s ease;
+}
+
+@keyframes cms-page-switcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cms-page-switcher__menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid #eef0f4;
+  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+}
+
+.cms-page-switcher__menu-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #98a2b3;
+}
+
+.cms-page-switcher__search {
+  position: relative;
+}
+
+.cms-page-switcher__search-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 12px;
+  height: 12px;
+  transform: translateY(-50%);
+  color: #98a2b3;
+  pointer-events: none;
+}
+
+.cms-page-switcher__search-input {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px 0 34px;
+  border: 1px solid #e4e7ec;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  color: #1f2937;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.cms-page-switcher__search-input:focus {
+  border-color: rgba(56, 88, 233, 0.45);
+  box-shadow: 0 0 0 3px rgba(56, 88, 233, 0.12);
+}
+
+.cms-page-switcher__list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 6px;
+}
+
+.cms-page-switcher__empty {
+  margin: 0;
+  padding: 18px 14px;
+  font-size: 13px;
+  color: #98a2b3;
+  text-align: center;
+}
+
+.cms-page-switcher__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.cms-page-switcher__item:hover {
+  background: #f8f9fb;
+}
+
+.cms-page-switcher__item.is-active {
+  background: #eef2ff;
+}
+
+.cms-page-switcher__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  color: #667085;
+  font-size: 13px;
+}
+
+.cms-page-switcher__item.is-active .cms-page-switcher__item-icon {
+  background: #dbe4ff;
+  color: #3858e9;
+}
+
+.cms-page-switcher__item-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cms-page-switcher__item-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.cms-page-switcher__item-slug {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #98a2b3;
+}
+
+.cms-page-switcher__badge {
+  flex: none;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fff4e5;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b54708;
+}
+
+.cms-page-switcher__check {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  color: #3858e9;
+}
+
+.cms-page-switcher__menu-footer {
+  border-top: 1px solid #eef0f4;
+  padding: 8px;
+  background: #fafbfc;
+}
+
+.cms-page-switcher__create {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  border: 1px dashed #d0d5dd;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3858e9;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.cms-page-switcher__create:hover {
+  background: #f5f8ff;
+  border-color: #b4c6ff;
+}
+
+.cms-page-switcher__create svg {
+  width: 11px;
+  height: 11px;
+}
+
+.cms-public-page {
+  margin: 0 auto;
+  max-width: 960px;
+}
+.builder-wrapper .editor-layout {
+  display: flex !important;
+  flex-wrap: wrap;
+}
+.builder-wrapper .editor-split-layout,
+.builder-wrapper .editor-layout > .gbk-inserter-panel {
+  max-height: 100% !important;
+}
+.builder-wrapper .editor-layout.left-open > .gbk-inserter-panel {
+  width: 350px;
+}
+.builder-wrapper .editor-layout > .editor-main {
+    width: calc(100% - 350px - 350px);
+    background-color: #e8eaef;
+}
+.builder-wrapper .editor-layout > .editor-split-layout {
+    width: 350px;
+}
+/* ---------------------------------------------------------------------------
+ * Mobile phone preview for the CMS block editor.
+ * The kit renders the center column as `.editor-canvas` (a flex column that
+ * holds the block list inline — no iframe). We constrain only that center
+ * column to a phone-sized frame and draw mobile chrome (top app bar + bottom
+ * tab bar) with ::before / ::after. The left inserter and right Style/Action
+ * sidebar keep their normal full-height layout. Scoped to `.cms-editor-shell`
+ * so nothing outside the editor is affected.
+ * ------------------------------------------------------------------------- */
+
+/* Grey backdrop around the phone, and center the frame horizontally. */
+body:has(.cms-editor-shell) {
+  height: 100vh;
+  overflow: hidden;
+}
+.cms-editor-shell .builder-wrapper .editor-canvas-wrapper {
+  background: #e9ebf0;
+  align-items: center;
+  padding: 24px 0 40px;
+  overflow: hidden !important;
+}
+/* The phone "screen" — fixed mobile width with a rounded device frame. */
+.cms-editor-shell .builder-wrapper .editor-canvas {
+  width: 390px;
+  max-width: 100%;
+  min-height: auto !important;
+  height: 83vh;
+  flex: none;
+  margin: 0 auto;
+  padding: 0;
+  align-items: stretch; /* blocks fill the mobile width (full-bleed) */
+  justify-content: flex-start;
+  background: #fff;
+  border: 1px solid #d8dadf;
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  position: relative;
+}
+.builder-wrapper .editor-canvas-wrapper .block-editor-block-list__layout {
+  overflow-y: auto !important;
+}
+/* Hide canvas "+" appenders inside riyasat blocks — use Content sidebar instead. */
+.cms-editor-shell [class$="-editor"] .block-list-appender,
+.cms-editor-shell [class$="-editor"] .block-editor-button-block-appender {
+  display: none !important;
+}
+/* Mobile top app bar: hamburger + title + search / wishlist / cart icons. */
+.cms-editor-shell  .editor-canvas::before {
+  content: "";
+  display: block;
+  flex: none;
+  height: 56px;
+  border-bottom: 1px solid #eee;
+  border-radius: 24px 24px 0 0;
+  background: #fff
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='390' height='56' viewBox='0 0 390 56'><g stroke='%231a1a2e' stroke-width='2' stroke-linecap='round' fill='none'><path d='M20 22h18M20 28h18M20 34h18'/><circle cx='300' cy='28' r='7'/><path d='M305 33l5 5'/><path d='M332 24c-2-4-9-3-9 2 0 4 9 9 9 9s9-5 9-9c0-5-7-6-9-2z'/><path d='M360 22h3l2 12h12l2-8h-15'/><circle cx='367' cy='39' r='1.4'/><circle cx='376' cy='39' r='1.4'/></g><text x='52' y='33' font-family='sans-serif' font-size='15' font-weight='700' fill='%231a1a2e'>Page Preview</text></svg>")
+    no-repeat center / cover;
+}
+
+/* Mobile bottom tab bar: home / cart / wishlist / account. */
+.cms-editor-shell .builder-wrapper .editor-canvas::after {
+  content: "";
+  display: block;
+  flex: none;
+  height: 56px;
+  margin-top: auto; /* pin to the bottom of the frame */
+  border-top: 1px solid #eee;
+  border-radius: 0 0 24px 24px;
+  background: #fff
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='390' height='56' viewBox='0 0 390 56'><g stroke='%231a1a2e' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'><path d='M41 30l8-7 8 7M43 28v9h12v-9'/><path d='M139 24h2l1.5 10h9l1.5-7h-11'/><circle cx='144' cy='38' r='1.3'/><circle cx='151' cy='38' r='1.3'/><path d='M244 25c-2-3.5-8-2.5-8 1.5 0 4 8 8.5 8 8.5s8-4.5 8-8.5c0-4-6-5-8-1.5z'/><circle cx='341' cy='25' r='4'/><path d='M334 39c0-5 3.5-7 7-7s7 2 7 7'/></g></svg>")
+    no-repeat center / cover;
+}
+
+/* Hover highlight for blocks inside preview canvas */
+.cms-editor-shell .builder-wrapper .editor-canvas .block-editor-block-list__block {
+  transition: box-shadow 0.12s ease;
+}
+
+.cms-editor-shell .builder-wrapper .editor-canvas .block-editor-block-list__block:hover,
+.cms-editor-shell .builder-wrapper .editor-canvas .block-editor-block-list__block.is-selected,
+.cms-editor-shell .builder-wrapper .editor-canvas .block-editor-block-list__block:focus-within {
+  box-shadow: inset 0 0 0 1px #3b82f6;
+}

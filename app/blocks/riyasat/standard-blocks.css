@@ -1,0 +1,268 @@
+/* Editor previews for standard / recently added blocks */
+
+.riyasat-blog-list-editor,
+.riyasat-blog-list {
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.riyasat-blog-list__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.riyasat-standard-html-editor__preview {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #374151;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.riyasat-angel-cards-editor {
+  padding: 12px;
+}
+
+.riyasat-angel-cards__track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.riyasat-angel-cards-editor .riyasat-angel-cards__track .block-editor-block-list__layout {
+  display: flex !important;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-width: min-content;
+}
+
+.riyasat-angel-card-item-editor {
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.riyasat-angel-card-item-editor__images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.riyasat-angel-card-item-editor__label {
+  margin: 0 0 6px;
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.riyasat-angel-card-item-editor__image {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+.riyasat-faqs-editor {
+  padding: 12px;
+}
+
+.riyasat-faqs__heading {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.riyasat-faq-item-editor,
+.riyasat-faq-item {
+  margin-bottom: 10px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.riyasat-faq-item__question {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.riyasat-faq-item__answer {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.riyasat-contact-us-editor,
+.riyasat-contact-us {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.riyasat-contact-us__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 13px;
+}
+
+.riyasat-contact-us__row:last-child {
+  border-bottom: none;
+}
+
+.riyasat-contact-us__label {
+  margin: 0;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.riyasat-contact-us__value {
+  margin: 0;
+  color: #111827;
+  white-space: pre-wrap;
+}
+
+.riyasat-healing-guidance-sessions-editor {
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.riyasat-healing-guidance-sessions__track {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.riyasat-healing-guidance-sessions-editor
+  .riyasat-healing-guidance-sessions__track
+  .block-editor-block-list__layout {
+  display: flex !important;
+  flex-wrap: nowrap;
+  gap: 12px;
+  min-width: min-content;
+}
+
+.riyasat-healing-guidance-session-editor {
+  min-width: 220px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.riyasat-healing-guidance-session-editor__image,
+.riyasat-healing-guidance-session__image {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.riyasat-healing-guidance-session-editor__placeholder {
+  height: 80px;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.riyasat-healing-guidance-session-editor__duration {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.riyasat-healing-guidance-session-editor__title {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.riyasat-healing-guidance-session-editor__description {
+  font-size: 12px;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.riyasat-healing-guidance-session-editor__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.riyasat-healing-guidance-session-editor__tag {
+  font-size: 11px;
+  background: #f3f4f6;
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.riyasat-healing-guidance-session-editor__healer {
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.riyasat-healing-guidance-session-editor__price {
+  font-weight: 600;
+}
+
+.riyasat-todays-meditation-editor {
+  position: relative;
+  overflow: hidden;
+  min-height: 240px;
+  border-radius: 12px;
+  background: #f3f4f6;
+}
+
+.riyasat-todays-meditation-editor__image {
+  display: block;
+  width: 100%;
+  min-height: 240px;
+  object-fit: cover;
+}
+
+.riyasat-todays-meditation-editor__placeholder {
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.riyasat-todays-meditation-editor__audio {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  width: calc(100% - 32px);
+}

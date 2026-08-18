@@ -1,0 +1,136 @@
+.riyasat-product-scroller-editor {
+  overflow: hidden;
+}
+
+.riyasat-product-scroller {
+  --riyasat-product-scroller-accent: var(--riyasat-accent);
+  --riyasat-product-scroller-card-width: calc((100% - 20px) / 1.5);
+  --riyasat-product-scroller-image-height: 260px;
+  padding: 40px 15px;
+}
+
+.riyasat-product-scroller__heading {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Subtitle — smaller, uppercase */
+.riyasat-product-scroller__title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* Title — larger, preserves user casing */
+.riyasat-product-scroller__subtitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #000;
+  text-transform: none;
+}
+
+.riyasat-product-scroller__track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 0;
+}
+
+.riyasat-product-scroller__card {
+  flex: 0 0 var(--riyasat-product-scroller-card-width);
+  min-width: var(--riyasat-product-scroller-card-width);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  scroll-snap-align: start;
+  box-sizing: border-box;
+}
+
+.riyasat-product-scroller__card-image {
+  display: block;
+  width: 100%;
+  height: var(--riyasat-product-scroller-image-height);
+  border-radius: 10px;
+  background: #e9e9ef;
+  object-fit: cover;
+}
+
+.riyasat-product-scroller__card-image--photo {
+  background: #f3f3f6;
+}
+
+.riyasat-product-scroller__card-body {
+  padding: 0 2px;
+}
+
+.riyasat-product-scroller__card-line {
+  height: 10px;
+  border-radius: 4px;
+  background: #e0e0e6;
+}
+
+.riyasat-product-scroller__card-line--short {
+  width: 62%;
+  margin-top: 8px;
+}
+
+.riyasat-product-scroller__card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #000;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.riyasat-product-scroller__card-price {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #333;
+}
+
+.riyasat-product-scroller__button-wrap {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.riyasat-product-scroller__button {
+  display: block;
+  width: 100%;
+  padding: 14px 24px;
+  border: 1px solid #1a1a2e;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: #1a1a2e;
+  background: #fff;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* Published page */
+.riyasat-product-scroller:not(.riyasat-product-scroller-editor) .riyasat-product-scroller__track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  width: 100%;
+  max-width: 100%;
+}
