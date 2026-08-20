@@ -10,9 +10,14 @@ const API_BASE = "/hot-updater/api";
 // Shopify admin, then forwards the request to the /hot-updater/api/*
 // management routes with the server-held MANAGEMENT_TOKEN injected. The
 // token never reaches the browser.
+//
+// `shop` is the authenticated session's shop (from authenticate.admin) and is
+// passed EXPLICITLY into the handler — never read from a client header — so
+// the dashboard can only ever touch its own shop's bundles on the shared DB.
 async function proxyRequest(
   request: Request,
   splat: string | undefined,
+  shop: string,
 ): Promise<Response> {
   const url = new URL(request.url);
   url.pathname = splat ? `${API_BASE}/${splat}` : API_BASE;
@@ -25,15 +30,15 @@ async function proxyRequest(
     init.body = await request.arrayBuffer();
   }
 
-  return handleOtaRequest(new Request(url, init));
+  return handleOtaRequest(new Request(url, init), { shop });
 }
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
-  return proxyRequest(request, params["*"]);
+  const { session } = await authenticate.admin(request);
+  return proxyRequest(request, params["*"], session.shop);
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
-  await authenticate.admin(request);
-  return proxyRequest(request, params["*"]);
+  const { session } = await authenticate.admin(request);
+  return proxyRequest(request, params["*"], session.shop);
 };

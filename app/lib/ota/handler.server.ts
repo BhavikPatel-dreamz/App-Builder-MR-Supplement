@@ -1,4 +1,6 @@
-import { hotUpdater } from "./hotUpdaterInstance.server";
+import { getScopedHotUpdater } from "./hotUpdaterInstance.server";
+import { db } from "./db.server";
+import { env } from "./env.server";
 import { requireManagementToken } from "./auth.server";
 import {
   assertSafeKey,
@@ -11,6 +13,7 @@ const BASE_PATH = "/hot-updater";
 const FILES_PREFIX = "/files/";
 const STORAGE_PATHS = new Set(["/upload", "/delete", "/readText", "/getDownloadUrl"]);
 const UPDATE_CHECK_RE = /^\/(app-version|fingerprint)\//;
+const CREATE_BUNDLE_RE = /^\/api\/bundles\/?$/;
 
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
@@ -23,6 +26,30 @@ function withCors(response: Response): Response {
   headers.set("Access-Control-Allow-Origin", "*");
   headers.set("Vary", "Origin");
   return new Response(response.body, { status: response.status, headers });
+}
+
+function jsonResponse(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+/**
+ * The bundles/bundle_patches FK to ShopSettings(shop) means a bundle can only
+ * be created for a shop that has already been installed (has a settings row).
+ * Checked up front on bundle-create so a misconfigured OTA_SHOP surfaces as a
+ * clear 409 instead of an opaque "bundles_shop_fkey" 500 from deep inside the
+ * library. Uses the unscoped db: ShopSettings is not a tenant table and the
+ * shop is filtered explicitly here.
+ */
+async function shopIsInitialized(shop: string): Promise<boolean> {
+  const row = await db
+    .selectFrom("ShopSettings")
+    .select("shop")
+    .where("shop", "=", shop)
+    .executeTakeFirst();
+  return Boolean(row);
 }
 
 /**
@@ -80,12 +107,22 @@ async function handleFileServe(rawKey: string): Promise<Response> {
 }
 
 /**
- * Dispatches a /hot-updater/* request: bearer-authed management + storage
- * routes handled here, everything else (update-check, bundle CRUD) delegated
- * to @hot-updater/server's fetch handler. Used directly by the catch-all
- * route and by the authenticated dashboard proxy.
+ * Dispatches a /hot-updater/* request. Bearer-authed management + storage
+ * routes are handled here; the DB-backed routes (bundle CRUD + update-check)
+ * are delegated to a PER-SHOP @hot-updater/server instance so the shared
+ * database stays isolated by shop.
+ *
+ * The shop is resolved from `opts.shop` (the embedded dashboard passes the
+ * authenticated session shop — never a client header) and falls back to
+ * OTA_SHOP (CLI uploads + device update-checks). DB routes are fail-closed:
+ * with no shop resolved they return 400 rather than touching the database.
+ * Storage byte routes (/upload, /files/* …) are content-addressed and stay
+ * shop-agnostic.
  */
-export async function handleOtaRequest(request: Request): Promise<Response> {
+export async function handleOtaRequest(
+  request: Request,
+  opts?: { shop?: string },
+): Promise<Response> {
   const path = new URL(request.url).pathname;
   const subPath = path.startsWith(BASE_PATH)
     ? path.slice(BASE_PATH.length) || "/"
@@ -108,14 +145,39 @@ export async function handleOtaRequest(request: Request): Promise<Response> {
     if (authError) return withCors(authError);
   }
 
-  let response: Response;
+  // Storage byte operations touch the filesystem, not the tenant tables, so
+  // they run unscoped and need no shop.
   if (STORAGE_PATHS.has(subPath)) {
-    response = await handleStorageRequest(request, subPath);
-  } else {
-    response = await hotUpdater.handler(request);
-    if (UPDATE_CHECK_RE.test(subPath)) {
-      await logUpdateCheck(subPath, response);
+    return withCors(await handleStorageRequest(request, subPath));
+  }
+
+  // Everything else (bundle CRUD + update-check) hits the shared bundles /
+  // bundle_patches tables and MUST be shop-scoped.
+  const shop = (opts?.shop ?? env.otaShop).trim();
+  if (!shop) {
+    return withCors(
+      jsonResponse(400, {
+        error:
+          "OTA shop could not be resolved. The embedded dashboard uses the authenticated shop; CLI uploads and device update-checks require OTA_SHOP to be set to this app's *.myshopify.com domain.",
+      }),
+    );
+  }
+
+  // Fail with a clear message (not an opaque FK 500) when the shop has no
+  // ShopSettings row yet.
+  if (request.method === "POST" && CREATE_BUNDLE_RE.test(subPath)) {
+    if (!(await shopIsInitialized(shop))) {
+      return withCors(
+        jsonResponse(409, {
+          error: `Shop "${shop}" has no ShopSettings row yet. Open the app once for this shop so its settings are created, then retry the bundle upload.`,
+        }),
+      );
     }
+  }
+
+  const response = await getScopedHotUpdater(shop).handler(request);
+  if (UPDATE_CHECK_RE.test(subPath)) {
+    await logUpdateCheck(subPath, response);
   }
 
   return withCors(response);

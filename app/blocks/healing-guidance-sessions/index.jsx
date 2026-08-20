@@ -44,6 +44,10 @@ const DEFAULT_SESSION_SUPPORTS = [
   'Finding calm, reassurance, and inner alignment',
   'Reconnecting with your intuition and higher wisdom',
 ];
+const DEFAULT_BUTTON = {
+  buttonText: 'Book a Session',
+  action: {},
+};
 
 function HealingSessionsIcon() {
   return (
@@ -65,6 +69,21 @@ function HealingSessionsIcon() {
 
 function asStringArray(value, fallback = []) {
   return Array.isArray(value) ? value : fallback;
+}
+
+function normalizeButton(value) {
+  const source =
+    value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  return {
+    buttonText:
+      typeof source.buttonText === 'string' && source.buttonText.trim()
+        ? source.buttonText
+        : DEFAULT_BUTTON.buttonText,
+    action:
+      source.action && typeof source.action === 'object' && !Array.isArray(source.action)
+        ? source.action
+        : {},
+  };
 }
 
 function StringRepeater({
@@ -148,6 +167,7 @@ function registerHealingGuidanceSession() {
         default: DEFAULT_SESSION_SUPPORTS_TITLE,
       },
       sessionSupports: { type: 'array', default: DEFAULT_SESSION_SUPPORTS },
+      button: { type: 'object', default: DEFAULT_BUTTON },
       action: { type: 'object', default: {} },
     },
 
@@ -162,11 +182,13 @@ function registerHealingGuidanceSession() {
         price,
         sessionSupportsTitle,
         sessionSupports,
+        button,
         action,
       } = attributes;
 
       const tagItems = asStringArray(tags, DEFAULT_TAGS);
       const supportItems = asStringArray(sessionSupports, DEFAULT_SESSION_SUPPORTS);
+      const sessionButton = normalizeButton(button);
 
       const blockProps = useBlockProps({
         className: 'riyasat-healing-guidance-session-editor',
@@ -270,6 +292,30 @@ function registerHealingGuidanceSession() {
                   addLabel="Add support"
                   itemLabelPrefix="Support"
                 />
+                <TextControl
+                  label="Button text"
+                  value={sessionButton.buttonText}
+                  onChange={(value) =>
+                    setAttributes({
+                      button: {
+                        ...sessionButton,
+                        buttonText: value,
+                      },
+                    })
+                  }
+                />
+                <ActionBuilder
+                  label="Button action"
+                  value={sessionButton.action ?? {}}
+                  onChange={(next) =>
+                    setAttributes({
+                      button: {
+                        ...sessionButton,
+                        action: next ?? {},
+                      },
+                    })
+                  }
+                />
                 <ActionBuilder
                   label="Action"
                   value={action ?? {}}
@@ -317,6 +363,11 @@ function registerHealingGuidanceSession() {
             <div className="riyasat-healing-guidance-session-editor__price">
               {price || DEFAULT_PRICE}
             </div>
+            {sessionButton.buttonText ? (
+              <span className="riyasat-healing-guidance-session-editor__button">
+                {sessionButton.buttonText}
+              </span>
+            ) : null}
           </div>
         </>
       );
@@ -335,11 +386,13 @@ function registerHealingGuidanceSession() {
         price,
         sessionSupportsTitle,
         sessionSupports,
+        button,
         action,
       } = attributes;
 
       const tagItems = asStringArray(tags);
       const supportItems = asStringArray(sessionSupports);
+      const sessionButton = normalizeButton(button);
 
       const blockProps = useBlockProps.save({
         className: 'riyasat-healing-guidance-session',
@@ -347,6 +400,7 @@ function registerHealingGuidanceSession() {
         'data-image-height': `${imageHeight || 0}`,
         'data-tags': JSON.stringify(tagItems),
         'data-session-supports': JSON.stringify(supportItems),
+        'data-button': JSON.stringify(sessionButton),
         'data-action': JSON.stringify(action ?? {}),
       });
 
@@ -400,6 +454,14 @@ function registerHealingGuidanceSession() {
                 <li key={`support-${index}`}>{item}</li>
               ))}
             </ul>
+          ) : null}
+          {sessionButton.buttonText ? (
+            <span
+              className="riyasat-healing-guidance-session__button"
+              data-action={JSON.stringify(sessionButton.action ?? {})}
+            >
+              {sessionButton.buttonText}
+            </span>
           ) : null}
         </div>
       );

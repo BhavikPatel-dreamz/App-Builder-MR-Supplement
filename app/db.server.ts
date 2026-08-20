@@ -5,7 +5,7 @@ declare global {
   var prismaGlobal: PrismaClient | undefined;
 }
 
-const PRISMA_DELEGATES = ["session", "page", "media", "shopSettings", "bundles", "bundle_patches"] as const;
+const PRISMA_DELEGATES = ["session", "page", "media", "shopSettings"] as const;
 
 function isStalePrismaClient(client: PrismaClient): boolean {
   return PRISMA_DELEGATES.some((name) => !(name in client));

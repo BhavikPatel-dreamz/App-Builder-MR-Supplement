@@ -29,6 +29,12 @@ export const env = {
   storageDir: path.resolve(
     process.env.OTA_STORAGE_DIR ?? path.join(process.cwd(), "data/ota"),
   ),
+  // The *.myshopify.com domain this deployment's OTA belongs to. The Hot
+  // Updater tables live in a Postgres database shared by several Shopify apps,
+  // so bundle rows must be tagged and filtered by shop. The embedded dashboard
+  // scopes to the authenticated session's shop; CLI uploads and device
+  // update-checks (which have no session) use this value instead.
+  otaShop: (process.env.OTA_SHOP ?? "").trim(),
 };
 
 if (!env.managementToken) {
@@ -40,5 +46,11 @@ if (!env.managementToken) {
 if (!env.databaseUrl) {
   console.warn(
     "[ota] DATABASE_URL is not set — every database query will fail. Set it to your Neon pooled connection string.",
+  );
+}
+
+if (!env.otaShop) {
+  console.warn(
+    "[ota] OTA_SHOP is not set — CLI bundle uploads and device update-checks will be rejected until it is set to this app's *.myshopify.com domain. (The embedded dashboard is unaffected; it uses the authenticated shop.)",
   );
 }

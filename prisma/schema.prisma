@@ -7,6 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Media {
+  id            String   @id @default(cuid())
+  shop          String
+  shopifyFileId String?
+  url           String
+  alt           String?
+  title         String?
+  mimeType      String?
+  createdAt     DateTime @default(now())
+
+  @@index([shop])
+}
+
+model Page {
+  id              String   @id @default(cuid())
+  shop            String
+  title           String
+  slug            String
+  html            String
+  json            String
+  status          String   @default("draft")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  description     String?
+  keywords        String?
+  ogImage         String?
+  seoDescription  String?
+  seoTitle        String?
+  type            String   @default("page")
+  hideHeader      Boolean  @default(false)
+  showPageTitle   Boolean  @default(true)
+  backgroundColor String   @default("#ffffff")
+  renderingType   String   @default("normal")
+  headerId        String?
+  footerId        String?
+  stickyHeader    String   @default("[]")
+  stickyFooter    String   @default("[]")
+  stickyHeaderId  String?
+  stickyFooterId  String?
+
+  @@unique([shop, slug])
+  @@index([shop])
+  @@index([shop, type])
+}
+
 model Session {
   id                  String    @id
   shop                String
@@ -21,119 +66,35 @@ model Session {
   email               String?
   accountOwner        Boolean   @default(false)
   locale              String?
-  collaborator        Boolean   @default(false)
-  emailVerified       Boolean   @default(false)
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
   refreshToken        String?
   refreshTokenExpires DateTime?
 }
 
-model Page {
-  id              String   @id @default(cuid())
-  shop            String
-  title           String
-  slug            String
-  html            String
-  json            String
-  status          String
-  createdAt       DateTime
-  updatedAt       DateTime @updatedAt
-  description     String?
-  keywords        String?
-  ogImage         String?
-  seoDescription  String?
-  seoTitle        String?
-  type            String
-  hideHeader      Boolean
-  showPageTitle   Boolean
-  backgroundColor String?
-  renderingType   String?
-  headerId        String?
-  footerId        String?
-  stickyHeader    String?
-  stickyFooter    String?
-  stickyHeaderId  String?
-  stickyFooterId  String?
-}
-
-model Media {
-  id            String   @id @default(cuid())
-  shop          String
-  shopifyFileId String
-  url           String
-  alt           String?
-  title         String?
-  mimeType      String?
-  createdAt     DateTime
-}
-
 model ShopSettings {
-  id                               String   @id @default(cuid())
-  shop                             String   @unique
-  androidAppVersion                String   @default("")
-  androidPlayStoreUrl              String   @default("")
-  androidForceUpdateEnabled        Boolean  @default(false)
-  iosAppVersion                    String   @default("")
-  iosAppStoreUrl                   String   @default("")
-  iosForceUpdateEnabled            Boolean  @default(false)
-  backgroundMusicFileUrl           String   @default("")
-  backgroundMusicUrl               String   @default("")
-  createdAt                        DateTime
-  updatedAt                        DateTime @updatedAt
-  productsTabCollection            Json     @default("{}")
-  coursesTabCollection             Json     @default("{}")
-  yagnasTabCollection              Json     @default("{}")
-  yagnasTabProduct                 Json     @default("{}")
-  todaysMeditationDefaultImageUrl  String   @default("")
-  todaysMeditationEntries          Json     @default("[]")
-  todaysAffirmationDefaultImageUrl String   @default("")
-  todaysAffirmationEntries         Json     @default("[]")
+  id                               String           @id @default(cuid())
+  shop                             String           @unique
+  androidAppVersion                String           @default("")
+  androidPlayStoreUrl              String           @default("")
+  androidForceUpdateEnabled        Boolean          @default(false)
+  iosAppVersion                    String           @default("")
+  iosAppStoreUrl                   String           @default("")
+  iosForceUpdateEnabled            Boolean          @default(false)
+  backgroundMusicFileUrl           String           @default("")
+  backgroundMusicUrl               String           @default("")
+  createdAt                        DateTime         @default(now())
+  updatedAt                        DateTime         @updatedAt
+  productsTabCollection            Json             @default("{}")
+  coursesTabCollection             Json             @default("{}")
+  yagnasTabCollection              Json             @default("{}")
+  yagnasTabProduct                 Json             @default("{}")
+  todaysMeditationDefaultImageUrl  String           @default("")
+  todaysMeditationEntries          Json             @default("[]")
+  todaysAffirmationDefaultImageUrl String           @default("")
+  todaysAffirmationEntries         Json             @default("[]")
+  bundle_patches                   bundle_patches[]
   bundles                          bundles[]
-  bundlePatches                    bundle_patches[]
-}
-
-model Invitation {
-  id                                   String            @id
-  name                                 String
-  email                                String
-  role                                 UserRole
-  purpose                              InvitationPurpose @default(INVITE)
-  status                               InvitationStatus  @default(PENDING)
-  tokenHash                            String            @unique
-  expiresAt                            DateTime
-  sentAt                               DateTime          @default(now())
-  acceptedAt                           DateTime?
-  cancelledAt                          DateTime?
-  invitedById                          String
-  acceptedUserId                       String?
-  createdAt                            DateTime          @default(now())
-  updatedAt                            DateTime          @default(now())
-  User_Invitation_acceptedUserIdToUser User?             @relation("Invitation_acceptedUserIdToUser", fields: [acceptedUserId], references: [id])
-  User_Invitation_invitedByIdToUser    User              @relation("Invitation_invitedByIdToUser", fields: [invitedById], references: [id])
-
-  @@index([email])
-  @@index([invitedById])
-  @@index([status, expiresAt])
-}
-
-model Shop {
-  id             String    @id
-  shopDomain     String    @unique
-  shopName       String?
-  ownerName      String?
-  email          String?
-  country        String?
-  planName       String?
-  accessToken    String?
-  scopes         String?
-  isActive       Boolean   @default(true)
-  installedAt    DateTime  @default(now())
-  uninstalledAt  DateTime?
-  lastAccessedAt DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @default(now())
-
-  @@index([installedAt])
-  @@index([isActive])
 }
 
 model TempUploadChunk {
@@ -152,111 +113,74 @@ model TempUploadChunk {
   @@index([uploadId])
 }
 
-model User {
-  id                                         String       @id
-  name                                       String
-  email                                      String       @unique
-  passwordHash                               String
-  role                                       UserRole
-  isActive                                   Boolean      @default(true)
-  createdAt                                  DateTime     @default(now())
-  updatedAt                                  DateTime
-  lastLoginAt                                DateTime?
-  supportCanInvite                           Boolean      @default(false)
-  sessionVersion                             Int          @default(0)
-  Invitation_Invitation_acceptedUserIdToUser Invitation[] @relation("Invitation_acceptedUserIdToUser")
-  Invitation_Invitation_invitedByIdToUser    Invitation[] @relation("Invitation_invitedByIdToUser")
-}
-
 model bundle_patches {
-  id                                             String  @id @db.VarChar(255)
-  shop                                           String
-  bundle_id                                      String  @db.Uuid
-  base_bundle_id                                 String  @db.Uuid
-  base_file_hash                                 String
-  patch_file_hash                                String
-  patch_storage_uri                              String
-  order_index                                    Int     @default(0)
-  bundles_bundle_patches_base_bundle_idTobundles bundles @relation("bundle_patches_base_bundle_idTobundles", fields: [base_bundle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bundle_patches_base_bundle_id_fk")
-  bundles_bundle_patches_bundle_idTobundles      bundles @relation("bundle_patches_bundle_idTobundles", fields: [bundle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bundle_patches_bundle_id_fk")
-  shopSettings                                   ShopSettings? @relation(fields: [shop], references: [shop])
+  id                                                  String       @id @db.VarChar(255)
+  bundle_id                                           String       @db.Uuid
+  base_bundle_id                                      String       @db.Uuid
+  base_file_hash                                      String
+  patch_file_hash                                     String
+  patch_storage_uri                                   String
+  order_index                                         Int          @default(0)
+  shop                                                String       @default("")
+  bundles_bundle_patches_base_bundle_idTobundles      bundles      @relation("bundle_patches_base_bundle_idTobundles", fields: [base_bundle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bundle_patches_base_bundle_id_fk")
+  bundles_bundle_patches_bundle_idTobundles           bundles      @relation("bundle_patches_bundle_idTobundles", fields: [bundle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bundle_patches_bundle_id_fk")
+  bundles_bundle_patches_shop_base_bundle_idTobundles bundles      @relation("bundle_patches_shop_base_bundle_idTobundles", fields: [shop, base_bundle_id], references: [shop, id], onDelete: Cascade)
+  bundles_bundle_patches_shop_bundle_idTobundles      bundles      @relation("bundle_patches_shop_bundle_idTobundles", fields: [shop, bundle_id], references: [shop, id], onDelete: Cascade)
+  ShopSettings                                        ShopSettings @relation(fields: [shop], references: [shop])
 
   @@unique([shop, id])
-  @@index([shop])
   @@index([base_bundle_id])
   @@index([bundle_id])
+  @@index([shop])
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model bundles {
-  id                                                    String           @id @db.Uuid
-  shop                                                  String
-  platform                                              String
-  should_force_update                                   Boolean
-  enabled                                               Boolean
-  file_hash                                             String
-  git_commit_hash                                       String?
-  message                                               String?
-  channel                                               String           @default("production")
-  storage_uri                                           String
-  target_app_version                                    String?
-  fingerprint_hash                                      String?
-  metadata                                              Json             @default("{}") @db.Json
-  rollout_cohort_count                                  Int              @default(1000)
-  target_cohorts                                        Json?            @db.Json
-  manifest_storage_uri                                  String?
-  manifest_file_hash                                    String?
-  asset_base_storage_uri                                String?
-  bundle_patches_bundle_patches_base_bundle_idTobundles bundle_patches[] @relation("bundle_patches_base_bundle_idTobundles")
-  bundle_patches_bundle_patches_bundle_idTobundles      bundle_patches[] @relation("bundle_patches_bundle_idTobundles")
-  shopSettings                                          ShopSettings?    @relation(fields: [shop], references: [shop])
+  id                                                         String           @id @db.Uuid
+  platform                                                   String
+  should_force_update                                        Boolean
+  enabled                                                    Boolean
+  file_hash                                                  String
+  git_commit_hash                                            String?
+  message                                                    String?
+  channel                                                    String           @default("production")
+  storage_uri                                                String
+  target_app_version                                         String?
+  fingerprint_hash                                           String?
+  metadata                                                   Json             @default("{}") @db.Json
+  rollout_cohort_count                                       Int              @default(1000)
+  target_cohorts                                             Json?            @db.Json
+  manifest_storage_uri                                       String?
+  manifest_file_hash                                         String?
+  asset_base_storage_uri                                     String?
+  shop                                                       String           @default("")
+  bundle_patches_bundle_patches_base_bundle_idTobundles      bundle_patches[] @relation("bundle_patches_base_bundle_idTobundles")
+  bundle_patches_bundle_patches_bundle_idTobundles           bundle_patches[] @relation("bundle_patches_bundle_idTobundles")
+  bundle_patches_bundle_patches_shop_base_bundle_idTobundles bundle_patches[] @relation("bundle_patches_shop_base_bundle_idTobundles")
+  bundle_patches_bundle_patches_shop_bundle_idTobundles      bundle_patches[] @relation("bundle_patches_shop_bundle_idTobundles")
+  ShopSettings                                               ShopSettings     @relation(fields: [shop], references: [shop])
 
   @@unique([shop, id])
-  @@index([shop])
   @@index([channel])
   @@index([fingerprint_hash])
   @@index([rollout_cohort_count], map: "bundles_rollout_idx")
+  @@index([shop])
   @@index([target_app_version])
 }
 
 model force_update_config {
   shop                        String   @id
-  android_app_version         String?
-  android_store_url           String?
-  android_enable_force_update Boolean
-  ios_app_version             String?
-  ios_store_url               String?
-  ios_enable_force_update     Boolean
-  created_at                  DateTime
-  updated_at                  DateTime
+  android_app_version         String   @default("")
+  android_store_url           String   @default("")
+  android_enable_force_update Boolean  @default(false)
+  ios_app_version             String   @default("")
+  ios_store_url               String   @default("")
+  ios_enable_force_update     Boolean  @default(false)
+  created_at                  DateTime @default(now())
+  updated_at                  DateTime @default(now())
 }
 
 model private_hot_updater_settings {
   key   String @id @db.VarChar(255)
   value String @default("0.31.0")
-}
-
-model settings {
-  shop      String   @unique
-  settings  Json     @default("{}")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-}
-
-enum InvitationPurpose {
-  INVITE
-  PASSWORD_RESET
-}
-
-enum InvitationStatus {
-  PENDING
-  ACCEPTED
-  EXPIRED
-  CANCELLED
-}
-
-enum UserRole {
-  ADMIN
-  SUPPORT
 }
