@@ -93,6 +93,8 @@ model ShopSettings {
   todaysMeditationEntries          Json             @default("[]")
   todaysAffirmationDefaultImageUrl String           @default("")
   todaysAffirmationEntries         Json             @default("[]")
+  tabBackgroundColor               String           @default("#ffffff")
+  bottomTabs                       Json             @default("[]")
   bundle_patches                   bundle_patches[]
   bundles                          bundles[]
 }
