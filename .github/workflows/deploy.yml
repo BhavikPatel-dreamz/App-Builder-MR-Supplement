@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  VPS_APP_PATH: "/var/www/html/App-Builder"
+  VPS_APP_PATH: "/var/www/html/App-Builder-Supplement"
   PM2_PROCESS_NAME: "App-Builder-Supplement"
   
 jobs:
