@@ -2,7 +2,7 @@
 
 client_id = "10c2ab08d8b0e48ea49842bb978146fa"
 name = "App Builder MR-Supplement"
-application_url = https://appbuilder.dreamzapps.com"
+application_url = "https://appbuilder.dreamzapps.com"
 embedded = true
 
 [build]
