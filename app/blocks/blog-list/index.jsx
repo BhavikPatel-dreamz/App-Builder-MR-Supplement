@@ -1,119 +1,205 @@
 // @ts-nocheck
-// Blogs List — single block (standard/blog-list).
-import { registerBlockType } from 'gutenberg-block-kit/wp/blocks';
+import { registerBlockType } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
   InspectorControls,
   PanelColorSettings,
-} from 'gutenberg-block-kit/wp/block-editor';
-import { PanelBody, TextControl } from 'gutenberg-block-kit/wp/components';
-import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_BLOG_LIST_BLOCK, APPBUILDER_CATEGORY } from '../constants';
+} from "gutenberg-block-kit/wp/block-editor";
+import { PanelBody, TextControl } from "gutenberg-block-kit/wp/components";
+import { ActionBuilder } from "gutenberg-block-kit/actions";
+import { BLOG_LIST_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
-const DEFAULT_BACKGROUND_COLOR = '#ffffff';
-const DEFAULT_TITLE = 'Blogs & Insights';
+const DEFAULT_TITLE = "Blogs & Insights";
+const DEFAULT_BUTTON = "VIEW ALL";
+const DEFAULT_BG = "#ffffff";
+const DEFAULT_TEXT = "#ffffff";
+const DEFAULT_TITLE_SIZE = 12;
+const DEFAULT_BUTTON_SIZE = 10;
+const DEFAULT_RADIUS = 10;
+const DEFAULT_BORDER_WIDTH = 2;
+const DEFAULT_BORDER = "#ffffff";
 
-function BlogListIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v12h14V6H5zm2 2h10v2H7V8zm0 4h10v2H7v-2zm0 4h7v2H7v-2z"
-      />
-    </svg>
-  );
+function toNumber(value, fallback) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-export function registerStandardBlogList() {
-  registerBlockType(STANDARD_BLOG_LIST_BLOCK, {
+export function registerBlogList() {
+  registerBlockType(BLOG_LIST_BLOCK, {
     apiVersion: 3,
-    title: 'Blogs List',
-    description: 'Blogs list section with title, background color and action.',
+    title: "Blogs List",
     category: APPBUILDER_CATEGORY,
-    icon: BlogListIcon,
-    supports: { html: false, align: ['wide', 'full'] },
+    icon: "list-view",
+    supports: { html: false, align: ["wide", "full"] },
     attributes: {
-      backgroundColor: { type: 'string', default: DEFAULT_BACKGROUND_COLOR },
-      title: { type: 'string', default: DEFAULT_TITLE },
-      action: { type: 'object', default: {} },
+      backgroundColor: { type: "string", default: DEFAULT_BG },
+      title: { type: "string", default: DEFAULT_TITLE },
+      buttonText: { type: "string", default: DEFAULT_BUTTON },
+      buttonTextColor: { type: "string", default: DEFAULT_TEXT },
+      buttonFontSize: { type: "number", default: DEFAULT_BUTTON_SIZE },
+      titleTextColor: { type: "string", default: DEFAULT_TEXT },
+      titleFontSize: { type: "number", default: DEFAULT_TITLE_SIZE },
+      buttonBorderRadius: { type: "number", default: DEFAULT_RADIUS },
+      buttonBorderColor: { type: "string", default: DEFAULT_BORDER },
+      buttonBorderWidth: { type: "number", default: DEFAULT_BORDER_WIDTH },
+      action: { type: "object", default: {} },
     },
-
     edit: ({ attributes, setAttributes }) => {
-      const { backgroundColor, title, action } = attributes;
+      const {
+        backgroundColor,
+        title,
+        buttonText,
+        buttonTextColor,
+        buttonFontSize,
+        titleTextColor,
+        titleFontSize,
+        buttonBorderRadius,
+        buttonBorderColor,
+        buttonBorderWidth,
+        action,
+      } = attributes;
+      const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
+      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
+      const radius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
+      const borderW = toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH);
       const blockProps = useBlockProps({
-        className: 'appbuilder-blog-list-editor',
-        style: {
-          background: backgroundColor || DEFAULT_BACKGROUND_COLOR,
-          padding: '16px',
-        },
+        className: "appbuilder-blog-list-editor",
+        style: { minHeight: "8px" },
       });
 
       return (
         <>
-          <InspectorControls group="content">
-            <div style={contentTabStyle}>
-              <PanelBody title="Blogs List" initialOpen={true}>
-                <TextControl
-                  label="Title"
-                  value={title}
-                  onChange={(value) => setAttributes({ title: value })}
-                />
-                <ActionBuilder
-                  label="Action"
-                  value={action ?? {}}
-                  onChange={(next) => setAttributes({ action: next })}
-                />
-              </PanelBody>
-            </div>
-          </InspectorControls>
-
           <InspectorControls>
+            <PanelBody title="Blogs List" initialOpen>
+              <TextControl
+                label="Title"
+                value={title}
+                onChange={(value) => setAttributes({ title: value })}
+              />
+              <TextControl
+                label="Button Text"
+                value={buttonText}
+                onChange={(value) => setAttributes({ buttonText: value })}
+              />
+              <TextControl
+                label="Title Font Size"
+                type="number"
+                value={titleSize}
+                onChange={(value) =>
+                  setAttributes({
+                    titleFontSize: toNumber(value, DEFAULT_TITLE_SIZE),
+                  })
+                }
+              />
+              <TextControl
+                label="Button Font Size"
+                type="number"
+                value={btnSize}
+                onChange={(value) =>
+                  setAttributes({
+                    buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
+                  })
+                }
+              />
+              <TextControl
+                label="Button Border Radius"
+                type="number"
+                value={radius}
+                onChange={(value) =>
+                  setAttributes({
+                    buttonBorderRadius: toNumber(value, DEFAULT_RADIUS),
+                  })
+                }
+              />
+              <TextControl
+                label="Button Border Width"
+                type="number"
+                value={borderW}
+                onChange={(value) =>
+                  setAttributes({
+                    buttonBorderWidth: toNumber(value, DEFAULT_BORDER_WIDTH),
+                  })
+                }
+              />
+              <ActionBuilder
+                label="Action"
+                value={action ?? {}}
+                onChange={(next) => setAttributes({ action: next })}
+              />
+            </PanelBody>
             <PanelColorSettings
               title="Colors"
               colorSettings={[
                 {
-                  label: 'Background color',
-                  value: backgroundColor || DEFAULT_BACKGROUND_COLOR,
+                  label: "Background Color",
+                  value: backgroundColor || DEFAULT_BG,
+                  onChange: (value) =>
+                    setAttributes({ backgroundColor: value || DEFAULT_BG }),
+                },
+                {
+                  label: "Title Text Color",
+                  value: titleTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
+                },
+                {
+                  label: "Button Text Color",
+                  value: buttonTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
+                },
+                {
+                  label: "Button Border Color",
+                  value: buttonBorderColor || DEFAULT_BORDER,
                   onChange: (value) =>
                     setAttributes({
-                      backgroundColor: value || DEFAULT_BACKGROUND_COLOR,
+                      buttonBorderColor: value || DEFAULT_BORDER,
                     }),
                 },
               ]}
             />
           </InspectorControls>
-
-          <div {...blockProps}>
-            <h3 className="appbuilder-blog-list__title" style={{ margin: 0 }}>
-              {title || DEFAULT_TITLE}
-            </h3>
-          </div>
+          <div {...blockProps} />
         </>
       );
     },
-
     save: ({ attributes }) => {
-      const { backgroundColor, title, action } = attributes;
+      const {
+        backgroundColor,
+        title,
+        buttonText,
+        buttonTextColor,
+        buttonFontSize,
+        titleTextColor,
+        titleFontSize,
+        buttonBorderRadius,
+        buttonBorderColor,
+        buttonBorderWidth,
+        action,
+      } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'appbuilder-blog-list',
-        'data-background-color': backgroundColor || DEFAULT_BACKGROUND_COLOR,
-        'data-action': JSON.stringify(action ?? {}),
-        style: { background: backgroundColor || DEFAULT_BACKGROUND_COLOR },
+        className: "appbuilder-blog-list",
+        "data-background-color": backgroundColor || DEFAULT_BG,
+        "data-title": title ?? "",
+        "data-button-text": buttonText ?? "",
+        "data-button-text-color": buttonTextColor || DEFAULT_TEXT,
+        "data-button-font-size": String(
+          toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
+        ),
+        "data-title-text-color": titleTextColor || DEFAULT_TEXT,
+        "data-title-font-size": String(
+          toNumber(titleFontSize, DEFAULT_TITLE_SIZE),
+        ),
+        "data-button-border-radius": String(
+          toNumber(buttonBorderRadius, DEFAULT_RADIUS),
+        ),
+        "data-button-border-color": buttonBorderColor || DEFAULT_BORDER,
+        "data-button-border-width": String(
+          toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH),
+        ),
+        "data-action": JSON.stringify(action ?? {}),
       });
-
-      return (
-        <div {...blockProps}>
-          {title ? <h3 className="appbuilder-blog-list__title">{title}</h3> : null}
-        </div>
-      );
+      return <div {...blockProps} />;
     },
   });
 }

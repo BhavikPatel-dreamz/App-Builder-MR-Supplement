@@ -17,15 +17,17 @@ import { registerStandardVideo } from "./video";
 import { registerStandardSpacer } from "./spacer";
 import { registerStandardSelectedProducts } from "./selected-products";
 import { registerStandardSearchBar } from "./search-bar";
-import { registerStandardFaqs } from "./faqs";
-import { registerContactUs } from "./contact-us";
 import { registerAdvancedMultimediaScroller } from "./advanced-multimedia-scroller";
-import { registerHeading } from "./heading";
-import { registerImageScroller } from "./image-scroller";
-import { registerGrid } from "./grid";
-import { registerPrebuildProductScroller } from "./prebuild-product-scroller";
-import { registerProductScrollerWithBackgroundImage } from "./product-scroller-with-background-image";
+import { registerMultimediaScroller } from "./multimedia-scroller";
 import { registerExpandalbeCategories } from "./expandalbe-categories";
+import { registerTopMarquee } from "./top-marquee";
+import { registerProductsByCategorisScroller } from "./products-by-categoris-scroller";
+import { registerBrandScroller } from "./brand-scroller";
+import { registerRewardsSteps } from "./rewards-steps";
+import { registerReviewSummary } from "./review-summary";
+import { registerStorySection } from "./story-section";
+import { registerSocialFeed } from "./social-feed";
+import { registerBlogList } from "./blog-list";
 
 let queued = false;
 
@@ -63,15 +65,17 @@ export function registerAppBuilderBlocks() {
     registerStandardSpacer();
     registerStandardSelectedProducts();
     registerStandardSearchBar();
-    registerStandardFaqs();
-    registerContactUs();
     registerAdvancedMultimediaScroller();
-    registerHeading();
-    registerImageScroller();
-    registerGrid();
-    registerPrebuildProductScroller();
-    registerProductScrollerWithBackgroundImage();
+    registerMultimediaScroller();
     registerExpandalbeCategories();
+    registerTopMarquee();
+    registerProductsByCategorisScroller();
+    registerBrandScroller();
+    registerRewardsSteps();
+    registerReviewSummary();
+    registerStorySection();
+    registerSocialFeed();
+    registerBlogList();
 
     // Disable every block that isn't a appbuilder block — this runs after the kit
     // has registered all WP core blocks (paragraph, image, heading, … and the

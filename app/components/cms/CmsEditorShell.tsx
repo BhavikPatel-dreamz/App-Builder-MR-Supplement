@@ -121,8 +121,6 @@ export function CmsEditorShell({
     import("../../blocks/appbuilder/selected-products.css");
     import("../../blocks/appbuilder/standard-blocks.css");
     import("../../blocks/appbuilder/advanced-multimedia-scroller.css");
-    import("../../blocks/appbuilder/prebuild-product-scroller.css");
-    import("../../blocks/appbuilder/product-scroller-with-background-image.css");
     import("../../blocks/appbuilder/expandalbe-categories.css");
     // Client-only: registers Appbuilder Blocks via the kit's registerBlocks() hook.
     // Imported here (not at module top) so the @wordpress runtime never loads

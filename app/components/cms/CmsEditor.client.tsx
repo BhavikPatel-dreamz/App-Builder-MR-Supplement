@@ -9,8 +9,6 @@ import "../../blocks/appbuilder/menu-items.css";
 import "../../blocks/appbuilder/selected-products.css";
 import "../../blocks/appbuilder/standard-blocks.css";
 import "../../blocks/appbuilder/advanced-multimedia-scroller.css";
-import "../../blocks/appbuilder/prebuild-product-scroller.css";
-import "../../blocks/appbuilder/product-scroller-with-background-image.css";
 import "../../blocks/appbuilder/expandalbe-categories.css";
 import { BlockEditor } from "gutenberg-block-kit/editor";
 import { directUploadMedia } from "../../lib/upload-client";

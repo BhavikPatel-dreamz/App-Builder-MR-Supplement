@@ -1,4 +1,4 @@
-name: Deploy App Builder app
+name: Deploy App Builder Mr Supplement app
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
 
 env:
   VPS_APP_PATH: "/var/www/html/App-Builder"
-  PM2_PROCESS_NAME: "App-Builder"
+  PM2_PROCESS_NAME: "App-Builder-Supplement"
   
 jobs:
   # 1. Validate on GitHub's own runner FIRST — nothing on the server is touched yet.

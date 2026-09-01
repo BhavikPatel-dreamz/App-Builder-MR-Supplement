@@ -10,8 +10,6 @@ import riyasatProductScrollerStyles from "../blocks/appbuilder/product-scroller.
 import riyasatCategoriesScrollerStyles from "../blocks/appbuilder/categories-scroller.css?url";
 import riyasatSelectedProductsStyles from "../blocks/appbuilder/selected-products.css?url";
 import riyasatAdvancedMultimediaScrollerStyles from "../blocks/appbuilder/advanced-multimedia-scroller.css?url";
-import riyasatPrebuildProductScrollerStyles from "../blocks/appbuilder/prebuild-product-scroller.css?url";
-import riyasatProductScrollerBgStyles from "../blocks/appbuilder/product-scroller-with-background-image.css?url";
 import riyasatExpandalbeCategoriesStyles from "../blocks/appbuilder/expandalbe-categories.css?url";
 
 export const links: LinksFunction = () => [
@@ -23,8 +21,6 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: riyasatCategoriesScrollerStyles },
   { rel: "stylesheet", href: riyasatSelectedProductsStyles },
   { rel: "stylesheet", href: riyasatAdvancedMultimediaScrollerStyles },
-  { rel: "stylesheet", href: riyasatPrebuildProductScrollerStyles },
-  { rel: "stylesheet", href: riyasatProductScrollerBgStyles },
   { rel: "stylesheet", href: riyasatExpandalbeCategoriesStyles },
 ];
 
