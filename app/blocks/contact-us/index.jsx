@@ -4,7 +4,7 @@ import { useBlockProps, InspectorControls } from 'gutenberg-block-kit/wp/block-e
 import { PanelBody, TextControl, TextareaControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import { contentTabStyle } from '../inspector-shared';
-import { CONTACT_US_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { CONTACT_US_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_EMAIL = 'support@company.com';
 const DEFAULT_PHONE = '+1 234 567 8900';
@@ -37,7 +37,7 @@ export function registerContactUs() {
     apiVersion: 3,
     title: 'Contact Us',
     description: 'Contact details section with action metadata.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: ContactUsIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -58,7 +58,7 @@ export function registerContactUs() {
         officeAddress,
         action,
       } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-contact-us-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-contact-us-editor' });
 
       return (
         <>
@@ -101,25 +101,25 @@ export function registerContactUs() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-contact-us__row">
-              <p className="riyasat-contact-us__label">Email</p>
-              <p className="riyasat-contact-us__value">{email}</p>
+            <div className="appbuilder-contact-us__row">
+              <p className="appbuilder-contact-us__label">Email</p>
+              <p className="appbuilder-contact-us__value">{email}</p>
             </div>
-            <div className="riyasat-contact-us__row">
-              <p className="riyasat-contact-us__label">Phone</p>
-              <p className="riyasat-contact-us__value">{phoneNumber}</p>
+            <div className="appbuilder-contact-us__row">
+              <p className="appbuilder-contact-us__label">Phone</p>
+              <p className="appbuilder-contact-us__value">{phoneNumber}</p>
             </div>
-            <div className="riyasat-contact-us__row">
-              <p className="riyasat-contact-us__label">WhatsApp</p>
-              <p className="riyasat-contact-us__value">{whatsAppNumber}</p>
+            <div className="appbuilder-contact-us__row">
+              <p className="appbuilder-contact-us__label">WhatsApp</p>
+              <p className="appbuilder-contact-us__value">{whatsAppNumber}</p>
             </div>
-            <div className="riyasat-contact-us__row">
-              <p className="riyasat-contact-us__label">Hours</p>
-              <p className="riyasat-contact-us__value">{businessHours}</p>
+            <div className="appbuilder-contact-us__row">
+              <p className="appbuilder-contact-us__label">Hours</p>
+              <p className="appbuilder-contact-us__value">{businessHours}</p>
             </div>
-            <div className="riyasat-contact-us__row">
-              <p className="riyasat-contact-us__label">Address</p>
-              <p className="riyasat-contact-us__value">{officeAddress}</p>
+            <div className="appbuilder-contact-us__row">
+              <p className="appbuilder-contact-us__label">Address</p>
+              <p className="appbuilder-contact-us__value">{officeAddress}</p>
             </div>
           </div>
         </>
@@ -136,22 +136,22 @@ export function registerContactUs() {
         action,
       } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-contact-us',
+        className: 'appbuilder-contact-us',
         'data-action': JSON.stringify(action ?? {}),
       });
 
       return (
         <div {...blockProps}>
-          {email ? <p className="riyasat-contact-us__email">{email}</p> : null}
-          {phoneNumber ? <p className="riyasat-contact-us__phone">{phoneNumber}</p> : null}
+          {email ? <p className="appbuilder-contact-us__email">{email}</p> : null}
+          {phoneNumber ? <p className="appbuilder-contact-us__phone">{phoneNumber}</p> : null}
           {whatsAppNumber ? (
-            <p className="riyasat-contact-us__whatsapp">{whatsAppNumber}</p>
+            <p className="appbuilder-contact-us__whatsapp">{whatsAppNumber}</p>
           ) : null}
           {businessHours ? (
-            <p className="riyasat-contact-us__business-hours">{businessHours}</p>
+            <p className="appbuilder-contact-us__business-hours">{businessHours}</p>
           ) : null}
           {officeAddress ? (
-            <pre className="riyasat-contact-us__address">{officeAddress}</pre>
+            <pre className="appbuilder-contact-us__address">{officeAddress}</pre>
           ) : null}
         </div>
       );

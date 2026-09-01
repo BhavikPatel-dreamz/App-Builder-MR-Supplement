@@ -25,7 +25,7 @@ import {
 import {
   STANDARD_HEALING_GUIDANCE_SESSIONS_BLOCK,
   STANDARD_HEALING_GUIDANCE_SESSION_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_BACKGROUND_COLOR = '#ffffff';
@@ -148,7 +148,7 @@ function registerHealingGuidanceSession() {
     apiVersion: 3,
     title: 'Healing Guidance Session',
     description: 'A single healing/guidance session card.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [STANDARD_HEALING_GUIDANCE_SESSIONS_BLOCK],
     icon: 'admin-users',
     supports: { html: false, reusable: false },
@@ -191,7 +191,7 @@ function registerHealingGuidanceSession() {
       const sessionButton = normalizeButton(button);
 
       const blockProps = useBlockProps({
-        className: 'riyasat-healing-guidance-session-editor',
+        className: 'appbuilder-healing-guidance-session-editor',
       });
 
       return (
@@ -330,41 +330,41 @@ function registerHealingGuidanceSession() {
               <img
                 src={image}
                 alt=""
-                className="riyasat-healing-guidance-session-editor__image"
+                className="appbuilder-healing-guidance-session-editor__image"
               />
             ) : (
-              <div className="riyasat-healing-guidance-session-editor__placeholder">
+              <div className="appbuilder-healing-guidance-session-editor__placeholder">
                 Add session image
               </div>
             )}
-            <div className="riyasat-healing-guidance-session-editor__duration">
+            <div className="appbuilder-healing-guidance-session-editor__duration">
               {duration || DEFAULT_DURATION}
             </div>
-            <strong className="riyasat-healing-guidance-session-editor__title">
+            <strong className="appbuilder-healing-guidance-session-editor__title">
               {title || DEFAULT_TITLE}
             </strong>
-            <div className="riyasat-healing-guidance-session-editor__description">
+            <div className="appbuilder-healing-guidance-session-editor__description">
               {(description || DEFAULT_DESCRIPTION).slice(0, 90)}
               {(description || DEFAULT_DESCRIPTION).length > 90 ? '…' : ''}
             </div>
-            <div className="riyasat-healing-guidance-session-editor__tags">
+            <div className="appbuilder-healing-guidance-session-editor__tags">
               {tagItems.filter(Boolean).map((tag, index) => (
                 <span
                   key={`tag-preview-${index}`}
-                  className="riyasat-healing-guidance-session-editor__tag"
+                  className="appbuilder-healing-guidance-session-editor__tag"
                 >
                   {tag}
                 </span>
               ))}
             </div>
-            <div className="riyasat-healing-guidance-session-editor__healer">
+            <div className="appbuilder-healing-guidance-session-editor__healer">
               {healerName || DEFAULT_HEALER_NAME}
             </div>
-            <div className="riyasat-healing-guidance-session-editor__price">
+            <div className="appbuilder-healing-guidance-session-editor__price">
               {price || DEFAULT_PRICE}
             </div>
             {sessionButton.buttonText ? (
-              <span className="riyasat-healing-guidance-session-editor__button">
+              <span className="appbuilder-healing-guidance-session-editor__button">
                 {sessionButton.buttonText}
               </span>
             ) : null}
@@ -395,7 +395,7 @@ function registerHealingGuidanceSession() {
       const sessionButton = normalizeButton(button);
 
       const blockProps = useBlockProps.save({
-        className: 'riyasat-healing-guidance-session',
+        className: 'appbuilder-healing-guidance-session',
         'data-image-width': `${imageWidth || 0}`,
         'data-image-height': `${imageHeight || 0}`,
         'data-tags': JSON.stringify(tagItems),
@@ -410,46 +410,46 @@ function registerHealingGuidanceSession() {
             <img
               src={image}
               alt=""
-              className="riyasat-healing-guidance-session__image"
+              className="appbuilder-healing-guidance-session__image"
             />
           ) : null}
           {duration ? (
-            <span className="riyasat-healing-guidance-session__duration">
+            <span className="appbuilder-healing-guidance-session__duration">
               {duration}
             </span>
           ) : null}
           {title ? (
-            <h3 className="riyasat-healing-guidance-session__title">{title}</h3>
+            <h3 className="appbuilder-healing-guidance-session__title">{title}</h3>
           ) : null}
           {description ? (
-            <p className="riyasat-healing-guidance-session__description">
+            <p className="appbuilder-healing-guidance-session__description">
               {description}
             </p>
           ) : null}
           {tagItems.length ? (
-            <ul className="riyasat-healing-guidance-session__tags">
+            <ul className="appbuilder-healing-guidance-session__tags">
               {tagItems.map((tag, index) => (
                 <li key={`tag-${index}`}>{tag}</li>
               ))}
             </ul>
           ) : null}
           {healerName ? (
-            <span className="riyasat-healing-guidance-session__healer">
+            <span className="appbuilder-healing-guidance-session__healer">
               {healerName}
             </span>
           ) : null}
           {price ? (
-            <span className="riyasat-healing-guidance-session__price">
+            <span className="appbuilder-healing-guidance-session__price">
               {price}
             </span>
           ) : null}
           {sessionSupportsTitle ? (
-            <h4 className="riyasat-healing-guidance-session__supports-title">
+            <h4 className="appbuilder-healing-guidance-session__supports-title">
               {sessionSupportsTitle}
             </h4>
           ) : null}
           {supportItems.length ? (
-            <ul className="riyasat-healing-guidance-session__supports">
+            <ul className="appbuilder-healing-guidance-session__supports">
               {supportItems.map((item, index) => (
                 <li key={`support-${index}`}>{item}</li>
               ))}
@@ -457,7 +457,7 @@ function registerHealingGuidanceSession() {
           ) : null}
           {sessionButton.buttonText ? (
             <span
-              className="riyasat-healing-guidance-session__button"
+              className="appbuilder-healing-guidance-session__button"
               data-action={JSON.stringify(sessionButton.action ?? {})}
             >
               {sessionButton.buttonText}
@@ -474,7 +474,7 @@ function registerHealingGuidanceSessionsParent() {
     apiVersion: 3,
     title: 'Healing/Guidance Sessions',
     description: 'List of healing and guidance session cards.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: HealingSessionsIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -485,7 +485,7 @@ function registerHealingGuidanceSessionsParent() {
     edit: ({ attributes, setAttributes }) => {
       const { backgroundColor, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-healing-guidance-sessions-editor',
+        className: 'appbuilder-healing-guidance-sessions-editor',
         style: {
           background: backgroundColor || DEFAULT_BACKGROUND_COLOR,
           padding: '16px',
@@ -523,7 +523,7 @@ function registerHealingGuidanceSessionsParent() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-healing-guidance-sessions__track">
+            <div className="appbuilder-healing-guidance-sessions__track">
               <InnerBlocks
                 allowedBlocks={[STANDARD_HEALING_GUIDANCE_SESSION_BLOCK]}
                 template={[
@@ -544,7 +544,7 @@ function registerHealingGuidanceSessionsParent() {
     save: ({ attributes }) => {
       const { backgroundColor, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-healing-guidance-sessions',
+        className: 'appbuilder-healing-guidance-sessions',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND_COLOR,
         'data-action': JSON.stringify(action ?? {}),
         style: { background: backgroundColor || DEFAULT_BACKGROUND_COLOR },

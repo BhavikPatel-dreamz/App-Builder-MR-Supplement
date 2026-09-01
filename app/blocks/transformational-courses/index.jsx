@@ -15,7 +15,7 @@ import {
 } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import { contentTabStyle } from '../inspector-shared';
-import { TRANSFORMATIONAL_COURSES_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { TRANSFORMATIONAL_COURSES_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_BACKGROUND = '#F5E9FF';
 const DEFAULT_BORDER = '#B05CF614';
@@ -60,7 +60,7 @@ export function registerTransformationalCourses() {
     apiVersion: 3,
     title: 'Transformational Courses',
     description: 'Course highlight section with stats, product link and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: TransformationalCoursesIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -109,7 +109,7 @@ export function registerTransformationalCourses() {
 
       const statItems = Array.isArray(stats) ? stats : [];
       const blockProps = useBlockProps({
-        className: 'riyasat-transformational-courses-editor',
+        className: 'appbuilder-transformational-courses-editor',
         style: {
           backgroundColor: backgroundColor || DEFAULT_BACKGROUND,
           border: `1px solid ${borderColor || DEFAULT_BORDER}`,
@@ -284,29 +284,29 @@ export function registerTransformationalCourses() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-transformational-courses">
-              {title ? <h3 className="riyasat-transformational-courses__title">{title}</h3> : null}
+            <div className="appbuilder-transformational-courses">
+              {title ? <h3 className="appbuilder-transformational-courses__title">{title}</h3> : null}
               {description ? (
-                <p className="riyasat-transformational-courses__description">{description}</p>
+                <p className="appbuilder-transformational-courses__description">{description}</p>
               ) : null}
               {imageUrl ? (
                 <img
                   src={imageUrl}
                   alt=""
-                  className="riyasat-transformational-courses__image"
+                  className="appbuilder-transformational-courses__image"
                 />
               ) : null}
               {courseTitle ? (
-                <h4 className="riyasat-transformational-courses__course-title">{courseTitle}</h4>
+                <h4 className="appbuilder-transformational-courses__course-title">{courseTitle}</h4>
               ) : null}
               {courseDescription ? (
-                <p className="riyasat-transformational-courses__course-description">
+                <p className="appbuilder-transformational-courses__course-description">
                   {courseDescription}
                 </p>
               ) : null}
               {buttonText ? (
                 <span
-                  className="riyasat-transformational-courses__button"
+                  className="appbuilder-transformational-courses__button"
                   style={{
                     backgroundColor: buttonColor || DEFAULT_BUTTON,
                     color: buttonTextColor || DEFAULT_BUTTON_TEXT,
@@ -316,17 +316,17 @@ export function registerTransformationalCourses() {
                 </span>
               ) : null}
               {statItems.length > 0 ? (
-                <div className="riyasat-transformational-courses__stats">
+                <div className="appbuilder-transformational-courses__stats">
                   {statItems.map((stat, index) => (
                     <div
                       key={`preview-stat-${index}`}
-                      className="riyasat-transformational-courses__stat"
+                      className="appbuilder-transformational-courses__stat"
                     >
                       {stat?.icon ? (
-                        <img src={stat.icon} alt="" className="riyasat-transformational-courses__stat-icon" />
+                        <img src={stat.icon} alt="" className="appbuilder-transformational-courses__stat-icon" />
                       ) : null}
                       {stat?.label ? (
-                        <span className="riyasat-transformational-courses__stat-label">
+                        <span className="appbuilder-transformational-courses__stat-label">
                           {stat.label}
                         </span>
                       ) : null}
@@ -359,7 +359,7 @@ export function registerTransformationalCourses() {
 
       const statItems = Array.isArray(stats) ? stats : [];
       const blockProps = useBlockProps.save({
-        className: 'riyasat-transformational-courses',
+        className: 'appbuilder-transformational-courses',
         'data-title': title || '',
         'data-description': description || '',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND,
@@ -381,24 +381,24 @@ export function registerTransformationalCourses() {
 
       return (
         <div {...blockProps}>
-          {title ? <h3 className="riyasat-transformational-courses__title">{title}</h3> : null}
+          {title ? <h3 className="appbuilder-transformational-courses__title">{title}</h3> : null}
           {description ? (
-            <p className="riyasat-transformational-courses__description">{description}</p>
+            <p className="appbuilder-transformational-courses__description">{description}</p>
           ) : null}
           {imageUrl ? (
-            <img src={imageUrl} alt="" className="riyasat-transformational-courses__image" />
+            <img src={imageUrl} alt="" className="appbuilder-transformational-courses__image" />
           ) : null}
           {courseTitle ? (
-            <h4 className="riyasat-transformational-courses__course-title">{courseTitle}</h4>
+            <h4 className="appbuilder-transformational-courses__course-title">{courseTitle}</h4>
           ) : null}
           {courseDescription ? (
-            <p className="riyasat-transformational-courses__course-description">
+            <p className="appbuilder-transformational-courses__course-description">
               {courseDescription}
             </p>
           ) : null}
           {buttonText ? (
             <span
-              className="riyasat-transformational-courses__button"
+              className="appbuilder-transformational-courses__button"
               style={{
                 backgroundColor: buttonColor || DEFAULT_BUTTON,
                 color: buttonTextColor || DEFAULT_BUTTON_TEXT,
@@ -408,14 +408,14 @@ export function registerTransformationalCourses() {
             </span>
           ) : null}
           {statItems.length > 0 ? (
-            <div className="riyasat-transformational-courses__stats">
+            <div className="appbuilder-transformational-courses__stats">
               {statItems.map((stat, index) => (
-                <div key={`saved-stat-${index}`} className="riyasat-transformational-courses__stat">
+                <div key={`saved-stat-${index}`} className="appbuilder-transformational-courses__stat">
                   {stat?.icon ? (
-                    <img src={stat.icon} alt="" className="riyasat-transformational-courses__stat-icon" />
+                    <img src={stat.icon} alt="" className="appbuilder-transformational-courses__stat-icon" />
                   ) : null}
                   {stat?.label ? (
-                    <span className="riyasat-transformational-courses__stat-label">
+                    <span className="appbuilder-transformational-courses__stat-label">
                       {stat.label}
                     </span>
                   ) : null}

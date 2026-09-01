@@ -16,7 +16,7 @@ import {
 } from '../inspector-shared';
 import {
   STANDARD_TODAYS_MEDITATION_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_AUDIO_URL = 'https://example.com/audio.mp3';
@@ -49,7 +49,7 @@ export function registerStandardTodaysMeditation() {
     apiVersion: 3,
     title: "Today's Meditation",
     description: 'Meditation card with selectable audio, image and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: TodaysMeditationIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -63,7 +63,7 @@ export function registerStandardTodaysMeditation() {
     edit: ({ attributes, setAttributes }) => {
       const { audioUrl, imageUrl, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-todays-meditation-editor',
+        className: 'appbuilder-todays-meditation-editor',
       });
 
       return (
@@ -151,10 +151,10 @@ export function registerStandardTodaysMeditation() {
               <img
                 src={imageUrl}
                 alt=""
-                className="riyasat-todays-meditation-editor__image"
+                className="appbuilder-todays-meditation-editor__image"
               />
             ) : (
-              <div className="riyasat-todays-meditation-editor__placeholder">
+              <div className="appbuilder-todays-meditation-editor__placeholder">
                 Add a meditation image
               </div>
             )}
@@ -162,7 +162,7 @@ export function registerStandardTodaysMeditation() {
               <audio
                 src={audioUrl}
                 controls
-                className="riyasat-todays-meditation-editor__audio"
+                className="appbuilder-todays-meditation-editor__audio"
               />
             ) : null}
           </div>
@@ -179,7 +179,7 @@ export function registerStandardTodaysMeditation() {
         action,
       } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-todays-meditation',
+        className: 'appbuilder-todays-meditation',
         'data-audio-url': audioUrl || '',
         'data-image-url': imageUrl || '',
         'data-image-width': `${imageWidth || 0}`,
@@ -193,14 +193,14 @@ export function registerStandardTodaysMeditation() {
             <img
               src={imageUrl}
               alt=""
-              className="riyasat-todays-meditation__image"
+              className="appbuilder-todays-meditation__image"
             />
           ) : null}
           {audioUrl ? (
             <audio
               src={audioUrl}
               controls
-              className="riyasat-todays-meditation__audio"
+              className="appbuilder-todays-meditation__audio"
             />
           ) : null}
         </div>

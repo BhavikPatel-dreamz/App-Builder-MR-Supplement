@@ -16,25 +16,29 @@ import {
 import { useEffect, useRef, useState } from 'gutenberg-block-kit/wp/element';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_VIDEO_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { STANDARD_VIDEO_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 import { isVideoLikeMedia } from '../../lib/media-utils';
 
 const DEFAULT_HEIGHT = 300;
 
 function getPickedMediaUrl(media) {
+  if (!media) return '';
+  if (typeof media === 'string') return media;
+  const item = Array.isArray(media) ? media[0] : media;
   return (
-    media?.url ||
-    media?.source_url ||
-    media?.src ||
-    media?.link ||
+    item?.url ||
+    item?.source_url ||
+    item?.src ||
+    item?.link ||
     ''
   );
 }
 
 function getVideoAttributesFromMedia(media) {
+  const item = Array.isArray(media) ? media[0] : media;
   return {
     videoUrl: getPickedMediaUrl(media),
-    height: media?.height > 0 ? media.height : DEFAULT_HEIGHT,
+    height: item?.height > 0 ? item.height : DEFAULT_HEIGHT,
   };
 }
 
@@ -57,10 +61,11 @@ function StandardVideoIcon() {
 }
 
 function isVideoMedia(media) {
+  const item = Array.isArray(media) ? media[0] : media;
   return isVideoLikeMedia({
-    type: media?.type,
-    mimeType: media?.mimeType,
-    mime: media?.mime,
+    type: item?.type,
+    mimeType: item?.mimeType,
+    mime: item?.mime,
   });
 }
 
@@ -69,7 +74,7 @@ export function registerStandardVideo() {
     apiVersion: 3,
     title: 'Video',
     description: 'Standard video section with thumbnail, playback options and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: StandardVideoIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -98,7 +103,7 @@ export function registerStandardVideo() {
         height,
         action,
       } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-standard-video-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-standard-video-editor' });
       const videoElRef = useRef(null);
       const [isPlaying, setIsPlaying] = useState(false);
 
@@ -328,7 +333,7 @@ export function registerStandardVideo() {
       } = attributes;
 
       const blockProps = useBlockProps.save({
-        className: 'riyasat-standard-video',
+        className: 'appbuilder-standard-video',
         'data-thumbnail-url': thumbnailUrl || '',
         'data-video-url': videoUrl || '',
         'data-resize-mode': resizeMode || 'cover',
@@ -345,7 +350,7 @@ export function registerStandardVideo() {
         <div {...blockProps}>
           {videoUrl ? (
             <video
-              className="riyasat-standard-video__video"
+              className="appbuilder-standard-video__video"
               src={videoUrl}
               poster={thumbnailUrl || undefined}
               controls={!!control}

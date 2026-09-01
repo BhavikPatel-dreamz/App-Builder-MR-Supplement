@@ -11,7 +11,7 @@ import { contentTabStyle } from '../inspector-shared';
 import {
   STANDARD_FAQS_BLOCK,
   STANDARD_FAQ_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_HEADING = 'Frequently Asked Questions';
@@ -41,7 +41,7 @@ function registerFaqItem() {
     apiVersion: 3,
     title: 'FAQ Item',
     description: 'A single FAQ row with question and answer.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [STANDARD_FAQS_BLOCK],
     icon: 'editor-help',
     supports: { html: false, reusable: false },
@@ -52,7 +52,7 @@ function registerFaqItem() {
 
     edit: ({ attributes, setAttributes }) => {
       const { question, answer } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-faq-item-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-faq-item-editor' });
 
       return (
         <>
@@ -75,8 +75,8 @@ function registerFaqItem() {
           </InspectorControls>
 
           <div {...blockProps}>
-            {question ? <h4 className="riyasat-faq-item__question">{question}</h4> : null}
-            {answer ? <p className="riyasat-faq-item__answer">{answer}</p> : null}
+            {question ? <h4 className="appbuilder-faq-item__question">{question}</h4> : null}
+            {answer ? <p className="appbuilder-faq-item__answer">{answer}</p> : null}
           </div>
         </>
       );
@@ -85,13 +85,13 @@ function registerFaqItem() {
     save: ({ attributes }) => {
       const { question, answer } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-faq-item',
+        className: 'appbuilder-faq-item',
       });
 
       return (
         <div {...blockProps}>
-          {question ? <h4 className="riyasat-faq-item__question">{question}</h4> : null}
-          {answer ? <p className="riyasat-faq-item__answer">{answer}</p> : null}
+          {question ? <h4 className="appbuilder-faq-item__question">{question}</h4> : null}
+          {answer ? <p className="appbuilder-faq-item__answer">{answer}</p> : null}
         </div>
       );
     },
@@ -103,7 +103,7 @@ function registerFaqsParent() {
     apiVersion: 3,
     title: 'FAQs',
     description: 'Frequently asked questions section.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: FaqIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -113,7 +113,7 @@ function registerFaqsParent() {
 
     edit: ({ attributes, setAttributes }) => {
       const { heading, action } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-faqs-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-faqs-editor' });
 
       return (
         <>
@@ -135,7 +135,7 @@ function registerFaqsParent() {
           </InspectorControls>
 
           <div {...blockProps}>
-            {heading ? <h3 className="riyasat-faqs__heading">{heading}</h3> : null}
+            {heading ? <h3 className="appbuilder-faqs__heading">{heading}</h3> : null}
             <InnerBlocks
               allowedBlocks={[STANDARD_FAQ_ITEM_BLOCK]}
               template={[
@@ -153,13 +153,13 @@ function registerFaqsParent() {
     save: ({ attributes }) => {
       const { heading, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-faqs',
+        className: 'appbuilder-faqs',
         'data-action': JSON.stringify(action ?? {}),
       });
 
       return (
         <div {...blockProps}>
-          {heading ? <h3 className="riyasat-faqs__heading">{heading}</h3> : null}
+          {heading ? <h3 className="appbuilder-faqs__heading">{heading}</h3> : null}
           <InnerBlocks.Content />
         </div>
       );

@@ -10,24 +10,11 @@ import {
   type SettingsProductRef,
 } from "./settings-resources";
 import {
-  normalizeTodaysMeditationEntries,
-  parseTodaysMeditationEntries,
-  resolveTodaysMeditation,
-  splitMeditationEntriesByDate,
-  todayDateKey,
-  toPublicMeditationEntry,
-  type PublicMeditationEntry,
-  type TodaysMeditationEntry,
-} from "./todays-meditation";
-import {
-  normalizeTodaysAffirmationEntries,
-  parseTodaysAffirmationEntries,
-  resolveTodaysAffirmation,
-  splitAffirmationEntriesByDate,
-  toPublicAffirmationEntry,
-  type PublicAffirmationEntry,
-  type TodaysAffirmationEntry,
-} from "./todays-affirmation";
+  parseBottomTabs,
+  parseTabBackgroundColor,
+  type BottomTabItem,
+} from "./bottom-tabs";
+import { invalidateCmsSettingsCache } from "./cms-public-cache.server";
 
 export type ShopSettingsInput = {
   androidAppVersion: string;
@@ -43,9 +30,11 @@ export type ShopSettingsInput = {
   yagnasTabCollection: SettingsCollectionRef;
   yagnasTabProduct: SettingsProductRef;
   todaysMeditationDefaultImageUrl: string;
-  todaysMeditationEntries: TodaysMeditationEntry[];
+  todaysMeditationEntries: any;
   todaysAffirmationDefaultImageUrl: string;
-  todaysAffirmationEntries: TodaysAffirmationEntry[];
+  todaysAffirmationEntries: any;
+  tabBackgroundColor: string;
+  bottomTabs: BottomTabItem[];
 };
 
 export const DEFAULT_SHOP_SETTINGS: ShopSettingsInput = {
@@ -65,6 +54,8 @@ export const DEFAULT_SHOP_SETTINGS: ShopSettingsInput = {
   todaysMeditationEntries: [],
   todaysAffirmationDefaultImageUrl: "",
   todaysAffirmationEntries: [],
+  tabBackgroundColor: "#ffffff",
+  bottomTabs: [],
 };
 
 function serializeShopSettings(row: ShopSettings): ShopSettingsInput {
@@ -82,12 +73,14 @@ function serializeShopSettings(row: ShopSettings): ShopSettingsInput {
     yagnasTabCollection: parseCollectionRef(row.yagnasTabCollection),
     yagnasTabProduct: parseProductRef(row.yagnasTabProduct),
     todaysMeditationDefaultImageUrl: row.todaysMeditationDefaultImageUrl || "",
-    todaysMeditationEntries: normalizeTodaysMeditationEntries(
-      row.todaysMeditationEntries,
-    ),
+    todaysMeditationEntries: Array.isArray(row.todaysMeditationEntries) ? row.todaysMeditationEntries : [],
     todaysAffirmationDefaultImageUrl: row.todaysAffirmationDefaultImageUrl || "",
-    todaysAffirmationEntries: normalizeTodaysAffirmationEntries(
-      row.todaysAffirmationEntries,
+    todaysAffirmationEntries: Array.isArray(row.todaysAffirmationEntries) ? row.todaysAffirmationEntries : [],
+    tabBackgroundColor: parseTabBackgroundColor(
+      (row as ShopSettings & { tabBackgroundColor?: string }).tabBackgroundColor,
+    ),
+    bottomTabs: parseBottomTabs(
+      (row as ShopSettings & { bottomTabs?: unknown }).bottomTabs,
     ),
   };
 }
@@ -138,19 +131,21 @@ export type PublicShopSettings = {
   todaysMeditation: {
     defaultImageUrl: string | null;
     todayDate: string;
-    entries: PublicMeditationEntry[];
-    past: PublicMeditationEntry[];
-    upcoming: PublicMeditationEntry[];
-    today: PublicMeditationEntry | null;
+    entries: any[];
+    past: any[];
+    upcoming: any[];
+    today: any | null;
   };
   todaysAffirmation: {
     defaultImageUrl: string | null;
     todayDate: string;
-    entries: PublicAffirmationEntry[];
-    past: PublicAffirmationEntry[];
-    upcoming: PublicAffirmationEntry[];
-    today: PublicAffirmationEntry | null;
+    entries: any[];
+    past: any[];
+    upcoming: any[];
+    today: any | null;
   };
+  tabBackgroundColor: string;
+  tabs: BottomTabItem[];
 };
 
 export function buildTodaysMeditationPublicPayload(
@@ -160,42 +155,14 @@ export function buildTodaysMeditationPublicPayload(
   >,
 ) {
   const defaultImage = settings.todaysMeditationDefaultImageUrl.trim();
-  const publishableEntries = parseTodaysMeditationEntries(
-    settings.todaysMeditationEntries,
-  );
-  const today = todayDateKey();
-  const { past, upcoming } = splitMeditationEntriesByDate(
-    publishableEntries,
-    today,
-  );
-  const resolvedToday = resolveTodaysMeditation({
-    entries: publishableEntries,
-    defaultImageUrl: defaultImage,
-    date: today,
-  });
-
+  const todayDate = new Date().toISOString().slice(0, 10);
   return {
     defaultImageUrl: defaultImage || null,
-    todayDate: today,
-    entries: publishableEntries.map((entry) =>
-      toPublicMeditationEntry(entry, defaultImage),
-    ),
-    past: past.map((entry) => toPublicMeditationEntry(entry, defaultImage)),
-    upcoming: upcoming.map((entry) =>
-      toPublicMeditationEntry(entry, defaultImage),
-    ),
-    today: resolvedToday
-      ? {
-          id: resolvedToday.id,
-          date: resolvedToday.date,
-          audioUrl: resolvedToday.audioUrl,
-          imageUrl: resolvedToday.usedDefaultImage
-            ? null
-            : resolvedToday.imageUrl || null,
-          resolvedImageUrl: resolvedToday.imageUrl || null,
-          usedDefaultImage: resolvedToday.usedDefaultImage,
-        }
-      : null,
+    todayDate,
+    entries: [],
+    past: [],
+    upcoming: [],
+    today: null,
   };
 }
 
@@ -206,41 +173,14 @@ export function buildTodaysAffirmationPublicPayload(
   >,
 ) {
   const defaultImage = settings.todaysAffirmationDefaultImageUrl.trim();
-  const publishableEntries = parseTodaysAffirmationEntries(
-    settings.todaysAffirmationEntries,
-  );
-  const today = todayDateKey();
-  const { past, upcoming } = splitAffirmationEntriesByDate(
-    publishableEntries,
-    today,
-  );
-  const resolvedToday = resolveTodaysAffirmation({
-    entries: publishableEntries,
-    defaultImageUrl: defaultImage,
-    date: today,
-  });
-
+  const todayDate = new Date().toISOString().slice(0, 10);
   return {
     defaultImageUrl: defaultImage || null,
-    todayDate: today,
-    entries: publishableEntries.map((entry) =>
-      toPublicAffirmationEntry(entry, defaultImage),
-    ),
-    past: past.map((entry) => toPublicAffirmationEntry(entry, defaultImage)),
-    upcoming: upcoming.map((entry) =>
-      toPublicAffirmationEntry(entry, defaultImage),
-    ),
-    today: resolvedToday
-      ? {
-          id: resolvedToday.id,
-          date: resolvedToday.date,
-          imageUrl: resolvedToday.usedDefaultImage
-            ? null
-            : resolvedToday.imageUrl || null,
-          resolvedImageUrl: resolvedToday.imageUrl || null,
-          usedDefaultImage: resolvedToday.usedDefaultImage,
-        }
-      : null,
+    todayDate,
+    entries: [],
+    past: [],
+    upcoming: [],
+    today: null,
   };
 }
 
@@ -284,12 +224,12 @@ export function toPublicShopSettings(
     },
     todaysMeditation: buildTodaysMeditationPublicPayload(settings),
     todaysAffirmation: buildTodaysAffirmationPublicPayload(settings),
+    tabBackgroundColor: parseTabBackgroundColor(settings.tabBackgroundColor),
+    tabs: parseBottomTabs(settings.bottomTabs),
   };
 }
 
 export async function repairShopSettingsNulls(): Promise<void> {
-  // Some older rows/columns can contain SQL NULL even though Prisma schema
-  // expects non-null strings/bools/json. Normalize before Prisma reads.
   await db.$executeRawUnsafe(`
     UPDATE "ShopSettings"
     SET
@@ -312,7 +252,6 @@ export async function repairShopSettingsNulls(): Promise<void> {
       OR "iosForceUpdateEnabled" IS NULL
   `);
 
-  // Newer columns may not exist until migrate deploy; ignore failures here.
   try {
     await db.$executeRawUnsafe(`
       UPDATE "ShopSettings"
@@ -335,25 +274,11 @@ export async function repairShopSettingsNulls(): Promise<void> {
     await db.$executeRawUnsafe(`
       UPDATE "ShopSettings"
       SET
-        "todaysMeditationDefaultImageUrl" = COALESCE("todaysMeditationDefaultImageUrl", ''),
-        "todaysMeditationEntries" = COALESCE("todaysMeditationEntries", '[]'::jsonb)
+        "tabBackgroundColor" = COALESCE("tabBackgroundColor", '#ffffff'),
+        "bottomTabs" = COALESCE("bottomTabs", '[]'::jsonb)
       WHERE
-        "todaysMeditationDefaultImageUrl" IS NULL
-        OR "todaysMeditationEntries" IS NULL
-    `);
-  } catch {
-    // Column not migrated yet.
-  }
-
-  try {
-    await db.$executeRawUnsafe(`
-      UPDATE "ShopSettings"
-      SET
-        "todaysAffirmationDefaultImageUrl" = COALESCE("todaysAffirmationDefaultImageUrl", ''),
-        "todaysAffirmationEntries" = COALESCE("todaysAffirmationEntries", '[]'::jsonb)
-      WHERE
-        "todaysAffirmationDefaultImageUrl" IS NULL
-        OR "todaysAffirmationEntries" IS NULL
+        "tabBackgroundColor" IS NULL
+        OR "bottomTabs" IS NULL
     `);
   } catch {
     // Column not migrated yet.
@@ -364,8 +289,6 @@ export async function getShopSettings(shop: string): Promise<ShopSettingsInput> 
   try {
     await repairShopSettingsNulls();
   } catch (error) {
-    // Columns from newer migrations may not exist yet; continue and let
-    // Prisma surface a clearer error if the read still fails.
     console.warn("Failed to repair ShopSettings null values:", error);
   }
 
@@ -379,6 +302,8 @@ export async function getShopSettings(shop: string): Promise<ShopSettingsInput> 
       yagnasTabProduct: { ...EMPTY_PRODUCT_REF },
       todaysMeditationEntries: [],
       todaysAffirmationEntries: [],
+      tabBackgroundColor: "#ffffff",
+      bottomTabs: [],
     };
   }
   return serializeShopSettings(row);
@@ -399,18 +324,20 @@ export async function upsertShopSettings(
   const row = existing
     ? await db.shopSettings.update({
         where: { id: existing.id },
-        data: input,
+        data: input as any,
       })
     : await db.shopSettings.create({
         data: {
           shop,
           ...input,
-        },
+        } as any,
       });
 
+  void invalidateCmsSettingsCache(shop);
   return serializeShopSettings(row);
 }
 
 export async function deleteShopSettings(shop: string): Promise<void> {
   await db.shopSettings.deleteMany({ where: { shop } });
+  void invalidateCmsSettingsCache(shop);
 }

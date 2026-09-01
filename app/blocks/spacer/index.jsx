@@ -4,12 +4,11 @@ import { registerBlockType } from 'gutenberg-block-kit/wp/blocks';
 import {
   useBlockProps,
   InspectorControls,
-  PanelColorSettings,
 } from 'gutenberg-block-kit/wp/block-editor';
 import { PanelBody, TextControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_SPACER_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { ColorSettingsPanel, contentTabStyle } from '../inspector-shared';
+import { STANDARD_SPACER_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_HEIGHT = 20;
 const DEFAULT_BACKGROUND = '#ffffff';
@@ -37,7 +36,7 @@ export function registerStandardSpacer() {
     apiVersion: 3,
     title: 'Spacer',
     description: 'Adjustable spacer with height, background color, and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: StandardSpacerIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -49,7 +48,7 @@ export function registerStandardSpacer() {
     edit: ({ attributes, setAttributes }) => {
       const { height, backgroundColor, action } = attributes;
       const spacerHeight = Number.isFinite(height) ? height : DEFAULT_HEIGHT;
-      const blockProps = useBlockProps({ className: 'riyasat-standard-spacer-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-standard-spacer-editor' });
 
       return (
         <>
@@ -77,14 +76,18 @@ export function registerStandardSpacer() {
 
           <InspectorControls>
             <PanelBody title="Settings" initialOpen={true}>
-              <PanelColorSettings
+              <ColorSettingsPanel
                 title="Colors"
                 colorSettings={[
                   {
                     label: 'Background color',
                     value: backgroundColor,
-                    onChange: (value) =>
-                      setAttributes({ backgroundColor: value || DEFAULT_BACKGROUND }),
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
+                      setAttributes({ backgroundColor: value });
+                    },
                   },
                 ]}
               />
@@ -93,7 +96,7 @@ export function registerStandardSpacer() {
 
           <div {...blockProps}>
             <div
-              className="riyasat-standard-spacer"
+              className="appbuilder-standard-spacer"
               style={{
                 height: `${spacerHeight}px`,
                 background: backgroundColor || DEFAULT_BACKGROUND,
@@ -109,7 +112,7 @@ export function registerStandardSpacer() {
       const { height, backgroundColor, action } = attributes;
       const spacerHeight = Number.isFinite(height) ? height : DEFAULT_HEIGHT;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-standard-spacer',
+        className: 'appbuilder-standard-spacer',
         'data-height': `${spacerHeight}`,
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND,
         'data-action': JSON.stringify(action ?? {}),

@@ -6,7 +6,7 @@
 - **CMS editor**: Headless Gutenberg via `gutenberg-block-kit` — blocks run client-only inside an iframe.
 - **Package manager**: pnpm (workspace: `extensions/*`).
 - **Node**: `>=20.19 <22 || >=22.12`.
-- **Production deploy**: Vercel (`riyasat-builder.vercel.app`).
+- **Production deploy**: Vercel (`appbuilder-builder.vercel.app`).
 
 ## Dev commands
 
@@ -52,7 +52,7 @@ Key constraints:
 
 ### Adding a block (3 steps)
 
-1. `constants.ts` — add block name constant + append to `RIYASAT_BLOCKS`.
+1. `constants.ts` — add block name constant + append to `APPBUILDER_BLOCKS`.
 2. `app/blocks/<kebab>/index.jsx` — write block(s), export `register<Name>()`.
 3. `app/blocks/index.ts` — import + call `register<Name>()` inside the `registerBlocks` callback (before the unregister sweep).
 
@@ -66,7 +66,7 @@ grep -rl "wp-runtime" build/server/      # must print nothing (SSR clean)
 
 ## Shopify app proxy
 
-Storefront/mobile requests to `https://{shop}.myshopify.com/apps/cms/...` are signed by Shopify and forwarded to `https://riyasat-builder.vercel.app/proxy/...`. The mobile app fetches published page JSON through these signed URLs. See `shopify.app.toml` `[app_proxy]` section.
+Storefront/mobile requests to `https://{shop}.myshopify.com/apps/cms/...` are signed by Shopify and forwarded to `https://appbuilder-builder.vercel.app/proxy/...`. The mobile app fetches published page JSON through these signed URLs. See `shopify.app.toml` `[app_proxy]` section.
 
 ## Webhooks
 

@@ -31,7 +31,7 @@ import type {
 
 /**
  * Per-shop isolation for the Hot Updater tables on the SHARED Postgres
- * database (this app plus app-builder / app-builder-xyxx / riyasat-builder
+ * database (this app plus app-builder / app-builder-xyxx / appbuilder-builder
  * all point at the same DB). The stock @hot-updater/server kysely adapter is
  * tenant-unaware: it never writes a `shop` value (so inserts hit the
  * `bundles_shop_fkey` FK with shop='') and never filters reads by shop (so it

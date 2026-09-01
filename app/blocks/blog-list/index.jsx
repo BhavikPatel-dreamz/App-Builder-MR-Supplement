@@ -9,7 +9,7 @@ import {
 import { PanelBody, TextControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_BLOG_LIST_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { STANDARD_BLOG_LIST_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_BACKGROUND_COLOR = '#ffffff';
 const DEFAULT_TITLE = 'Blogs & Insights';
@@ -37,7 +37,7 @@ export function registerStandardBlogList() {
     apiVersion: 3,
     title: 'Blogs List',
     description: 'Blogs list section with title, background color and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: BlogListIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -49,7 +49,7 @@ export function registerStandardBlogList() {
     edit: ({ attributes, setAttributes }) => {
       const { backgroundColor, title, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-blog-list-editor',
+        className: 'appbuilder-blog-list-editor',
         style: {
           background: backgroundColor || DEFAULT_BACKGROUND_COLOR,
           padding: '16px',
@@ -92,7 +92,7 @@ export function registerStandardBlogList() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <h3 className="riyasat-blog-list__title" style={{ margin: 0 }}>
+            <h3 className="appbuilder-blog-list__title" style={{ margin: 0 }}>
               {title || DEFAULT_TITLE}
             </h3>
           </div>
@@ -103,7 +103,7 @@ export function registerStandardBlogList() {
     save: ({ attributes }) => {
       const { backgroundColor, title, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-blog-list',
+        className: 'appbuilder-blog-list',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND_COLOR,
         'data-action': JSON.stringify(action ?? {}),
         style: { background: backgroundColor || DEFAULT_BACKGROUND_COLOR },
@@ -111,7 +111,7 @@ export function registerStandardBlogList() {
 
       return (
         <div {...blockProps}>
-          {title ? <h3 className="riyasat-blog-list__title">{title}</h3> : null}
+          {title ? <h3 className="appbuilder-blog-list__title">{title}</h3> : null}
         </div>
       );
     },

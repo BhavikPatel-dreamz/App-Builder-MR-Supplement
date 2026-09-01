@@ -19,7 +19,7 @@ import { contentTabStyle } from '../inspector-shared';
 import {
   BLOGS_BLOCK,
   BLOGS_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_IMAGE_URL =
@@ -51,7 +51,7 @@ function registerBlogsItem() {
     apiVersion: 3,
     title: 'Blogs Item',
     description: 'A single blog card item with image, date, title, button text and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [BLOGS_BLOCK],
     icon: 'format-image',
     supports: { html: false, reusable: false },
@@ -66,7 +66,7 @@ function registerBlogsItem() {
     edit: ({ attributes, setAttributes }) => {
       const { imageUrl, date, title, buttonText, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-blogs-item-editor',
+        className: 'appbuilder-blogs-item-editor',
       });
 
       return (
@@ -116,14 +116,14 @@ function registerBlogsItem() {
 
           <div {...blockProps}>
             {imageUrl ? (
-              <img src={imageUrl} alt="" className="riyasat-blogs__image" />
+              <img src={imageUrl} alt="" className="appbuilder-blogs__image" />
             ) : (
-              <div className="riyasat-blogs-item-editor__placeholder">Add image</div>
+              <div className="appbuilder-blogs-item-editor__placeholder">Add image</div>
             )}
-            {date ? <p className="riyasat-blogs__date">{date}</p> : null}
-            {title ? <p className="riyasat-blogs__item-title">{title}</p> : null}
+            {date ? <p className="appbuilder-blogs__date">{date}</p> : null}
+            {title ? <p className="appbuilder-blogs__item-title">{title}</p> : null}
             {buttonText ? (
-              <span className="riyasat-blogs__button">{buttonText}</span>
+              <span className="appbuilder-blogs__button">{buttonText}</span>
             ) : null}
           </div>
         </>
@@ -133,16 +133,16 @@ function registerBlogsItem() {
     save: ({ attributes }) => {
       const { imageUrl, date, title, buttonText, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-blogs__item',
+        className: 'appbuilder-blogs__item',
         'data-action': JSON.stringify(action ?? {}),
       });
 
       return (
         <div {...blockProps}>
-          {imageUrl ? <img src={imageUrl} alt="" className="riyasat-blogs__image" /> : null}
-          {date ? <p className="riyasat-blogs__date">{date}</p> : null}
-          {title ? <p className="riyasat-blogs__item-title">{title}</p> : null}
-          {buttonText ? <span className="riyasat-blogs__button">{buttonText}</span> : null}
+          {imageUrl ? <img src={imageUrl} alt="" className="appbuilder-blogs__image" /> : null}
+          {date ? <p className="appbuilder-blogs__date">{date}</p> : null}
+          {title ? <p className="appbuilder-blogs__item-title">{title}</p> : null}
+          {buttonText ? <span className="appbuilder-blogs__button">{buttonText}</span> : null}
         </div>
       );
     },
@@ -154,7 +154,7 @@ function registerBlogsParent() {
     apiVersion: 3,
     title: 'Blogs',
     description: 'Blog cards section with title, view-all toggle, background and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: BlogsIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -167,7 +167,7 @@ function registerBlogsParent() {
     edit: ({ attributes, setAttributes }) => {
       const { title, showViewAll, backgroundColor, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-blogs-editor',
+        className: 'appbuilder-blogs-editor',
         style: { backgroundColor: backgroundColor || '#f5f5f5' },
       });
 
@@ -210,12 +210,12 @@ function registerBlogsParent() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-blogs">
-              {title ? <h3 className="riyasat-blogs__title">{title}</h3> : null}
+            <div className="appbuilder-blogs">
+              {title ? <h3 className="appbuilder-blogs__title">{title}</h3> : null}
               {showViewAll ? (
-                <span className="riyasat-blogs__view-all">View All</span>
+                <span className="appbuilder-blogs__view-all">View All</span>
               ) : null}
-              <div className="riyasat-blogs__grid">
+              <div className="appbuilder-blogs__grid">
                 <InnerBlocks
                   allowedBlocks={[BLOGS_ITEM_BLOCK]}
                   template={[
@@ -236,7 +236,7 @@ function registerBlogsParent() {
     save: ({ attributes }) => {
       const { title, showViewAll, backgroundColor, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-blogs',
+        className: 'appbuilder-blogs',
         'data-show-view-all': showViewAll ? 'true' : 'false',
         'data-action': JSON.stringify(action ?? {}),
         'data-background-color': backgroundColor || '#f5f5f5',
@@ -245,9 +245,9 @@ function registerBlogsParent() {
 
       return (
         <div {...blockProps}>
-          {title ? <h3 className="riyasat-blogs__title">{title}</h3> : null}
-          {showViewAll ? <span className="riyasat-blogs__view-all">View All</span> : null}
-          <div className="riyasat-blogs__grid">
+          {title ? <h3 className="appbuilder-blogs__title">{title}</h3> : null}
+          {showViewAll ? <span className="appbuilder-blogs__view-all">View All</span> : null}
+          <div className="appbuilder-blogs__grid">
             <InnerBlocks.Content />
           </div>
         </div>

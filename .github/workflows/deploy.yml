@@ -20,7 +20,7 @@ jobs:
               git reset --hard "origin/main"
               git clean -fd
           else
-              git clone -b main git@github.com:BhavikPatel-dreamz/riyasat-builder.git "${{ env.VPS_APP_PATH }}"
+              git clone -b main git@github.com:BhavikPatel-dreamz/appbuilder-builder.git "${{ env.VPS_APP_PATH }}"
           fi
 
       - name: Build

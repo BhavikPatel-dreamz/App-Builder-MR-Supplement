@@ -17,7 +17,7 @@ import {
 import {
   ANGEL_CARDS_BLOCK,
   ANGEL_CARD_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_CARD_URL =
@@ -46,7 +46,7 @@ function registerAngelCardItem() {
     apiVersion: 3,
     title: 'Angel Card Item',
     description: 'Single angel card with front and revealed image.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [ANGEL_CARDS_BLOCK],
     icon: 'format-image',
     supports: { html: false, reusable: false },
@@ -62,7 +62,7 @@ function registerAngelCardItem() {
 
     edit: ({ attributes, setAttributes }) => {
       const { defaultCardUrl, angelCardUrl, action } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-angel-card-item-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-angel-card-item-editor' });
 
       return (
         <>
@@ -133,24 +133,24 @@ function registerAngelCardItem() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-angel-card-item-editor__images">
+            <div className="appbuilder-angel-card-item-editor__images">
               <div>
-                <p className="riyasat-angel-card-item-editor__label">Default</p>
+                <p className="appbuilder-angel-card-item-editor__label">Default</p>
                 {defaultCardUrl ? (
                   <img
                     src={defaultCardUrl}
                     alt=""
-                    className="riyasat-angel-card-item-editor__image"
+                    className="appbuilder-angel-card-item-editor__image"
                   />
                 ) : null}
               </div>
               <div>
-                <p className="riyasat-angel-card-item-editor__label">Angel</p>
+                <p className="appbuilder-angel-card-item-editor__label">Angel</p>
                 {angelCardUrl ? (
                   <img
                     src={angelCardUrl}
                     alt=""
-                    className="riyasat-angel-card-item-editor__image"
+                    className="appbuilder-angel-card-item-editor__image"
                   />
                 ) : null}
               </div>
@@ -171,7 +171,7 @@ function registerAngelCardItem() {
         action,
       } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-angel-card-item',
+        className: 'appbuilder-angel-card-item',
         'data-default-card-width': `${defaultCardWidth || 0}`,
         'data-default-card-height': `${defaultCardHeight || 0}`,
         'data-angel-card-width': `${angelCardWidth || 0}`,
@@ -185,14 +185,14 @@ function registerAngelCardItem() {
             <img
               src={defaultCardUrl}
               alt=""
-              className="riyasat-angel-card-item__default-card"
+              className="appbuilder-angel-card-item__default-card"
             />
           ) : null}
           {angelCardUrl ? (
             <img
               src={angelCardUrl}
               alt=""
-              className="riyasat-angel-card-item__angel-card"
+              className="appbuilder-angel-card-item__angel-card"
             />
           ) : null}
         </div>
@@ -206,7 +206,7 @@ function registerAngelCardsParent() {
     apiVersion: 3,
     title: 'Angel Cards',
     description: 'Angel cards section with revealable card items.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: AngelCardsIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -215,7 +215,7 @@ function registerAngelCardsParent() {
 
     edit: ({ attributes, setAttributes }) => {
       const { action } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-angel-cards-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-angel-cards-editor' });
 
       return (
         <>
@@ -232,7 +232,7 @@ function registerAngelCardsParent() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-angel-cards__track">
+            <div className="appbuilder-angel-cards__track">
               <InnerBlocks
                 allowedBlocks={[ANGEL_CARD_ITEM_BLOCK]}
                 template={[[ANGEL_CARD_ITEM_BLOCK, {}]]}
@@ -249,7 +249,7 @@ function registerAngelCardsParent() {
     save: ({ attributes }) => {
       const { action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-angel-cards',
+        className: 'appbuilder-angel-cards',
         'data-action': JSON.stringify(action ?? {}),
       });
 

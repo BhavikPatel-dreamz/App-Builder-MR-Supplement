@@ -1,6 +1,10 @@
 // @ts-nocheck
 import { useRef, useEffect, useCallback } from 'gutenberg-block-kit/wp/element';
-import { MediaUpload, MediaUploadCheck } from 'gutenberg-block-kit/wp/block-editor';
+import {
+  MediaUpload,
+  MediaUploadCheck,
+  PanelColorSettings,
+} from 'gutenberg-block-kit/wp/block-editor';
 import { Button } from 'gutenberg-block-kit/wp/components';
 import { useSelect, useDispatch } from 'gutenberg-block-kit/wp/data';
 
@@ -11,11 +15,28 @@ export const contentTabStyle = {
   overscrollBehavior: 'contain',
 };
 
+export function getImageUrl(media) {
+  if (!media) return '';
+  if (typeof media === 'string') return media;
+  const item = Array.isArray(media) ? media[0] : media;
+  if (!item || typeof item !== 'object') return '';
+  return (
+    item.url ||
+    item.src ||
+    item.sizes?.full?.url ||
+    item.sizes?.medium?.url ||
+    item.source_url ||
+    ''
+  );
+}
+
 export function imageAttributesFromMedia(media, urlKey = 'imageUrl') {
+  const item = Array.isArray(media) ? media[0] : media;
+  const url = getImageUrl(media);
   return {
-    [urlKey]: media?.url ?? '',
-    imageWidth: media?.width ?? 0,
-    imageHeight: media?.height ?? 0,
+    [urlKey]: url ?? '',
+    imageWidth: item?.width ?? item?.imageWidth ?? 0,
+    imageHeight: item?.height ?? item?.imageHeight ?? 0,
   };
 }
 
@@ -36,8 +57,8 @@ export function SliderPaginationDots({
   count,
   activeIndex,
   onSelect,
-  className = 'riyasat-pagination',
-  dotClassName = 'riyasat-pagination__dot',
+  className = 'appbuilder-pagination',
+  dotClassName = 'appbuilder-pagination__dot',
   ariaLabelPrefix = 'Go to slide',
 }) {
   if (!count || count <= 1) return null;
@@ -368,4 +389,207 @@ export function ImagePicker({
       />
     </MediaUploadCheck>
   );
+}
+
+export function ParentBlockBackButton({ clientId, label }) {
+  const { parentClientId, parentTitle } = useSelect(
+    (select) => {
+      try {
+        const editor = select('core/block-editor');
+        if (!editor || !editor.getBlockParents) return { parentClientId: null, parentTitle: '' };
+        const parents = editor.getBlockParents(clientId);
+        if (!parents || !parents.length) return { parentClientId: null, parentTitle: '' };
+        const parentId = parents[parents.length - 1];
+        if (!parentId) return { parentClientId: null, parentTitle: '' };
+
+        const parentName = editor.getBlockName ? editor.getBlockName(parentId) : (editor.getBlock(parentId)?.name || '');
+        if (!parentName) return { parentClientId: parentId, parentTitle: 'Parent Block' };
+
+        const blockType = editor.getBlockType ? editor.getBlockType(parentName) : null;
+        return {
+          parentClientId: parentId,
+          parentTitle: blockType?.title || 'Parent Block',
+        };
+      } catch (err) {
+        return { parentClientId: null, parentTitle: '' };
+      }
+    },
+    [clientId],
+  );
+
+  const { selectBlock } = useDispatch('core/block-editor');
+
+  if (!parentClientId) return null;
+
+  const displayText = label || `Back to ${parentTitle}`;
+
+  return (
+    <button
+      type="button"
+      onClick={() => selectBlock(parentClientId)}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px',
+        width: '100%',
+        padding: '7px 10px',
+        marginBottom: '12px',
+        background: '#f8fafc',
+        border: '1px solid #e2e8f0',
+        borderRadius: '6px',
+        color: '#0f172a',
+        fontSize: '13px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
+        transition: 'all 0.15s ease-in-out',
+        outline: 'none',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = '#f1f5f9';
+        e.currentTarget.style.borderColor = '#cbd5e1';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = '#f8fafc';
+        e.currentTarget.style.borderColor = '#e2e8f0';
+      }}
+      title={displayText}
+    >
+      <div
+        style={{
+          width: '22px',
+          height: '22px',
+          borderRadius: '50%',
+          background: '#ffffff',
+          border: '1px solid #cbd5e1',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+        }}
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          style={{ color: '#334155', marginLeft: '-1px' }}
+        >
+          <path
+            fillRule="evenodd"
+            d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+      <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {displayText}
+      </span>
+    </button>
+  );
+}
+
+/**
+ * Drop-in replacement for `PanelColorSettings` that fixes the color-picker
+ * flicker where dragging makes colors rapidly auto-change (often two at once)
+ * and only stops after an explicit click.
+ *
+ * The bundled picker fires `onChange` continuously on every pointer-move during
+ * a drag. Committing each move straight to block attributes re-renders the panel
+ * and feeds a re-normalized value back into the controlled picker, which then
+ * oscillates (hex -> hsva -> hex rounding) and can let a sibling color control
+ * pick up the change too. We debounce the commit so nothing re-renders mid-drag:
+ * the picker's `value` prop stays frozen (no snap-back, no feedback loop) while
+ * its own gradient/thumb still track live, and a single commit lands
+ * `commitDelay`ms after the drag settles.
+ *
+ * API-compatible with `PanelColorSettings` — same `title`/`colorSettings` props.
+ */
+export function ColorSettingsPanel({ colorSettings = [], commitDelay = 120, ...panelProps }) {
+  // Keep the latest caller-provided settings so the debounced commit always
+  // calls the current `onChange` (which closes over fresh block attributes).
+  const settingsRef = useRef(colorSettings);
+  settingsRef.current = colorSettings;
+
+  const timersRef = useRef([]);
+
+  useEffect(
+    () => () => {
+      timersRef.current.forEach((timer) => timer && clearTimeout(timer));
+    },
+    [],
+  );
+
+  useEffect(() => {
+    function handleOutsideClick(event) {
+      const target = event?.target;
+      if (!target || !(target instanceof Node)) return;
+
+      const hasActiveModal = !!document.querySelector(
+        '.components-modal__frame, .components-modal__screen-overlay, .rbb-media-modal, .components-modal, [role="dialog"], s-modal'
+      );
+      const isInsideModal = target.closest && target.closest(
+        '.components-modal__frame, .components-modal__screen-overlay, .rbb-media-modal, .components-modal, [role="dialog"], s-modal, .components-modal__content, .components-modal__header'
+      );
+      if (hasActiveModal || isInsideModal) return;
+
+      const popovers = Array.from(
+        document.querySelectorAll(
+          '.components-popover, .components-dropdown__content, .components-color-picker, .components-popover__content, .components-color-palette__picker, .components-dropdown-menu__menu'
+        )
+      ).filter((el) => {
+        const style = window.getComputedStyle(el);
+        return style.display !== 'none' && style.visibility !== 'hidden';
+      });
+
+      if (popovers.length === 0) return;
+
+      const isInsidePopover = popovers.some((popover) => popover.contains(target));
+      if (isInsidePopover) return;
+
+      const isTrigger = target.closest && target.closest(
+        'button, .components-color-palette__item, .components-panel__color-title, [aria-expanded="true"], .components-color-palette__custom-color'
+      );
+      if (isTrigger && isTrigger.getAttribute('aria-expanded') === 'true') {
+        return;
+      }
+
+      const escapeEvent = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        which: 27,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(escapeEvent);
+      if (document.activeElement && document.activeElement !== document.body) {
+        document.activeElement.dispatchEvent(escapeEvent);
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutsideClick, true);
+    document.addEventListener('touchstart', handleOutsideClick, true);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick, true);
+      document.removeEventListener('touchstart', handleOutsideClick, true);
+    };
+  }, []);
+
+  const debouncedSettings = colorSettings.map((setting, index) => ({
+    ...setting,
+    onChange: (nextColor) => {
+      if (timersRef.current[index]) {
+        clearTimeout(timersRef.current[index]);
+      }
+      timersRef.current[index] = setTimeout(() => {
+        timersRef.current[index] = null;
+        settingsRef.current[index]?.onChange?.(nextColor);
+      }, commitDelay);
+    },
+  }));
+
+  return <PanelColorSettings {...panelProps} colorSettings={debouncedSettings} />;
 }

@@ -3,7 +3,7 @@ import { ClientBlockEditor } from "gutenberg-block-kit/editor-client";
 // constants.ts holds plain strings only — safe to import during SSR. The block
 // modules (which pull the @wordpress/emotion runtime) are loaded client-only in
 // the effect below.
-import { RIYASAT_BLOCKS } from "../../blocks/constants";
+import { APPBUILDER_BLOCKS } from "../../blocks/constants";
 import { directUploadMedia } from "../../lib/upload-client";
 import { cmsEditorActions } from "./actionsConfig";
 import { CmsPageSwitcher, type CmsPageListItem } from "./CmsPageSwitcher";
@@ -112,15 +112,19 @@ export function CmsEditorShell({
     void import("gutenberg-block-kit/styles").then(() =>
       import("../../styles/cms.css"),
     );
-    import("../../blocks/riyasat/shared-ui.css");
-    import("../../blocks/riyasat/image-carousel.css");
-    import("../../blocks/riyasat/image-slider.css");
-    import("../../blocks/riyasat/product-scroller.css");
-    import("../../blocks/riyasat/categories-scroller.css");
-    import("../../blocks/riyasat/menu-items.css");
-    import("../../blocks/riyasat/selected-products.css");
-    import("../../blocks/riyasat/standard-blocks.css");
-    // Client-only: registers riyasat blocks via the kit's registerBlocks() hook.
+    import("../../blocks/appbuilder/shared-ui.css");
+    import("../../blocks/appbuilder/image-carousel.css");
+    import("../../blocks/appbuilder/image-slider.css");
+    import("../../blocks/appbuilder/product-scroller.css");
+    import("../../blocks/appbuilder/categories-scroller.css");
+    import("../../blocks/appbuilder/menu-items.css");
+    import("../../blocks/appbuilder/selected-products.css");
+    import("../../blocks/appbuilder/standard-blocks.css");
+    import("../../blocks/appbuilder/advanced-multimedia-scroller.css");
+    import("../../blocks/appbuilder/prebuild-product-scroller.css");
+    import("../../blocks/appbuilder/product-scroller-with-background-image.css");
+    import("../../blocks/appbuilder/expandalbe-categories.css");
+    // Client-only: registers Appbuilder Blocks via the kit's registerBlocks() hook.
     // Imported here (not at module top) so the @wordpress runtime never loads
     // during SSR — registerBlocks queues until the editor's registry inits.
     import("../../blocks");
@@ -164,6 +168,54 @@ export function CmsEditorShell({
       }
     }
 
+    function handleOutsideClick(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node | null;
+      if (!target || !(target instanceof Node)) return;
+
+      const hasActiveModal = !!document.querySelector(
+        ".components-modal__frame, .components-modal__screen-overlay, .rbb-media-modal, .components-modal, [role='dialog'], s-modal",
+      );
+      const isInsideModal = (target as Element).closest?.(
+        ".components-modal__frame, .components-modal__screen-overlay, .rbb-media-modal, .components-modal, [role='dialog'], s-modal, .components-modal__content, .components-modal__header",
+      );
+      if (hasActiveModal || isInsideModal) return;
+
+      const popovers = Array.from(
+        document.querySelectorAll(
+          ".components-popover, .components-dropdown__content, .components-color-picker, .components-popover__content, .components-color-palette__picker, .components-dropdown-menu__menu",
+        ),
+      ).filter((el) => {
+        const style = window.getComputedStyle(el);
+        return style.display !== "none" && style.visibility !== "hidden";
+      });
+
+      if (popovers.length === 0) return;
+
+      const isInsidePopover = popovers.some((popover) => popover.contains(target));
+      if (isInsidePopover) return;
+
+      const isTrigger = (target as Element).closest?.(
+        "button, .components-color-palette__item, .components-panel__color-title, [aria-expanded='true'], .components-color-palette__custom-color",
+      );
+      if (isTrigger && isTrigger.getAttribute("aria-expanded") === "true") {
+        return;
+      }
+
+      const escapeEvent = new KeyboardEvent("keydown", {
+        key: "Escape",
+        code: "Escape",
+        keyCode: 27,
+        which: 27,
+        bubbles: true,
+        cancelable: true,
+      });
+
+      document.dispatchEvent(escapeEvent);
+      if (document.activeElement && document.activeElement !== document.body) {
+        document.activeElement.dispatchEvent(escapeEvent);
+      }
+    }
+
     ensureWidgetListOpen();
     const observer = new MutationObserver(ensureWidgetListOpen);
     observer.observe(document.body, {
@@ -173,10 +225,14 @@ export function CmsEditorShell({
       attributeFilter: ["data-inserter-open", "class"],
     });
     document.addEventListener("click", preventWidgetListClose, true);
+    document.addEventListener("mousedown", handleOutsideClick, true);
+    document.addEventListener("touchstart", handleOutsideClick, true);
 
     return () => {
       observer.disconnect();
       document.removeEventListener("click", preventWidgetListClose, true);
+      document.removeEventListener("mousedown", handleOutsideClick, true);
+      document.removeEventListener("touchstart", handleOutsideClick, true);
     };
   }, []);
 
@@ -847,8 +903,8 @@ export function CmsEditorShell({
         unregisterBlocks={["core/breadcrumbs","core/table","core/code","core/gallery","core/shortcode","core/search","core/tag-cloud","core/html"]}
         // Drop the kit's myapp/* demo blocks entirely.
         disableBundledBlocks
-        // Hide remaining defaults (WP core) — only riyasat blocks insertable.
-        editorSettings={{ allowedBlockTypes: RIYASAT_BLOCKS }}
+        // Hide remaining defaults (WP core) — only Appbuilder Blocks insertable.
+        editorSettings={{ allowedBlockTypes: APPBUILDER_BLOCKS }}
         media={{
           perPage: 20,
           listImages,

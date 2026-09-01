@@ -1,13 +1,17 @@
 import { useCallback } from "react";
 import "gutenberg-block-kit/styles";
-import "../../blocks/riyasat/shared-ui.css";
-import "../../blocks/riyasat/image-carousel.css";
-import "../../blocks/riyasat/image-slider.css";
-import "../../blocks/riyasat/product-scroller.css";
-import "../../blocks/riyasat/categories-scroller.css";
-import "../../blocks/riyasat/menu-items.css";
-import "../../blocks/riyasat/selected-products.css";
-import "../../blocks/riyasat/standard-blocks.css";
+import "../../blocks/appbuilder/shared-ui.css";
+import "../../blocks/appbuilder/image-carousel.css";
+import "../../blocks/appbuilder/image-slider.css";
+import "../../blocks/appbuilder/product-scroller.css";
+import "../../blocks/appbuilder/categories-scroller.css";
+import "../../blocks/appbuilder/menu-items.css";
+import "../../blocks/appbuilder/selected-products.css";
+import "../../blocks/appbuilder/standard-blocks.css";
+import "../../blocks/appbuilder/advanced-multimedia-scroller.css";
+import "../../blocks/appbuilder/prebuild-product-scroller.css";
+import "../../blocks/appbuilder/product-scroller-with-background-image.css";
+import "../../blocks/appbuilder/expandalbe-categories.css";
 import { BlockEditor } from "gutenberg-block-kit/editor";
 import { directUploadMedia } from "../../lib/upload-client";
 

@@ -11,21 +11,22 @@ import {
   InspectorControls,
   MediaUpload,
   MediaUploadCheck,
-  PanelColorSettings,
 } from 'gutenberg-block-kit/wp/block-editor';
-import { PanelBody, ToggleControl, Button } from 'gutenberg-block-kit/wp/components';
+import { PanelBody, ToggleControl, Button, SelectControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import {
+  ColorSettingsPanel,
   contentTabStyle,
   useChildBlocks,
   useCarouselPagination,
   SliderPaginationDots,
+  ParentBlockBackButton,
 } from '../inspector-shared';
 import { isVideoLikeMedia } from '../../lib/media-utils';
 import {
   IMAGE_CAROUSEL_BLOCK,
   IMAGE_CAROUSEL_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_ACTIVE_DOT_COLOR = '#FFFFFF';
@@ -34,16 +35,17 @@ const DEFAULT_BACKGROUND_COLOR = '#FFFFFF';
 
 function getCarouselDotColors(activeDotColor, inActiveDotColor) {
   return {
-    '--riyasat-pagination-active': activeDotColor || DEFAULT_ACTIVE_DOT_COLOR,
-    '--riyasat-pagination-inactive': inActiveDotColor || DEFAULT_INACTIVE_DOT_COLOR,
+    '--appbuilder-pagination-active': activeDotColor || DEFAULT_ACTIVE_DOT_COLOR,
+    '--appbuilder-pagination-inactive': inActiveDotColor || DEFAULT_INACTIVE_DOT_COLOR,
   };
 }
 
 function mediaFromSelection(selected) {
+  const item = Array.isArray(selected) ? selected[0] : selected;
   return {
     media: {
-      url: selected?.url ?? '',
-      type: selected?.mime ?? selected?.type ?? '',
+      url: item?.url || item?.src || '',
+      type: item?.mime || item?.type || '',
     },
   };
 }
@@ -58,7 +60,10 @@ function clearMedia() {
 }
 
 function getMediaUrl(media) {
-  return media?.url || '';
+  if (!media) return '';
+  if (typeof media === 'string') return media;
+  const item = Array.isArray(media) ? media[0] : media;
+  return item?.url || item?.src || '';
 }
 
 function isSlideVideo(media) {
@@ -126,7 +131,7 @@ function SlideMediaPicker({
                 {isVideo ? (
                   <video
                     src={mediaUrl}
-                    className="riyasat-image-carousel-item-editor__video"
+                    className="appbuilder-image-carousel-item-editor__video"
                     muted
                     playsInline
                     style={{
@@ -170,7 +175,7 @@ function CarouselSlideMedia({ media, onOpen, className }) {
 
   if (!mediaUrl) {
     return (
-      <button type="button" className="riyasat-image-carousel-item-editor__placeholder" onClick={onOpen}>
+      <button type="button" className="appbuilder-image-carousel-item-editor__placeholder" onClick={onOpen}>
         Click to add image or video
       </button>
     );
@@ -180,7 +185,7 @@ function CarouselSlideMedia({ media, onOpen, className }) {
     return (
       <video
         src={mediaUrl}
-        className={className || 'riyasat-image-carousel-item-editor__video'}
+        className={className || 'appbuilder-image-carousel-item-editor__video'}
         muted
         playsInline
         autoPlay
@@ -199,7 +204,7 @@ function CarouselSlideMedia({ media, onOpen, className }) {
     <img
       src={mediaUrl}
       alt=""
-      className={className || 'riyasat-image-carousel-item-editor__image'}
+      className={className || 'appbuilder-image-carousel-item-editor__image'}
       onClick={onOpen}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') onOpen();
@@ -218,7 +223,7 @@ function registerCarouselItem() {
     apiVersion: 3,
     title: 'Carousel Slide',
     description: 'A single slide with image or video and optional tap action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [IMAGE_CAROUSEL_BLOCK],
     icon: 'format-image',
     supports: { html: false, reusable: false },
@@ -227,17 +232,18 @@ function registerCarouselItem() {
       action: { type: 'object', default: {} },
     },
 
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const { media, action: rawAction } = attributes;
       const action = rawAction ?? {};
       const blockProps = useBlockProps({
-        className: 'riyasat-image-carousel-item-editor',
+        className: 'appbuilder-image-carousel-item-editor',
       });
 
       return (
         <>
           <InspectorControls group="content">
             <div style={contentTabStyle}>
+              <ParentBlockBackButton clientId={clientId} />
               <PanelBody title="Slide" initialOpen={true}>
                 <SlideMediaPicker
                   media={media}
@@ -272,7 +278,7 @@ function registerCarouselItem() {
       const { media, action } = attributes;
       const mediaUrl = getMediaUrl(media);
       const blockProps = useBlockProps.save({
-        className: 'riyasat-image-carousel__slide',
+        className: 'appbuilder-image-carousel__slide',
         'data-media': JSON.stringify(media ?? {}),
         'data-action': JSON.stringify(action ?? {}),
       });
@@ -284,7 +290,7 @@ function registerCarouselItem() {
           <div {...blockProps}>
             <video
               src={mediaUrl}
-              className="riyasat-image-carousel__video"
+              className="appbuilder-image-carousel__video"
               muted
               playsInline
               autoPlay
@@ -296,7 +302,7 @@ function registerCarouselItem() {
 
       return (
         <div {...blockProps}>
-          <img src={mediaUrl} alt="" className="riyasat-image-carousel__image" />
+          <img src={mediaUrl} alt="" className="appbuilder-image-carousel__image" />
         </div>
       );
     },
@@ -311,22 +317,23 @@ function registerCarouselParent() {
     apiVersion: 3,
     title: 'Hero Carousel',
     description: 'Full-width image or video carousel with pagination dots.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: CarouselIcon,
     keywords: ['carousel', 'hero', 'slider', 'images', 'video'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
       showPagination: { type: 'boolean', default: true },
+      dotPosition: { type: 'string', default: 'center' },
       backgroundColor: { type: 'string', default: DEFAULT_BACKGROUND_COLOR },
       activeDotColor: { type: 'string', default: DEFAULT_ACTIVE_DOT_COLOR },
       inActiveDotColor: { type: 'string', default: DEFAULT_INACTIVE_DOT_COLOR },
     },
 
     edit: ({ attributes, setAttributes, clientId }) => {
-      const { showPagination, backgroundColor, activeDotColor, inActiveDotColor } =
+      const { showPagination, dotPosition = 'center', backgroundColor, activeDotColor, inActiveDotColor } =
         attributes;
       const dotColors = getCarouselDotColors(activeDotColor, inActiveDotColor);
-      const blockProps = useBlockProps({ className: 'riyasat-image-carousel-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-image-carousel-editor' });
       const [activeIndex, setActiveIndex] = useState(0);
       const { childBlocks, childCount, insertBlock, removeBlock, updateBlockAttributes } =
         useChildBlocks(clientId);
@@ -398,32 +405,56 @@ function registerCarouselParent() {
                 checked={showPagination}
                 onChange={(value) => setAttributes({ showPagination: value })}
               />
-              <PanelColorSettings
+              {showPagination ? (
+                <SelectControl
+                  label="Dot Indicator Position"
+                  value={dotPosition || 'center'}
+                  options={[
+                    { label: 'Left', value: 'left' },
+                    { label: 'Center', value: 'center' },
+                    { label: 'Right', value: 'right' },
+                  ]}
+                  onChange={(val) => setAttributes({ dotPosition: val })}
+                />
+              ) : null}
+              <ColorSettingsPanel
                 title="Colors"
                 colorSettings={[
                   {
                     label: 'Background color',
                     value: backgroundColor || DEFAULT_BACKGROUND_COLOR,
-                    onChange: (value) =>
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
                       setAttributes({
-                        backgroundColor: value || DEFAULT_BACKGROUND_COLOR,
-                      }),
+                        backgroundColor: value,
+                      });
+                    },
                   },
                   {
                     label: 'Active dot color',
                     value: activeDotColor || DEFAULT_ACTIVE_DOT_COLOR,
-                    onChange: (value) =>
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
                       setAttributes({
-                        activeDotColor: value || DEFAULT_ACTIVE_DOT_COLOR,
-                      }),
+                        activeDotColor: value,
+                      });
+                    },
                   },
                   {
                     label: 'Inactive dot color',
                     value: inActiveDotColor || DEFAULT_INACTIVE_DOT_COLOR,
-                    onChange: (value) =>
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
                       setAttributes({
-                        inActiveDotColor: value || DEFAULT_INACTIVE_DOT_COLOR,
-                      }),
+                        inActiveDotColor: value,
+                      });
+                    },
                   },
                 ]}
               />
@@ -432,7 +463,7 @@ function registerCarouselParent() {
 
           <div {...blockProps}>
             <div
-              className="riyasat-image-carousel"
+              className="appbuilder-image-carousel"
               style={{
                 position: 'relative',
                 backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR,
@@ -440,7 +471,7 @@ function registerCarouselParent() {
               }}
             >
               <div
-                className="riyasat-image-carousel__track"
+                className="appbuilder-image-carousel__track"
                 data-active-index={activeIndex}
               >
                 <InnerBlocks
@@ -459,8 +490,8 @@ function registerCarouselParent() {
                   count={slideCount}
                   activeIndex={activeIndex}
                   onSelect={goToSlide}
-                  className="riyasat-image-carousel__pagination riyasat-image-carousel__pagination--preview"
-                  dotClassName="riyasat-image-carousel__dot"
+                  className={`appbuilder-image-carousel__pagination appbuilder-image-carousel__pagination--preview appbuilder-image-carousel__pagination--${dotPosition || 'center'}`}
+                  dotClassName="appbuilder-image-carousel__dot"
                   ariaLabelPrefix="Go to slide"
                 />
               ) : null}
@@ -471,12 +502,13 @@ function registerCarouselParent() {
     },
 
     save: ({ attributes }) => {
-      const { showPagination, backgroundColor, activeDotColor, inActiveDotColor } =
+      const { showPagination, dotPosition = 'center', backgroundColor, activeDotColor, inActiveDotColor } =
         attributes;
       const dotColors = getCarouselDotColors(activeDotColor, inActiveDotColor);
       const blockProps = useBlockProps.save({
-        className: 'riyasat-image-carousel',
+        className: 'appbuilder-image-carousel',
         'data-show-pagination': showPagination ? 'true' : 'false',
+        'data-dot-position': dotPosition || 'center',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND_COLOR,
         'data-active-dot-color': activeDotColor || DEFAULT_ACTIVE_DOT_COLOR,
         'data-in-active-dot-color': inActiveDotColor || DEFAULT_INACTIVE_DOT_COLOR,
@@ -487,11 +519,14 @@ function registerCarouselParent() {
       });
       return (
         <div {...blockProps}>
-          <div className="riyasat-image-carousel__track">
+          <div className="appbuilder-image-carousel__track">
             <InnerBlocks.Content />
           </div>
           {showPagination ? (
-            <div className="riyasat-image-carousel__pagination" aria-hidden="true" />
+            <div
+              className={`appbuilder-image-carousel__pagination appbuilder-image-carousel__pagination--${dotPosition || 'center'}`}
+              aria-hidden="true"
+            />
           ) : null}
         </div>
       );

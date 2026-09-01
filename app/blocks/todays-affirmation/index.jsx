@@ -16,7 +16,7 @@ import {
 } from '../inspector-shared';
 import {
   STANDARD_TODAYS_AFFIRMATION_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 function parseDimension(value, fallback = 0) {
@@ -91,7 +91,7 @@ export function registerStandardTodaysAffirmation() {
     apiVersion: 3,
     title: "Today's Affirmation",
     description: 'Affirmation banner with selectable image and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: TodaysAffirmationIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -106,7 +106,7 @@ export function registerStandardTodaysAffirmation() {
       const width = parseDimension(imageWidth);
       const height = parseDimension(imageHeight);
       const blockProps = useBlockProps({
-        className: 'riyasat-todays-affirmation-editor',
+        className: 'appbuilder-todays-affirmation-editor',
       });
 
       return (
@@ -174,7 +174,7 @@ export function registerStandardTodaysAffirmation() {
       const width = parseDimension(imageWidth);
       const height = parseDimension(imageHeight);
       const blockProps = useBlockProps.save({
-        className: 'riyasat-todays-affirmation',
+        className: 'appbuilder-todays-affirmation',
         'data-image-width': `${width}`,
         'data-image-height': `${height}`,
         'data-action': JSON.stringify(action ?? {}),
@@ -186,7 +186,7 @@ export function registerStandardTodaysAffirmation() {
             <img
               src={imageUrl}
               alt=""
-              className="riyasat-todays-affirmation__image"
+              className="appbuilder-todays-affirmation__image"
               style={getAffirmationImageStyle(width, height)}
             />
           ) : null}

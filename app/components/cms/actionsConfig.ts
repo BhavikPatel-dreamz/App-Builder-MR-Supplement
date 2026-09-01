@@ -1,6 +1,6 @@
 // Action registry config for the CMS block editor.
 //
-// Passed as <ClientBlockEditor actions={...}> so every riyasat block's
+// Passed as <ClientBlockEditor actions={...}> so every appbuilder block's
 // <ActionBuilder> offers the same set of button actions. The kit ships only
 // OPEN_URL; everything Shopify/native-app specific is added here. See ACTIONS.md.
 //

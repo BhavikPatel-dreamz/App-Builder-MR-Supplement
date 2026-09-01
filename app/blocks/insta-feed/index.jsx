@@ -14,7 +14,7 @@ import { contentTabStyle } from '../inspector-shared';
 import {
   INSTA_FEED_BLOCK,
   INSTA_FEED_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 function InstaFeedIcon() {
@@ -40,7 +40,7 @@ function registerInstaFeedItem() {
     apiVersion: 3,
     title: 'Insta Feed Item',
     description: 'A single Instagram image tile with optional tap action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [INSTA_FEED_BLOCK],
     icon: 'format-image',
     supports: { html: false, reusable: false },
@@ -56,7 +56,7 @@ function registerInstaFeedItem() {
     edit: ({ attributes, setAttributes }) => {
       const { imageUrl, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-insta-feed-item-editor',
+        className: 'appbuilder-insta-feed-item-editor',
       });
 
       return (
@@ -91,9 +91,9 @@ function registerInstaFeedItem() {
 
           <div {...blockProps}>
             {imageUrl ? (
-              <img src={imageUrl} alt="" className="riyasat-insta-feed__image" />
+              <img src={imageUrl} alt="" className="appbuilder-insta-feed__image" />
             ) : (
-              <div className="riyasat-insta-feed-item-editor__placeholder">Add image</div>
+              <div className="appbuilder-insta-feed-item-editor__placeholder">Add image</div>
             )}
           </div>
         </>
@@ -103,13 +103,13 @@ function registerInstaFeedItem() {
     save: ({ attributes }) => {
       const { imageUrl, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-insta-feed__item',
+        className: 'appbuilder-insta-feed__item',
         'data-action': JSON.stringify(action ?? {}),
       });
 
       return (
         <div {...blockProps}>
-          {imageUrl ? <img src={imageUrl} alt="" className="riyasat-insta-feed__image" /> : null}
+          {imageUrl ? <img src={imageUrl} alt="" className="appbuilder-insta-feed__image" /> : null}
         </div>
       );
     },
@@ -121,7 +121,7 @@ function registerInstaFeedParent() {
     apiVersion: 3,
     title: 'Insta Feed',
     description: 'Instagram feed tiles with heading, link and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: InstaFeedIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -134,7 +134,7 @@ function registerInstaFeedParent() {
     edit: ({ attributes, setAttributes }) => {
       const { title, link, backgroundColor, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-insta-feed-editor',
+        className: 'appbuilder-insta-feed-editor',
         style: { backgroundColor },
       });
 
@@ -177,10 +177,10 @@ function registerInstaFeedParent() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-insta-feed">
-              {title ? <h3 className="riyasat-insta-feed__title">{title}</h3> : null}
-              {link ? <p className="riyasat-insta-feed__link">{link}</p> : null}
-              <div className="riyasat-insta-feed__grid">
+            <div className="appbuilder-insta-feed">
+              {title ? <h3 className="appbuilder-insta-feed__title">{title}</h3> : null}
+              {link ? <p className="appbuilder-insta-feed__link">{link}</p> : null}
+              <div className="appbuilder-insta-feed__grid">
                 <InnerBlocks
                   allowedBlocks={[INSTA_FEED_ITEM_BLOCK]}
                   template={[
@@ -201,7 +201,7 @@ function registerInstaFeedParent() {
     save: ({ attributes }) => {
       const { title, link, backgroundColor, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-insta-feed',
+        className: 'appbuilder-insta-feed',
         'data-link': link || '',
         'data-action': JSON.stringify(action ?? {}),
         'data-background-color': backgroundColor || '#f5f5f5',
@@ -210,9 +210,9 @@ function registerInstaFeedParent() {
 
       return (
         <div {...blockProps}>
-          {title ? <h3 className="riyasat-insta-feed__title">{title}</h3> : null}
-          {link ? <p className="riyasat-insta-feed__link">{link}</p> : null}
-          <div className="riyasat-insta-feed__grid">
+          {title ? <h3 className="appbuilder-insta-feed__title">{title}</h3> : null}
+          {link ? <p className="appbuilder-insta-feed__link">{link}</p> : null}
+          <div className="appbuilder-insta-feed__grid">
             <InnerBlocks.Content />
           </div>
         </div>

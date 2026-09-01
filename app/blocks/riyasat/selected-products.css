@@ -1,17 +1,17 @@
-.riyasat-standard-selected-products-editor {
+.appbuilder-standard-selected-products-editor {
   overflow: hidden;
 }
 
-.riyasat-standard-selected-products {
+.appbuilder-standard-selected-products {
   padding: 40px 15px;
 }
 
-.riyasat-standard-selected-products__heading {
+.appbuilder-standard-selected-products__heading {
   margin-bottom: 16px;
   text-align: center;
 }
 
-.riyasat-standard-selected-products__title {
+.appbuilder-standard-selected-products__title {
   margin: 0 0 8px;
   font-size: 12px;
   font-weight: 600;
@@ -21,7 +21,7 @@
   color: #000;
 }
 
-.riyasat-standard-selected-products__subtitle {
+.appbuilder-standard-selected-products__subtitle {
   margin: 0 0 16px;
   font-size: 22px;
   font-weight: 700;
@@ -29,13 +29,13 @@
   color: #000;
 }
 
-.riyasat-standard-selected-products__grid {
+.appbuilder-standard-selected-products__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
-.riyasat-standard-selected-products__card {
+.appbuilder-standard-selected-products__card {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   padding: 8px;
@@ -47,19 +47,19 @@
   background: #fff;
 }
 
-.riyasat-standard-selected-products__card-id {
+.appbuilder-standard-selected-products__card-id {
   font-size: 11px;
   color: #6b7280;
 }
 
-.riyasat-standard-selected-products__card-handle {
+.appbuilder-standard-selected-products__card-handle {
   font-size: 12px;
   color: #111827;
   font-weight: 600;
   word-break: break-word;
 }
 
-.riyasat-standard-selected-products__empty {
+.appbuilder-standard-selected-products__empty {
   border: 1px dashed rgba(0, 0, 0, 0.2);
   border-radius: 8px;
   padding: 12px;

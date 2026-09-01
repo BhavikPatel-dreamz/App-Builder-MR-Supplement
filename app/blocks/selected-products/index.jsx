@@ -4,12 +4,11 @@ import { registerBlockType } from 'gutenberg-block-kit/wp/blocks';
 import {
   useBlockProps,
   InspectorControls,
-  PanelColorSettings,
 } from 'gutenberg-block-kit/wp/block-editor';
 import { PanelBody, Button, TextControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_SELECTED_PRODUCTS_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { ColorSettingsPanel, contentTabStyle } from '../inspector-shared';
+import { STANDARD_SELECTED_PRODUCTS_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_BACKGROUND = '#FFFFFF';
 
@@ -58,7 +57,7 @@ export function registerStandardSelectedProducts() {
     apiVersion: 3,
     title: 'Selected Products',
     description: 'Select multiple individual products across collections.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: StandardSelectedProductsIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -73,7 +72,7 @@ export function registerStandardSelectedProducts() {
       const { title, subTitle, backgroundColor, products, action } = attributes;
       const productList = Array.isArray(products) ? products : [];
       const blockProps = useBlockProps({
-        className: 'riyasat-standard-selected-products-editor',
+        className: 'appbuilder-standard-selected-products-editor',
       });
 
       async function onPickProducts() {
@@ -146,14 +145,18 @@ export function registerStandardSelectedProducts() {
 
           <InspectorControls>
             <PanelBody title="Settings" initialOpen={true}>
-              <PanelColorSettings
+              <ColorSettingsPanel
                 title="Colors"
                 colorSettings={[
                   {
                     label: 'Background color',
                     value: backgroundColor,
-                    onChange: (value) =>
-                      setAttributes({ backgroundColor: value || DEFAULT_BACKGROUND }),
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
+                      setAttributes({ backgroundColor: value });
+                    },
                   },
                 ]}
               />
@@ -162,37 +165,37 @@ export function registerStandardSelectedProducts() {
 
           <div {...blockProps}>
             <div
-              className="riyasat-standard-selected-products"
+              className="appbuilder-standard-selected-products"
               style={{ background: backgroundColor }}
             >
               {(title || subTitle) && (
-                <div className="riyasat-standard-selected-products__heading">
+                <div className="appbuilder-standard-selected-products__heading">
                   {title ? (
-                    <h3 className="riyasat-standard-selected-products__title">{title}</h3>
+                    <h3 className="appbuilder-standard-selected-products__title">{title}</h3>
                   ) : null}
                   {subTitle ? (
-                    <p className="riyasat-standard-selected-products__subtitle">{subTitle}</p>
+                    <p className="appbuilder-standard-selected-products__subtitle">{subTitle}</p>
                   ) : null}
                 </div>
               )}
               {productList.length > 0 ? (
-                <div className="riyasat-standard-selected-products__grid">
+                <div className="appbuilder-standard-selected-products__grid">
                   {productList.map((product, index) => (
                     <div
                       key={`${product.productId}-${index}-preview`}
-                      className="riyasat-standard-selected-products__card"
+                      className="appbuilder-standard-selected-products__card"
                     >
-                      <div className="riyasat-standard-selected-products__card-id">
+                      <div className="appbuilder-standard-selected-products__card-id">
                         {product.productId || '-'}
                       </div>
-                      <div className="riyasat-standard-selected-products__card-handle">
+                      <div className="appbuilder-standard-selected-products__card-handle">
                         {product.productHandle || 'product'}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="riyasat-standard-selected-products__empty">
+                <div className="appbuilder-standard-selected-products__empty">
                   Select products from the right sidebar
                 </div>
               )}
@@ -205,7 +208,7 @@ export function registerStandardSelectedProducts() {
     save: ({ attributes }) => {
       const { title, subTitle, backgroundColor, products, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-standard-selected-products',
+        className: 'appbuilder-standard-selected-products',
         'data-title': title || '',
         'data-sub-title': subTitle || '',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND,
@@ -216,12 +219,12 @@ export function registerStandardSelectedProducts() {
       return (
         <div {...blockProps}>
           {(title || subTitle) && (
-            <div className="riyasat-standard-selected-products__heading">
+            <div className="appbuilder-standard-selected-products__heading">
               {title ? (
-                <h3 className="riyasat-standard-selected-products__title">{title}</h3>
+                <h3 className="appbuilder-standard-selected-products__title">{title}</h3>
               ) : null}
               {subTitle ? (
-                <p className="riyasat-standard-selected-products__subtitle">{subTitle}</p>
+                <p className="appbuilder-standard-selected-products__subtitle">{subTitle}</p>
               ) : null}
             </div>
           )}

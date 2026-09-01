@@ -3,14 +3,16 @@ import { useLoaderData } from "react-router";
 import { BlockRenderer } from "gutenberg-block-kit/renderer";
 
 import blockLibraryStyles from "../styles/wp-block-library.css?url";
-import riyasatSharedUiStyles from "../blocks/riyasat/shared-ui.css?url";
-import riyasatCarouselStyles from "../blocks/riyasat/image-carousel.css?url";
-import riyasatImageSliderStyles from "../blocks/riyasat/image-slider.css?url";
-import riyasatProductScrollerStyles from "../blocks/riyasat/product-scroller.css?url";
-import riyasatCategoriesScrollerStyles from "../blocks/riyasat/categories-scroller.css?url";
-import riyasatSelectedProductsStyles from "../blocks/riyasat/selected-products.css?url";
-
-import { getPageBySlug } from "../lib/cms.server";
+import riyasatSharedUiStyles from "../blocks/appbuilder/shared-ui.css?url";
+import riyasatCarouselStyles from "../blocks/appbuilder/image-carousel.css?url";
+import riyasatImageSliderStyles from "../blocks/appbuilder/image-slider.css?url";
+import riyasatProductScrollerStyles from "../blocks/appbuilder/product-scroller.css?url";
+import riyasatCategoriesScrollerStyles from "../blocks/appbuilder/categories-scroller.css?url";
+import riyasatSelectedProductsStyles from "../blocks/appbuilder/selected-products.css?url";
+import riyasatAdvancedMultimediaScrollerStyles from "../blocks/appbuilder/advanced-multimedia-scroller.css?url";
+import riyasatPrebuildProductScrollerStyles from "../blocks/appbuilder/prebuild-product-scroller.css?url";
+import riyasatProductScrollerBgStyles from "../blocks/appbuilder/product-scroller-with-background-image.css?url";
+import riyasatExpandalbeCategoriesStyles from "../blocks/appbuilder/expandalbe-categories.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: blockLibraryStyles },
@@ -20,6 +22,10 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: riyasatProductScrollerStyles },
   { rel: "stylesheet", href: riyasatCategoriesScrollerStyles },
   { rel: "stylesheet", href: riyasatSelectedProductsStyles },
+  { rel: "stylesheet", href: riyasatAdvancedMultimediaScrollerStyles },
+  { rel: "stylesheet", href: riyasatPrebuildProductScrollerStyles },
+  { rel: "stylesheet", href: riyasatProductScrollerBgStyles },
+  { rel: "stylesheet", href: riyasatExpandalbeCategoriesStyles },
 ];
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -29,12 +35,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     throw new Response("Not found", { status: 404 });
   }
 
-  const url = new URL(request.url);
-  const shop = url.searchParams.get("shop");
-
-  const page = shop
-    ? await getPageBySlug(shop, slug)
-    : await getPublishedPageBySlug(slug);
+  const page = await getPublishedPageBySlug(slug);
 
   if (!page) {
     throw new Response("Page not found", { status: 404 });

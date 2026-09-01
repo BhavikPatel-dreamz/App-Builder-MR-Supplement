@@ -5,14 +5,13 @@ import { registerBlockType } from 'gutenberg-block-kit/wp/blocks';
 import {
   useBlockProps,
   InspectorControls,
-  PanelColorSettings,
   MediaUpload,
   MediaUploadCheck,
 } from 'gutenberg-block-kit/wp/block-editor';
 import { PanelBody, TextControl, Button } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_SEARCH_BAR_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { ColorSettingsPanel, contentTabStyle, getImageUrl } from '../inspector-shared';
+import { STANDARD_SEARCH_BAR_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_BACKGROUND_COLOR = '#ffffff';
 const DEFAULT_BORDER_COLOR = '#00000';
@@ -128,7 +127,7 @@ function SearchBarIconPicker({ icon, onSelect, onClear }) {
   return (
     <MediaUploadCheck>
       <MediaUpload
-        onSelect={(media) => onSelect(media?.url ?? '')}
+        onSelect={(media) => onSelect(getImageUrl(media))}
         allowedTypes={['image']}
         render={({ open }) => (
           <div>
@@ -226,7 +225,7 @@ export function registerStandardSearchBar() {
     apiVersion: 3,
     title: 'Search Bar',
     description: 'Search input with icon, rotating placeholders, colors and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: SearchBarBlockIcon,
     keywords: ['search', 'bar', 'input', 'find'],
     supports: { html: false, align: ['wide', 'full'] },
@@ -275,7 +274,7 @@ export function registerStandardSearchBar() {
       }
 
       const blockProps = useBlockProps({
-        className: 'riyasat-search-bar-editor',
+        className: 'appbuilder-search-bar-editor',
       });
 
       const previewStyle = {
@@ -359,32 +358,44 @@ export function registerStandardSearchBar() {
           </InspectorControls>
 
           <InspectorControls>
-            <PanelColorSettings
+            <ColorSettingsPanel
               title="Colors"
               colorSettings={[
                 {
                   label: 'Background color',
                   value: backgroundColor || DEFAULT_BACKGROUND_COLOR,
-                  onChange: (value) =>
+                  onChange: (value) => {
+                    if (value === undefined || value === null || value === '') {
+                      return;
+                    }
                     setAttributes({
-                      backgroundColor: value || DEFAULT_BACKGROUND_COLOR,
-                    }),
+                      backgroundColor: value,
+                    });
+                  },
                 },
                 {
                   label: 'Border color',
                   value: borderColor || DEFAULT_BORDER_COLOR,
-                  onChange: (value) =>
+                  onChange: (value) => {
+                    if (value === undefined || value === null || value === '') {
+                      return;
+                    }
                     setAttributes({
-                      borderColor: value || DEFAULT_BORDER_COLOR,
-                    }),
+                      borderColor: value,
+                    });
+                  },
                 },
                 {
                   label: 'Input background color',
                   value: inputBackgroundColor || DEFAULT_INPUT_BACKGROUND_COLOR,
-                  onChange: (value) =>
+                  onChange: (value) => {
+                    if (value === undefined || value === null || value === '') {
+                      return;
+                    }
                     setAttributes({
-                      inputBackgroundColor: value || DEFAULT_INPUT_BACKGROUND_COLOR,
-                    }),
+                      inputBackgroundColor: value,
+                    });
+                  },
                 },
               ]}
             />
@@ -393,13 +404,13 @@ export function registerStandardSearchBar() {
           <div {...blockProps}>
             <MediaUploadCheck>
               <MediaUpload
-                onSelect={(media) => setAttributes({ icon: media?.url ?? '' })}
+                onSelect={(media) => setAttributes({ icon: getImageUrl(media) })}
                 allowedTypes={['image']}
                 render={({ open }) => (
-                  <div className="riyasat-search-bar" style={previewStyle}>
+                  <div className="appbuilder-search-bar" style={previewStyle}>
                     <SearchBarIconPreview
                       iconUrl={icon}
-                      className="riyasat-search-bar__icon"
+                      className="appbuilder-search-bar__icon"
                       style={{
                         width: '20px',
                         height: '20px',
@@ -409,7 +420,7 @@ export function registerStandardSearchBar() {
                       }}
                       onClick={open}
                     />
-                    <div className="riyasat-search-bar__input" style={inputStyle}>
+                    <div className="appbuilder-search-bar__input" style={inputStyle}>
                       <RotatingPlaceholder placeholders={placeholderItems} />
                     </div>
                   </div>
@@ -435,7 +446,7 @@ export function registerStandardSearchBar() {
       const placeholderTexts = getPlaceholderTexts(placeholderItems);
       const resolvedIcon = resolveIconUrl(icon);
       const blockProps = useBlockProps.save({
-        className: 'riyasat-search-bar',
+        className: 'appbuilder-search-bar',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND_COLOR,
         'data-border-color': borderColor || DEFAULT_BORDER_COLOR,
         'data-input-background-color':
@@ -452,17 +463,17 @@ export function registerStandardSearchBar() {
       return (
         <div {...blockProps}>
           {resolvedIcon ? (
-            <img src={resolvedIcon} alt="" className="riyasat-search-bar__icon" />
+            <img src={resolvedIcon} alt="" className="appbuilder-search-bar__icon" />
           ) : (
-            <span className="riyasat-search-bar__icon riyasat-search-bar__icon--default" aria-hidden="true" />
+            <span className="appbuilder-search-bar__icon appbuilder-search-bar__icon--default" aria-hidden="true" />
           )}
           <div
-            className="riyasat-search-bar__input"
+            className="appbuilder-search-bar__input"
             style={{
               backgroundColor: inputBackgroundColor || DEFAULT_INPUT_BACKGROUND_COLOR,
             }}
           >
-            <span className="riyasat-search-bar__placeholder">
+            <span className="appbuilder-search-bar__placeholder">
               {placeholderTexts[0] || 'Search…'}
             </span>
           </div>

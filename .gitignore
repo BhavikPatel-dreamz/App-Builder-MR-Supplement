@@ -36,3 +36,4 @@ docker-compose.yml
 .react-router/
 *.woff2
 .vscode/
+temp_auto_push.bat

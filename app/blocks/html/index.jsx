@@ -4,7 +4,7 @@ import { useBlockProps, InspectorControls } from 'gutenberg-block-kit/wp/block-e
 import { PanelBody, TextareaControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import { contentTabStyle } from '../inspector-shared';
-import { STANDARD_HTML_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { STANDARD_HTML_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_HTML_TEXT = `<!DOCTYPE html>
 <html>
@@ -44,7 +44,7 @@ export function registerStandardHtml() {
     apiVersion: 3,
     title: 'Html',
     description: 'Custom HTML content with action metadata.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: HtmlIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -54,7 +54,7 @@ export function registerStandardHtml() {
 
     edit: ({ attributes, setAttributes }) => {
       const { htmlText, action } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-standard-html-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-standard-html-editor' });
 
       return (
         <>
@@ -77,7 +77,7 @@ export function registerStandardHtml() {
           </InspectorControls>
 
           <div {...blockProps}>
-            <pre className="riyasat-standard-html-editor__preview">
+            <pre className="appbuilder-standard-html-editor__preview">
               {htmlText || ''}
             </pre>
           </div>
@@ -88,7 +88,7 @@ export function registerStandardHtml() {
     save: ({ attributes }) => {
       const { htmlText, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-standard-html',
+        className: 'appbuilder-standard-html',
         'data-html-text': htmlText || '',
         'data-action': JSON.stringify(action ?? {}),
       });

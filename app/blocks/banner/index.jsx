@@ -14,7 +14,7 @@ import {
   imageAttributesFromMedia,
   clearImageAttributes,
 } from '../inspector-shared';
-import { STANDARD_BANNER_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { STANDARD_BANNER_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 function parseDimension(value, fallback = 0) {
   const parsed = Number.parseInt(value, 10);
@@ -88,7 +88,7 @@ export function registerStandardBanner() {
     apiVersion: 3,
     title: 'Banner',
     description: 'Standard banner with selectable image and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: StandardBannerIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -102,7 +102,7 @@ export function registerStandardBanner() {
       const { imageUrl, imageWidth, imageHeight, action } = attributes;
       const width = parseDimension(imageWidth);
       const height = parseDimension(imageHeight);
-      const blockProps = useBlockProps({ className: 'riyasat-standard-banner-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-standard-banner-editor' });
 
       return (
         <>
@@ -169,7 +169,7 @@ export function registerStandardBanner() {
       const width = parseDimension(imageWidth);
       const height = parseDimension(imageHeight);
       const blockProps = useBlockProps.save({
-        className: 'riyasat-standard-banner',
+        className: 'appbuilder-standard-banner',
         'data-image-width': `${width}`,
         'data-image-height': `${height}`,
         'data-action': JSON.stringify(action ?? {}),
@@ -181,7 +181,7 @@ export function registerStandardBanner() {
             <img
               src={imageUrl}
               alt=""
-              className="riyasat-standard-banner__image"
+              className="appbuilder-standard-banner__image"
               style={getBannerImageStyle(width, height)}
             />
           ) : null}

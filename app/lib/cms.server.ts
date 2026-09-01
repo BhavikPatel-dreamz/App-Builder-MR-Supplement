@@ -1,4 +1,5 @@
 import db from "../db.server";
+import { invalidateCmsPublicCache } from "./cms-public-cache.server";
 
 export type PageStatus = "draft" | "published";
 export type PageType = "page" | "header" | "footer";
@@ -424,6 +425,7 @@ export async function createPage(
     },
   });
 
+  void invalidateCmsPublicCache(shop);
   return serializePage(page);
 }
 
@@ -496,6 +498,7 @@ export async function updatePage(
     },
   });
 
+  void invalidateCmsPublicCache(shop);
   return serializePage(page);
 }
 
@@ -509,6 +512,7 @@ export async function deletePage(shop: string, id: string) {
   }
 
   await db.page.delete({ where: { id } });
+  void invalidateCmsPublicCache(shop);
   return true;
 }
 

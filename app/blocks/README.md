@@ -1,4 +1,4 @@
-# Riyasat blocks — build recipe
+# Appbuilder Blocks — build recipe
 
 Spec for adding a Gutenberg block to this app. Give the agent a block spec +
 sample JSON in the format at the bottom; it produces the files mechanically by
@@ -12,10 +12,10 @@ following this recipe. No re-derivation needed.
   directly — always `gutenberg-block-kit/wp/*`.
 - Blocks register via the kit's `registerBlocks(cb)` hook (timing-safe). The
   barrel `app/blocks/index.ts` calls each block's `register<Name>()` inside one
-  `registerBlocks` callback, then unregisters every non-riyasat block (kills WP
-  core) and adds the "Riyasat Blocks" category.
+  `registerBlocks` callback, then unregisters every non-appbuilder block (kills WP
+  core) and adds the "Appbuilder Blocks" category.
 - `CmsEditorShell.tsx` mounts `<ClientBlockEditor>` with `disableBundledBlocks`
-  + `editorSettings={{ allowedBlockTypes: RIYASAT_BLOCKS }}`, and client-only
+  + `editorSettings={{ allowedBlockTypes: APPBUILDER_BLOCKS }}`, and client-only
   `import("../../blocks")` inside `useEffect`.
 
 ## SSR rule (critical)
@@ -31,13 +31,13 @@ Block files import the `@wordpress` runtime (emotion → `document`). They must 
 - Block name: `core/<kebab>` (matches the saved-JSON / mobile contract).
 - Parent/child (when JSON has `innerBlocks`): `core/<x>` + `core/<x>-item`.
   Child has `parent: ['core/<x>']`, registers **first**.
-- `category: 'riyasat-blocks'` (use `RIYASAT_CATEGORY`).
+- `category: 'appbuilder-blocks'` (use `APPBUILDER_CATEGORY`).
 - `apiVersion: 3`, `supports: { html: false }` (+ `align: ['wide','full']` on
   parents/standalone; `reusable: false` on children).
 - Object attributes (`action`, `media`, `collection`) default `{}`.
 - `// @ts-nocheck` at top of every `.jsx` block file.
 - `save()` carries data the storefront/mobile needs as `data-*` JSON +
-  `riyasat-<name>*` classes. Editor previews may use inline styles. No storefront
+  `appbuilder-<name>*` classes. Editor previews may use inline styles. No storefront
   CSS is written here unless asked.
 
 ## Control → component map
@@ -58,7 +58,7 @@ Block files import the `@wordpress` runtime (emotion → `document`). They must 
 ## The 3 steps to add a block
 
 1. **`constants.ts`** — add `const <NAME>_BLOCK = "core/<kebab>";` (+ `_ITEM` if
-   parent/child) and append to `RIYASAT_BLOCKS`.
+   parent/child) and append to `APPBUILDER_BLOCKS`.
 2. **`app/blocks/<kebab>/index.jsx`** — write the block(s); export
    `register<Name>()`. (Parent/child: child first inside that fn.)
 3. **`app/blocks/index.ts`** — `import { register<Name> } from "./<kebab>"` and
@@ -83,13 +83,13 @@ import { useBlockProps, InspectorControls, PanelColorSettings,
   MediaUpload, MediaUploadCheck } from 'gutenberg-block-kit/wp/block-editor';
 import { PanelBody, TextControl, TextareaControl, Button } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { FOO_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { FOO_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 export function registerFoo() {
   registerBlockType(FOO_BLOCK, {
     apiVersion: 3,
     title: 'Foo',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: 'star-filled',
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -99,7 +99,7 @@ export function registerFoo() {
     },
     edit: ({ attributes, setAttributes }) => {
       const { title, backgroundColor, action } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-foo-editor' });
+      const blockProps = useBlockProps({ className: 'appbuilder-foo-editor' });
       return (
         <>
           <InspectorControls>
@@ -121,12 +121,12 @@ export function registerFoo() {
     save: ({ attributes }) => {
       const { title, backgroundColor, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-foo',
+        className: 'appbuilder-foo',
         'data-action': JSON.stringify(action ?? {}),
         'data-background-color': backgroundColor,
         style: { background: backgroundColor },
       });
-      return <div {...blockProps}>{title ? <h3 className="riyasat-foo__title">{title}</h3> : null}</div>;
+      return <div {...blockProps}>{title ? <h3 className="appbuilder-foo__title">{title}</h3> : null}</div>;
     },
   });
 }
@@ -141,11 +141,11 @@ import { useBlockProps, InnerBlocks, InspectorControls,
   MediaUpload, MediaUploadCheck } from 'gutenberg-block-kit/wp/block-editor';
 import { PanelBody, TextControl, Button } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { FOO_BLOCK, FOO_ITEM_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { FOO_BLOCK, FOO_ITEM_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 function registerFooItem() {
   registerBlockType(FOO_ITEM_BLOCK, {
-    apiVersion: 3, title: 'Foo Item', category: RIYASAT_CATEGORY,
+    apiVersion: 3, title: 'Foo Item', category: APPBUILDER_CATEGORY,
     parent: [FOO_BLOCK], icon: 'format-image',
     supports: { html: false, reusable: false },
     attributes: {
@@ -157,7 +157,7 @@ function registerFooItem() {
     save: ({ attributes }) => {
       const { imageUrl, label, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-foo__item', 'data-action': JSON.stringify(action ?? {}),
+        className: 'appbuilder-foo__item', 'data-action': JSON.stringify(action ?? {}),
       });
       return <div {...blockProps}>{imageUrl ? <img src={imageUrl} alt="" /> : null}{label ? <span>{label}</span> : null}</div>;
     },
@@ -166,13 +166,13 @@ function registerFooItem() {
 
 function registerFooParent() {
   registerBlockType(FOO_BLOCK, {
-    apiVersion: 3, title: 'Foo', category: RIYASAT_CATEGORY,
+    apiVersion: 3, title: 'Foo', category: APPBUILDER_CATEGORY,
     icon: 'screenoptions', supports: { html: false, align: ['wide', 'full'] },
     attributes: { showPagination: { type: 'boolean', default: true } },
     edit: ({ attributes, setAttributes }) => (
       <>
         <InspectorControls>{/* PanelBody + controls */}</InspectorControls>
-        <div {...useBlockProps({ className: 'riyasat-foo-editor' })}>
+        <div {...useBlockProps({ className: 'appbuilder-foo-editor' })}>
           <InnerBlocks allowedBlocks={[FOO_ITEM_BLOCK]}
             template={[[FOO_ITEM_BLOCK, {}], [FOO_ITEM_BLOCK, {}]]}
             templateLock={false} renderAppender={InnerBlocks.ButtonBlockAppender} />
@@ -180,7 +180,7 @@ function registerFooParent() {
       </>
     ),
     save: ({ attributes }) => (
-      <div {...useBlockProps.save({ className: 'riyasat-foo' })}><InnerBlocks.Content /></div>
+      <div {...useBlockProps.save({ className: 'appbuilder-foo' })}><InnerBlocks.Content /></div>
     ),
   });
 }

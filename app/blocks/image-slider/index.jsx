@@ -10,20 +10,20 @@ import {
   InspectorControls,
   MediaUpload,
   MediaUploadCheck,
-  PanelColorSettings,
 } from 'gutenberg-block-kit/wp/block-editor';
 import {
   PanelBody,
   TextControl,
   ToggleControl,
   Button,
+  SelectControl,
 } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { contentTabStyle, ImagePicker, imageAttributesFromMedia, clearImageAttributes, useChildBlocks, useSliderPagination, SliderPaginationDots } from '../inspector-shared';
+import { ColorSettingsPanel, contentTabStyle, ImagePicker, imageAttributesFromMedia, clearImageAttributes, useChildBlocks, useSliderPagination, SliderPaginationDots, ParentBlockBackButton } from '../inspector-shared';
 import {
   IMAGE_SLIDER_BLOCK,
   IMAGE_SLIDER_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 function ImageSliderIcon() {
@@ -52,7 +52,7 @@ function registerImageSliderItem() {
     apiVersion: 3,
     title: 'Slider Item',
     description: 'A single slide: image, label and optional tap action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [IMAGE_SLIDER_BLOCK],
     icon: 'format-image',
     supports: { html: false, reusable: false },
@@ -64,16 +64,17 @@ function registerImageSliderItem() {
       action: { type: 'object', default: {} },
     },
 
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const { imageUrl, label, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-image-slider-item-editor',
+        className: 'appbuilder-image-slider-item-editor',
       });
 
       return (
         <>
           <InspectorControls group="content">
             <div style={contentTabStyle}>
+              <ParentBlockBackButton clientId={clientId} />
               <PanelBody title="Slide" initialOpen={true}>
                 <ImagePicker
                   imageUrl={imageUrl}
@@ -104,7 +105,7 @@ function registerImageSliderItem() {
                     <img
                       src={imageUrl}
                       alt=""
-                      className="riyasat-image-slider-item-editor__image"
+                      className="appbuilder-image-slider-item-editor__image"
                       onClick={open}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' || event.key === ' ') open();
@@ -123,7 +124,7 @@ function registerImageSliderItem() {
                   render={({ open }) => (
                     <button
                       type="button"
-                      className="riyasat-image-slider-item-editor__image-btn"
+                      className="appbuilder-image-slider-item-editor__image-btn"
                       onClick={open}
                     >
                       Add image
@@ -134,7 +135,7 @@ function registerImageSliderItem() {
             )}
             <input
               type="text"
-              className="riyasat-image-slider-item-editor__label"
+              className="appbuilder-image-slider-item-editor__label"
               value={label}
               placeholder="Label…"
               onChange={(event) => setAttributes({ label: event.target.value })}
@@ -147,16 +148,16 @@ function registerImageSliderItem() {
     save: ({ attributes }) => {
       const { imageUrl, label, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-image-slider__slide',
+        className: 'appbuilder-image-slider__slide',
         'data-action': JSON.stringify(action ?? {}),
       });
       return (
         <div {...blockProps}>
           {imageUrl ? (
-            <img src={imageUrl} alt="" className="riyasat-image-slider__image" />
+            <img src={imageUrl} alt="" className="appbuilder-image-slider__image" />
           ) : null}
           {label ? (
-            <span className="riyasat-image-slider__label">{label}</span>
+            <span className="appbuilder-image-slider__label">{label}</span>
           ) : null}
         </div>
       );
@@ -172,7 +173,7 @@ function registerImageSliderParent() {
     apiVersion: 3,
     title: 'Image Slider',
     description: 'A titled, horizontally scrolling row of image slides.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: ImageSliderIcon,
     keywords: ['slider', 'scroller', 'images', 'products'],
     supports: { html: false, align: ['wide', 'full'] },
@@ -180,13 +181,14 @@ function registerImageSliderParent() {
       title: { type: 'string', default: '' },
       subTitle: { type: 'string', default: '' },
       showPagination: { type: 'boolean', default: true },
+      dotPosition: { type: 'string', default: 'center' },
       gap: { type: 'number', default: 20 },
       backgroundColor: { type: 'string', default: '#ffffff' },
     },
 
     edit: ({ attributes, setAttributes, clientId }) => {
-      const { title, subTitle, showPagination, gap, backgroundColor } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-image-slider-editor' });
+      const { title, subTitle, showPagination, dotPosition = 'center', gap, backgroundColor } = attributes;
+      const blockProps = useBlockProps({ className: 'appbuilder-image-slider-editor' });
       const [activeIndex, setActiveIndex] = useState(0);
       const { childBlocks, childCount, insertBlock, removeBlock, updateBlockAttributes } =
         useChildBlocks(clientId);
@@ -284,14 +286,30 @@ function registerImageSliderParent() {
                 checked={showPagination}
                 onChange={(value) => setAttributes({ showPagination: value })}
               />
-              <PanelColorSettings
+              {showPagination ? (
+                <SelectControl
+                  label="Dot Indicator Position"
+                  value={dotPosition || 'center'}
+                  options={[
+                    { label: 'Left', value: 'left' },
+                    { label: 'Center', value: 'center' },
+                    { label: 'Right', value: 'right' },
+                  ]}
+                  onChange={(val) => setAttributes({ dotPosition: val })}
+                />
+              ) : null}
+              <ColorSettingsPanel
                 title="Colors"
                 colorSettings={[
                   {
                     label: 'Background color',
                     value: backgroundColor || '#ffffff',
-                    onChange: (value) =>
-                      setAttributes({ backgroundColor: value || '#ffffff' }),
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
+                      setAttributes({ backgroundColor: value });
+                    },
                   },
                 ]}
               />
@@ -300,24 +318,24 @@ function registerImageSliderParent() {
 
           <div {...blockProps}>
             <div
-              className="riyasat-image-slider"
+              className="appbuilder-image-slider"
               style={{
-                '--riyasat-image-slider-gap': `${sliderGap}px`,
+                '--appbuilder-image-slider-gap': `${sliderGap}px`,
                 backgroundColor: backgroundColor || '#ffffff',
               }}
             >
               {(title || subTitle) && (
-                <div className="riyasat-image-slider__heading">
+                <div className="appbuilder-image-slider__heading">
                   {title ? (
-                    <h3 className="riyasat-image-slider__title">{title}</h3>
+                    <h3 className="appbuilder-image-slider__title">{title}</h3>
                   ) : null}
                   {subTitle ? (
-                    <p className="riyasat-image-slider__subtitle">{subTitle}</p>
+                    <p className="appbuilder-image-slider__subtitle">{subTitle}</p>
                   ) : null}
                 </div>
               )}
 
-              <div className="riyasat-image-slider__track" ref={trackRef}>
+              <div className="appbuilder-image-slider__track" ref={trackRef}>
                 <InnerBlocks
                   allowedBlocks={[IMAGE_SLIDER_ITEM_BLOCK]}
                   template={[
@@ -335,8 +353,8 @@ function registerImageSliderParent() {
                   count={slideCount}
                   activeIndex={activeIndex}
                   onSelect={goToSlide}
-                  className="riyasat-image-slider__pagination"
-                  dotClassName="riyasat-image-slider__dot"
+                  className={`appbuilder-image-slider__pagination appbuilder-image-slider__pagination--${dotPosition || 'center'}`}
+                  dotClassName="appbuilder-image-slider__dot"
                   ariaLabelPrefix="Go to slide"
                 />
               ) : null}
@@ -347,35 +365,36 @@ function registerImageSliderParent() {
     },
 
     save: ({ attributes }) => {
-      const { title, subTitle, showPagination, gap, backgroundColor } = attributes;
+      const { title, subTitle, showPagination, dotPosition = 'center', gap, backgroundColor } = attributes;
       const sliderGap = Number.isFinite(gap) ? Math.max(0, gap) : 20;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-image-slider',
+        className: 'appbuilder-image-slider',
         'data-show-pagination': showPagination ? 'true' : 'false',
+        'data-dot-position': dotPosition || 'center',
         'data-background-color': backgroundColor || '#ffffff',
         style: {
-          '--riyasat-image-slider-gap': `${sliderGap}px`,
+          '--appbuilder-image-slider-gap': `${sliderGap}px`,
           backgroundColor: backgroundColor || '#ffffff',
         },
       });
       return (
         <div {...blockProps}>
           {(title || subTitle) && (
-            <div className="riyasat-image-slider__heading">
+            <div className="appbuilder-image-slider__heading">
               {title ? (
-                <h3 className="riyasat-image-slider__title">{title}</h3>
+                <h3 className="appbuilder-image-slider__title">{title}</h3>
               ) : null}
               {subTitle ? (
-                <p className="riyasat-image-slider__subtitle">{subTitle}</p>
+                <p className="appbuilder-image-slider__subtitle">{subTitle}</p>
               ) : null}
             </div>
           )}
-          <div className="riyasat-image-slider__track">
+          <div className="appbuilder-image-slider__track">
             <InnerBlocks.Content />
           </div>
           {showPagination ? (
             <div
-              className="riyasat-image-slider__pagination"
+              className={`appbuilder-image-slider__pagination appbuilder-image-slider__pagination--${dotPosition || 'center'}`}
               aria-hidden="true"
             />
           ) : null}

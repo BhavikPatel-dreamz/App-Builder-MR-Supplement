@@ -6,22 +6,23 @@ import {
   useBlockProps,
   InnerBlocks,
   InspectorControls,
-  PanelColorSettings,
   MediaUpload,
   MediaUploadCheck,
 } from 'gutenberg-block-kit/wp/block-editor';
 import { PanelBody, TextControl, Button } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import {
+  ColorSettingsPanel,
   contentTabStyle,
   ImagePicker,
+  getImageUrl,
   useChildBlocks,
 } from '../inspector-shared';
 import {
   MENU_ITEMS_BLOCK,
   MENU_ITEM_BLOCK,
   MENU_SUB_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_BACKGROUND_COLOR = '#FFFFFF';
@@ -48,7 +49,7 @@ function IconField({ icon, onChange, onClear }) {
   return (
     <ImagePicker
       imageUrl={icon}
-      onSelect={(media) => onChange(media?.url ?? '')}
+      onSelect={(media) => onChange(getImageUrl(media))}
       onClear={onClear}
       addLabel="Add icon"
       changeLabel="Change icon"
@@ -63,7 +64,7 @@ function MenuRowPreview({ icon, label, onIconOpen, onLabelChange, className, pla
         <img
           src={icon}
           alt=""
-          className="riyasat-menu-items__icon"
+          className="appbuilder-menu-items__icon"
           onClick={onIconOpen}
           onKeyDown={(event) => {
             if (event.key === 'Enter' || event.key === ' ') onIconOpen?.();
@@ -72,15 +73,15 @@ function MenuRowPreview({ icon, label, onIconOpen, onLabelChange, className, pla
           tabIndex={onIconOpen ? 0 : undefined}
         />
       ) : onIconOpen ? (
-        <button type="button" className="riyasat-menu-items__icon-btn" onClick={onIconOpen}>
+        <button type="button" className="appbuilder-menu-items__icon-btn" onClick={onIconOpen}>
           Icon
         </button>
       ) : (
-        <span className="riyasat-menu-items__icon-placeholder" aria-hidden="true" />
+        <span className="appbuilder-menu-items__icon-placeholder" aria-hidden="true" />
       )}
       <input
         type="text"
-        className="riyasat-menu-items__label-input"
+        className="appbuilder-menu-items__label-input"
         value={label}
         placeholder={placeholder}
         onChange={(event) => onLabelChange(event.target.value)}
@@ -119,7 +120,7 @@ function registerMenuSubItem() {
     apiVersion: 3,
     title: 'Menu Sub Item',
     description: 'A nested drawer menu row with icon, label and action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [MENU_ITEM_BLOCK],
     icon: 'minus',
     supports: { html: false, reusable: false },
@@ -132,7 +133,7 @@ function registerMenuSubItem() {
     edit: ({ attributes, setAttributes }) => {
       const { icon, label, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-menu-items-sub-item-editor',
+        className: 'appbuilder-menu-items-sub-item-editor',
       });
 
       return (
@@ -152,7 +153,7 @@ function registerMenuSubItem() {
           <div {...blockProps}>
             <MediaUploadCheck>
               <MediaUpload
-                onSelect={(media) => setAttributes({ icon: media?.url ?? '' })}
+                onSelect={(media) => setAttributes({ icon: getImageUrl(media) })}
                 allowedTypes={['image']}
                 render={({ open }) => (
                   <MenuRowPreview
@@ -160,7 +161,7 @@ function registerMenuSubItem() {
                     label={label}
                     onIconOpen={open}
                     onLabelChange={(value) => setAttributes({ label: value })}
-                    className="riyasat-menu-items__sub-item"
+                    className="appbuilder-menu-items__sub-item"
                     placeholder="Sub item label…"
                   />
                 )}
@@ -174,15 +175,15 @@ function registerMenuSubItem() {
     save: ({ attributes }) => {
       const { icon, label, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-menu-items__sub-item',
+        className: 'appbuilder-menu-items__sub-item',
         'data-icon': icon || '',
         'data-action': JSON.stringify(action ?? {}),
       });
 
       return (
         <div {...blockProps}>
-          {icon ? <img src={icon} alt="" className="riyasat-menu-items__icon" /> : null}
-          {label ? <span className="riyasat-menu-items__label">{label}</span> : null}
+          {icon ? <img src={icon} alt="" className="appbuilder-menu-items__icon" /> : null}
+          {label ? <span className="appbuilder-menu-items__label">{label}</span> : null}
         </div>
       );
     },
@@ -197,7 +198,7 @@ function registerMenuItem() {
     apiVersion: 3,
     title: 'Menu Item',
     description: 'A drawer menu row with icon, label, action and optional sub items.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [MENU_ITEMS_BLOCK],
     icon: 'menu',
     supports: { html: false, reusable: false },
@@ -210,7 +211,7 @@ function registerMenuItem() {
     edit: ({ attributes, setAttributes }) => {
       const { icon, label, action } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-menu-items-item-editor',
+        className: 'appbuilder-menu-items-item-editor',
       });
 
       return (
@@ -230,7 +231,7 @@ function registerMenuItem() {
           <div {...blockProps}>
             <MediaUploadCheck>
               <MediaUpload
-                onSelect={(media) => setAttributes({ icon: media?.url ?? '' })}
+                onSelect={(media) => setAttributes({ icon: getImageUrl(media) })}
                 allowedTypes={['image']}
                 render={({ open }) => (
                   <MenuRowPreview
@@ -238,14 +239,14 @@ function registerMenuItem() {
                     label={label}
                     onIconOpen={open}
                     onLabelChange={(value) => setAttributes({ label: value })}
-                    className="riyasat-menu-items__item"
+                    className="appbuilder-menu-items__item"
                     placeholder="Menu label…"
                   />
                 )}
               />
             </MediaUploadCheck>
 
-            <div className="riyasat-menu-items__sub-list">
+            <div className="appbuilder-menu-items__sub-list">
               <InnerBlocks
                 allowedBlocks={[MENU_SUB_ITEM_BLOCK]}
                 template={[]}
@@ -261,16 +262,16 @@ function registerMenuItem() {
     save: ({ attributes }) => {
       const { icon, label, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-menu-items__item',
+        className: 'appbuilder-menu-items__item',
         'data-icon': icon || '',
         'data-action': JSON.stringify(action ?? {}),
       });
 
       return (
         <div {...blockProps}>
-          {icon ? <img src={icon} alt="" className="riyasat-menu-items__icon" /> : null}
-          {label ? <span className="riyasat-menu-items__label">{label}</span> : null}
-          <div className="riyasat-menu-items__sub-list">
+          {icon ? <img src={icon} alt="" className="appbuilder-menu-items__icon" /> : null}
+          {label ? <span className="appbuilder-menu-items__label">{label}</span> : null}
+          <div className="appbuilder-menu-items__sub-list">
             <InnerBlocks.Content />
           </div>
         </div>
@@ -287,7 +288,7 @@ function registerMenuItemsParent() {
     apiVersion: 3,
     title: 'Drawer Menu',
     description: 'Mobile drawer navigation with icons, labels and nested sub items.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: DrawerMenuIcon,
     keywords: ['menu', 'drawer', 'navigation', 'nav'],
     supports: { html: false, align: ['wide', 'full'] },
@@ -298,7 +299,7 @@ function registerMenuItemsParent() {
     edit: ({ attributes, setAttributes, clientId }) => {
       const { backgroundColor } = attributes;
       const blockProps = useBlockProps({
-        className: 'riyasat-menu-items-editor',
+        className: 'appbuilder-menu-items-editor',
         style: { backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR },
       });
       const { childBlocks, childCount, insertBlock, removeBlock, updateBlockAttributes } =
@@ -361,23 +362,27 @@ function registerMenuItemsParent() {
           </InspectorControls>
 
           <InspectorControls>
-            <PanelColorSettings
+            <ColorSettingsPanel
               title="Colors"
               colorSettings={[
                 {
                   label: 'Background color',
                   value: backgroundColor || DEFAULT_BACKGROUND_COLOR,
-                  onChange: (value) =>
+                  onChange: (value) => {
+                    if (value === undefined || value === null || value === '') {
+                      return;
+                    }
                     setAttributes({
-                      backgroundColor: value || DEFAULT_BACKGROUND_COLOR,
-                    }),
+                      backgroundColor: value,
+                    });
+                  },
                 },
               ]}
             />
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-menu-items">
+            <div className="appbuilder-menu-items">
               <InnerBlocks
                 allowedBlocks={[MENU_ITEM_BLOCK]}
                 template={[
@@ -397,7 +402,7 @@ function registerMenuItemsParent() {
     save: ({ attributes }) => {
       const { backgroundColor } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-menu-items',
+        className: 'appbuilder-menu-items',
         'data-background-color': backgroundColor || DEFAULT_BACKGROUND_COLOR,
         style: { backgroundColor: backgroundColor || DEFAULT_BACKGROUND_COLOR },
       });

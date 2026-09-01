@@ -12,8 +12,7 @@ import {
   parseCollectionRef,
   parseProductRef,
 } from "../lib/settings-resources";
-import { normalizeTodaysAffirmationEntries } from "../lib/todays-affirmation";
-import { normalizeTodaysMeditationEntries } from "../lib/todays-meditation";
+import { parseBottomTabs, parseTabBackgroundColor } from "../lib/bottom-tabs";
 import { authenticate } from "../shopify.server";
 
 function parseBoolean(value: unknown): boolean {
@@ -26,35 +25,6 @@ function parseSettingsBody(body: unknown): ShopSettingsInput | null {
   }
 
   const input = body as Record<string, unknown>;
-
-  // Support both flat fields and nested `todaysMeditation` payloads.
-  const nestedMeditation =
-    input.todaysMeditation && typeof input.todaysMeditation === "object"
-      ? (input.todaysMeditation as Record<string, unknown>)
-      : null;
-
-  const todaysMeditationDefaultImageUrl = String(
-    nestedMeditation?.defaultImageUrl ??
-      input.todaysMeditationDefaultImageUrl ??
-      "",
-  );
-  const todaysMeditationEntries = normalizeTodaysMeditationEntries(
-    nestedMeditation?.entries ?? input.todaysMeditationEntries,
-  );
-
-  const nestedAffirmation =
-    input.todaysAffirmation && typeof input.todaysAffirmation === "object"
-      ? (input.todaysAffirmation as Record<string, unknown>)
-      : null;
-
-  const todaysAffirmationDefaultImageUrl = String(
-    nestedAffirmation?.defaultImageUrl ??
-      input.todaysAffirmationDefaultImageUrl ??
-      "",
-  );
-  const todaysAffirmationEntries = normalizeTodaysAffirmationEntries(
-    nestedAffirmation?.entries ?? input.todaysAffirmationEntries,
-  );
 
   return {
     androidAppVersion: String(input.androidAppVersion ?? ""),
@@ -69,10 +39,12 @@ function parseSettingsBody(body: unknown): ShopSettingsInput | null {
     coursesTabCollection: parseCollectionRef(input.coursesTabCollection),
     yagnasTabCollection: parseCollectionRef(input.yagnasTabCollection),
     yagnasTabProduct: parseProductRef(input.yagnasTabProduct),
-    todaysMeditationDefaultImageUrl,
-    todaysMeditationEntries,
-    todaysAffirmationDefaultImageUrl,
-    todaysAffirmationEntries,
+    todaysMeditationDefaultImageUrl: String(input.todaysMeditationDefaultImageUrl ?? ""),
+    todaysMeditationEntries: Array.isArray(input.todaysMeditationEntries) ? input.todaysMeditationEntries : [],
+    todaysAffirmationDefaultImageUrl: String(input.todaysAffirmationDefaultImageUrl ?? ""),
+    todaysAffirmationEntries: Array.isArray(input.todaysAffirmationEntries) ? input.todaysAffirmationEntries : [],
+    tabBackgroundColor: parseTabBackgroundColor(input.tabBackgroundColor),
+    bottomTabs: parseBottomTabs(input.bottomTabs ?? input.tabs),
   };
 }
 
@@ -82,7 +54,6 @@ function buildSettingsResponse(settings: ShopSettingsInput) {
   return {
     success: true,
     settings,
-    // Explicit payloads for admin + mobile consumers.
     todaysMeditation: buildTodaysMeditationPublicPayload(settings),
     todaysAffirmation: buildTodaysAffirmationPublicPayload(settings),
     public: publicSettings,

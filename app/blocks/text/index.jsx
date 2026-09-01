@@ -3,8 +3,8 @@ import { registerBlockType } from 'gutenberg-block-kit/wp/blocks';
 import {
   useBlockProps,
   InspectorControls,
-  PanelColorSettings,
 } from 'gutenberg-block-kit/wp/block-editor';
+import { ColorSettingsPanel } from '../inspector-shared';
 import {
   PanelBody,
   TextControl,
@@ -12,7 +12,7 @@ import {
   SelectControl,
 } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
-import { STANDARD_TEXT_BLOCK, RIYASAT_CATEGORY } from '../constants';
+import { STANDARD_TEXT_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 
 const DEFAULT_TEXT = 'Hello, World!';
 const DEFAULT_FONT_SIZE = 16;
@@ -51,7 +51,7 @@ export function registerStandardText() {
     apiVersion: 3,
     title: 'Text',
     description: 'Plain text with typography, spacing and action settings.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: TextIcon,
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
@@ -84,7 +84,7 @@ export function registerStandardText() {
       } = attributes;
 
       const blockProps = useBlockProps({
-        className: 'riyasat-standard-text-editor',
+        className: 'appbuilder-standard-text-editor',
       });
 
       const resolvedStyle = {
@@ -181,27 +181,35 @@ export function registerStandardText() {
           </InspectorControls>
 
           <InspectorControls>
-            <PanelColorSettings
+            <ColorSettingsPanel
               title="Colors"
               colorSettings={[
                 {
                   label: 'Font color',
                   value: fontColor,
-                  onChange: (value) =>
-                    setAttributes({ fontColor: value || DEFAULT_FONT_COLOR }),
+                  onChange: (value) => {
+                    if (value === undefined || value === null || value === '') {
+                      return;
+                    }
+                    setAttributes({ fontColor: value });
+                  },
                 },
                 {
                   label: 'Background color',
                   value: backgroundColor,
-                  onChange: (value) =>
-                    setAttributes({ backgroundColor: value || DEFAULT_BACKGROUND }),
+                  onChange: (value) => {
+                    if (value === undefined || value === null || value === '') {
+                      return;
+                    }
+                    setAttributes({ backgroundColor: value });
+                  },
                 },
               ]}
             />
           </InspectorControls>
 
           <div {...blockProps}>
-            <div className="riyasat-standard-text" style={resolvedStyle}>
+            <div className="appbuilder-standard-text" style={resolvedStyle}>
               {text || DEFAULT_TEXT}
             </div>
           </div>
@@ -237,7 +245,7 @@ export function registerStandardText() {
       };
 
       const blockProps = useBlockProps.save({
-        className: 'riyasat-standard-text',
+        className: 'appbuilder-standard-text',
         'data-text': text || DEFAULT_TEXT,
         'data-font-size': `${toNonNegativeNumber(fontSize, DEFAULT_FONT_SIZE)}`,
         'data-font-color': fontColor || DEFAULT_FONT_COLOR,

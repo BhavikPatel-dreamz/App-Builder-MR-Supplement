@@ -1,8 +1,8 @@
 {
-  "name": "app-builder",
+  "name": "App Builder MR-Supplement",
   "private": true,
   "scripts": {
-    "build": "prisma generate && react-router build",
+    "build": "prisma generate && prisma migrate deploy && react-router build",
     "dev": "shopify app dev --tunnel-url=https://bhavik.dynamicdreamz.net:3000",
     "config:link": "shopify app config link",
     "generate": "shopify app generate",
@@ -20,7 +20,12 @@
     "prisma": "prisma",
     "graphql-codegen": "graphql-codegen",
     "vite": "vite",
-    "typecheck": "react-router typegen && tsc --noEmit"
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "build:ci": "prisma generate && react-router build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "register:queries": "tsx scripts/register-persisted-queries.ts",
+    "load-test:coalescing": "tsx scripts/load-test-coalescing.ts"
   },
   "type": "module",
   "engines": {
@@ -48,7 +53,9 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.6.0",
     "react-router": "^7.12.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "ioredis": "^6.0.0",
+    "undici": "^8.10.0"
   },
   "devDependencies": {
     "@shopify/api-codegen-preset": "^1.2.0",
@@ -71,7 +78,9 @@
     "hot-updater": "0.35.8",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
-    "vite": "^6.3.6"
+    "vite": "^6.3.6",
+    "vitest": "^4.1.11",
+    "tsx": "^4.20.3"
   },
   "workspaces": [
     "extensions/*"

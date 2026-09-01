@@ -435,7 +435,7 @@ body:has(.cms-editor-shell) {
 .builder-wrapper .editor-canvas-wrapper .block-editor-block-list__layout {
   overflow-y: auto !important;
 }
-/* Hide canvas "+" appenders inside riyasat blocks — use Content sidebar instead. */
+/* Hide canvas "+" appenders inside Appbuilder Blocks — use Content sidebar instead. */
 .cms-editor-shell [class$="-editor"] .block-list-appender,
 .cms-editor-shell [class$="-editor"] .block-editor-button-block-appender {
   display: none !important;

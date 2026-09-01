@@ -7,13 +7,13 @@ import {
   useBlockProps,
   InnerBlocks,
   InspectorControls,
-  PanelColorSettings,
   MediaUpload,
   MediaUploadCheck,
 } from 'gutenberg-block-kit/wp/block-editor';
-import { PanelBody, TextControl, Button } from 'gutenberg-block-kit/wp/components';
+import { PanelBody, TextControl, Button, SelectControl } from 'gutenberg-block-kit/wp/components';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
 import {
+  ColorSettingsPanel,
   contentTabStyle,
   ImagePicker,
   imageAttributesFromMedia,
@@ -21,11 +21,12 @@ import {
   useChildBlocks,
   useSliderPagination,
   SliderPaginationDots,
+  ParentBlockBackButton,
 } from '../inspector-shared';
 import {
   CATEGORIES_SCROLLER_BLOCK,
   CATEGORIES_SCROLLER_ITEM_BLOCK,
-  RIYASAT_CATEGORY,
+  APPBUILDER_CATEGORY,
 } from '../constants';
 
 const DEFAULT_BACKGROUND = '#f5f5f5';
@@ -56,7 +57,7 @@ function registerCategoriesScrollerItem() {
     apiVersion: 3,
     title: 'Category Item',
     description: 'A category tile with image, label and optional tap action.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     parent: [CATEGORIES_SCROLLER_BLOCK],
     icon: 'category',
     supports: { html: false, reusable: false },
@@ -68,17 +69,18 @@ function registerCategoriesScrollerItem() {
       action: { type: 'object', default: {} },
     },
 
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const { imageUrl, label, action: rawAction } = attributes;
       const action = rawAction ?? {};
       const blockProps = useBlockProps({
-        className: 'riyasat-categories-scroller-item-editor',
+        className: 'appbuilder-categories-scroller-item-editor',
       });
 
       return (
         <>
           <InspectorControls group="content">
             <div style={contentTabStyle}>
+              <ParentBlockBackButton clientId={clientId} />
               <PanelBody title="Category" initialOpen={true}>
                 <ImagePicker
                   imageUrl={imageUrl}
@@ -109,7 +111,7 @@ function registerCategoriesScrollerItem() {
                     <img
                       src={imageUrl}
                       alt=""
-                      className="riyasat-categories-scroller-item-editor__image"
+                      className="appbuilder-categories-scroller-item-editor__image"
                       onClick={open}
                       onKeyDown={(event) => {
                         if (event.key === 'Enter' || event.key === ' ') open();
@@ -128,7 +130,7 @@ function registerCategoriesScrollerItem() {
                   render={({ open }) => (
                     <button
                       type="button"
-                      className="riyasat-categories-scroller-item-editor__image-btn"
+                      className="appbuilder-categories-scroller-item-editor__image-btn"
                       onClick={open}
                     >
                       Add image
@@ -139,7 +141,7 @@ function registerCategoriesScrollerItem() {
             )}
             <input
               type="text"
-              className="riyasat-categories-scroller-item-editor__label"
+              className="appbuilder-categories-scroller-item-editor__label"
               value={label}
               placeholder="Label…"
               onChange={(event) => setAttributes({ label: event.target.value })}
@@ -152,7 +154,7 @@ function registerCategoriesScrollerItem() {
     save: ({ attributes }) => {
       const { imageUrl, label, action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-categories-scroller__item',
+        className: 'appbuilder-categories-scroller__item',
         'data-action': JSON.stringify(action ?? {}),
       });
       return (
@@ -161,11 +163,11 @@ function registerCategoriesScrollerItem() {
             <img
               src={imageUrl}
               alt=""
-              className="riyasat-categories-scroller__image"
+              className="appbuilder-categories-scroller__image"
             />
           ) : null}
           {label ? (
-            <span className="riyasat-categories-scroller__label">{label}</span>
+            <span className="appbuilder-categories-scroller__label">{label}</span>
           ) : null}
         </div>
       );
@@ -181,18 +183,19 @@ function registerCategoriesScrollerParent() {
     apiVersion: 3,
     title: 'Categories Scroller',
     description: 'Horizontally scrolling category tiles with image and label.',
-    category: RIYASAT_CATEGORY,
+    category: APPBUILDER_CATEGORY,
     icon: CategoriesScrollerIcon,
     keywords: ['categories', 'scroller', 'shop', 'collection'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
       backgroundColor: { type: 'string', default: DEFAULT_BACKGROUND },
+      dotPosition: { type: 'string', default: 'center' },
       action: { type: 'object', default: {} },
     },
 
     edit: ({ attributes, setAttributes, clientId }) => {
-      const { backgroundColor, action } = attributes;
-      const blockProps = useBlockProps({ className: 'riyasat-categories-scroller-editor' });
+      const { backgroundColor, dotPosition = 'center', action } = attributes;
+      const blockProps = useBlockProps({ className: 'appbuilder-categories-scroller-editor' });
       const [activeIndex, setActiveIndex] = useState(0);
       const { childBlocks, childCount, insertBlock, removeBlock, updateBlockAttributes } =
         useChildBlocks(clientId);
@@ -271,14 +274,28 @@ function registerCategoriesScrollerParent() {
 
           <InspectorControls>
             <PanelBody title="Settings" initialOpen={true}>
-              <PanelColorSettings
+              <SelectControl
+                label="Dot Indicator Position"
+                value={dotPosition || 'center'}
+                options={[
+                  { label: 'Left', value: 'left' },
+                  { label: 'Center', value: 'center' },
+                  { label: 'Right', value: 'right' },
+                ]}
+                onChange={(val) => setAttributes({ dotPosition: val })}
+              />
+              <ColorSettingsPanel
                 title="Colors"
                 colorSettings={[
                   {
                     label: 'Background color',
                     value: backgroundColor,
-                    onChange: (value) =>
-                      setAttributes({ backgroundColor: value || DEFAULT_BACKGROUND }),
+                    onChange: (value) => {
+                      if (value === undefined || value === null || value === '') {
+                        return;
+                      }
+                      setAttributes({ backgroundColor: value });
+                    },
                   },
                 ]}
               />
@@ -292,10 +309,10 @@ function registerCategoriesScrollerParent() {
 
           <div {...blockProps}>
             <div
-              className="riyasat-categories-scroller"
+              className="appbuilder-categories-scroller"
               style={{ background: backgroundColor }}
             >
-              <div className="riyasat-categories-scroller__track" ref={trackRef}>
+              <div className="appbuilder-categories-scroller__track" ref={trackRef}>
                 <InnerBlocks
                   allowedBlocks={[CATEGORIES_SCROLLER_ITEM_BLOCK]}
                   template={[
@@ -312,8 +329,8 @@ function registerCategoriesScrollerParent() {
                 count={slideCount}
                 activeIndex={activeIndex}
                 onSelect={goToSlide}
-                className="riyasat-categories-scroller__pagination"
-                dotClassName="riyasat-categories-scroller__dot"
+                className={`appbuilder-categories-scroller__pagination appbuilder-categories-scroller__pagination--${dotPosition || 'center'}`}
+                dotClassName="appbuilder-categories-scroller__dot"
                 ariaLabelPrefix="Go to category"
               />
             </div>
@@ -323,18 +340,20 @@ function registerCategoriesScrollerParent() {
     },
 
     save: ({ attributes }) => {
-      const { backgroundColor, action } = attributes;
+      const { backgroundColor, dotPosition = 'center', action } = attributes;
       const blockProps = useBlockProps.save({
-        className: 'riyasat-categories-scroller',
+        className: 'appbuilder-categories-scroller',
         'data-background-color': backgroundColor,
+        'data-dot-position': dotPosition || 'center',
         'data-action': JSON.stringify(action ?? {}),
         style: { background: backgroundColor },
       });
       return (
         <div {...blockProps}>
-          <div className="riyasat-categories-scroller__track">
+          <div className="appbuilder-categories-scroller__track">
             <InnerBlocks.Content />
           </div>
+          <div className={`appbuilder-categories-scroller__pagination appbuilder-categories-scroller__pagination--${dotPosition || 'center'}`} aria-hidden="true" />
         </div>
       );
     },
