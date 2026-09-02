@@ -9,8 +9,14 @@ import riyasatImageSliderStyles from "../blocks/appbuilder/image-slider.css?url"
 import riyasatProductScrollerStyles from "../blocks/appbuilder/product-scroller.css?url";
 import riyasatCategoriesScrollerStyles from "../blocks/appbuilder/categories-scroller.css?url";
 import riyasatSelectedProductsStyles from "../blocks/appbuilder/selected-products.css?url";
-import riyasatAdvancedMultimediaScrollerStyles from "../blocks/appbuilder/advanced-multimedia-scroller.css?url";
+//import riyasatAdvancedMultimediaScrollerStyles from "../blocks/appbuilder/advanced-multimedia-scroller.css?url";
+import riyasatMultimediaScrollerStyles from "../blocks/appbuilder/multimedia-scroller.css?url";
 import riyasatExpandalbeCategoriesStyles from "../blocks/appbuilder/expandalbe-categories.css?url";
+import riyasatProductsByCategorisScrollerStyles from "../blocks/appbuilder/products-by-categoris-scroller.css?url";
+import riyasatBrandScrollerStyles from "../blocks/appbuilder/brand-scroller.css?url";
+import riyasatSocialFeedStyles from "../blocks/appbuilder/social-feed.css?url";
+import riyasatStorySectionStyles from "../blocks/appbuilder/story-section.css?url";
+import riyasatRewardsStepsStyles from "../blocks/appbuilder/rewards-steps.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: blockLibraryStyles },
@@ -20,8 +26,14 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: riyasatProductScrollerStyles },
   { rel: "stylesheet", href: riyasatCategoriesScrollerStyles },
   { rel: "stylesheet", href: riyasatSelectedProductsStyles },
-  { rel: "stylesheet", href: riyasatAdvancedMultimediaScrollerStyles },
+  // { rel: "stylesheet", href: riyasatAdvancedMultimediaScrollerStyles },
+  { rel: "stylesheet", href: riyasatMultimediaScrollerStyles },
   { rel: "stylesheet", href: riyasatExpandalbeCategoriesStyles },
+  { rel: "stylesheet", href: riyasatProductsByCategorisScrollerStyles },
+  { rel: "stylesheet", href: riyasatBrandScrollerStyles },
+  { rel: "stylesheet", href: riyasatSocialFeedStyles },
+  { rel: "stylesheet", href: riyasatStorySectionStyles },
+  { rel: "stylesheet", href: riyasatRewardsStepsStyles },
 ];
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {

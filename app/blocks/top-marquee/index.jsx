@@ -30,7 +30,7 @@ const DEFAULT_DELAY = 2000;
 const DEFAULT_HEIGHT = 15;
 const DEFAULT_DIVIDER_HEIGHT = 4;
 const DEFAULT_DIVIDER_COLOR = "#ffffff";
-const DEFAULT_BG = "#ffffff";
+const DEFAULT_BG = "#1A1C1E";
 const DEFAULT_TEXT_COLOR = "#ffffff";
 const DEFAULT_FONT_SIZE = 10;
 
@@ -57,17 +57,20 @@ function registerTopMarqueeItem() {
       action: { type: "object", default: {} },
     },
     edit: ({ attributes, setAttributes }) => {
-      const { iconUrl, text, textColor, textFontSize, action } = attributes;
+      const {
+        iconUrl,
+        imageWidth,
+        imageHeight,
+        text,
+        textColor,
+        textFontSize,
+        action,
+      } = attributes;
       const fontSize = toNumber(textFontSize, DEFAULT_FONT_SIZE);
+      const iconW = toNumber(imageWidth, 0) || 18;
+      const iconH = toNumber(imageHeight, 0) || 18;
       const blockProps = useBlockProps({
         className: "appbuilder-top-marquee-item-editor",
-        style: {
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "4px 10px",
-          whiteSpace: "nowrap",
-        },
       });
 
       return (
@@ -130,11 +133,11 @@ function registerTopMarqueeItem() {
                     <img
                       src={iconUrl}
                       alt=""
+                      className="appbuilder-top-marquee-item-editor__icon"
                       onClick={open}
                       style={{
-                        width: 16,
-                        height: 16,
-                        objectFit: "contain",
+                        width: iconW,
+                        height: iconH,
                         cursor: "pointer",
                       }}
                     />
@@ -157,9 +160,10 @@ function registerTopMarqueeItem() {
               </MediaUploadCheck>
             )}
             <span
+              className="appbuilder-top-marquee-item-editor__text"
               style={{
                 color: textColor || DEFAULT_TEXT_COLOR,
-                fontSize: `${fontSize}px`,
+                fontSize: `${Math.max(fontSize, 11)}px`,
               }}
             >
               {text || "Marquee text"}
@@ -239,15 +243,18 @@ function registerTopMarqueeParent() {
       const delay = toNumber(autoSlideDelay, DEFAULT_DELAY);
       const height = toNumber(blockHeight, DEFAULT_HEIGHT);
       const dividerH = toNumber(dividerHeight, DEFAULT_DIVIDER_HEIGHT);
+      const showingDivider = showDivider ?? true;
+      const previewHeight = Math.max(height, 40);
       const blockProps = useBlockProps({
-        className: "appbuilder-top-marquee-editor",
+        className: `appbuilder-top-marquee-editor${
+          showingDivider ? " is-showing-divider" : ""
+        }`,
         style: {
           background: backgroundColor || DEFAULT_BG,
-          minHeight: `${height}px`,
-          borderBottom: showDivider
-            ? `${dividerH}px solid ${dividerColor || DEFAULT_DIVIDER_COLOR}`
-            : "none",
-          overflow: "hidden",
+          minHeight: `${previewHeight}px`,
+          "--appbuilder-top-marquee-divider-height": `${dividerH}px`,
+          "--appbuilder-top-marquee-divider-color":
+            dividerColor || DEFAULT_DIVIDER_COLOR,
         },
       });
 
@@ -335,7 +342,7 @@ function registerTopMarqueeParent() {
                 ],
                 [
                   TOP_MARQUEE_ITEM_BLOCK,
-                  { text: "Trusted since 2004" },
+                  { text: "Proudly Australian owned" },
                 ],
               ]}
               orientation="horizontal"

@@ -26,15 +26,35 @@ import {
   APPBUILDER_CATEGORY,
 } from "../constants";
 
-const DEFAULT_TITLE = "Products";
-const DEFAULT_SUBTITLE = "Australia's Most Popular Supplements";
-const DEFAULT_BUTTON = "View more";
+const DEFAULT_TITLE = "SHOP BY BRAND";
+const DEFAULT_SUBTITLE = "Browse Australia's leading supplement brands";
+const DEFAULT_BUTTON = "View All Brands";
 const DEFAULT_BG = "#ffffff";
 const DEFAULT_TEXT = "#ffffff";
+const PREVIEW_BG = "#1a1c1e";
+const PREVIEW_TITLE_COLOR = "#ffffff";
+const PREVIEW_SUBTITLE_COLOR = "#b8b8b8";
+const PREVIEW_BUTTON_COLOR = "#8bc53f";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_SUBTITLE_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
 const DEFAULT_RADIUS = 10;
+
+function previewColor(value, fallback) {
+  const raw = String(value || "").trim();
+  if (!raw || raw.toLowerCase() === "#ffffff" || raw.toLowerCase() === "#fff") {
+    return fallback;
+  }
+  return raw;
+}
+
+function previewBackground(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (!raw || raw === "#ffffff" || raw === "#fff") {
+    return PREVIEW_BG;
+  }
+  return value;
+}
 
 function toNumber(value, fallback) {
   const parsed = Number(value);
@@ -59,7 +79,6 @@ function registerBrandScrollerItem() {
       const { imageUrl, action } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-brand-scroller-item-editor",
-        style: { minWidth: "96px" },
       });
 
       return (
@@ -92,13 +111,8 @@ function registerBrandScrollerItem() {
                     <img
                       src={imageUrl}
                       alt=""
+                      className="appbuilder-brand-scroller-item-editor__image"
                       onClick={open}
-                      style={{
-                        width: "100%",
-                        height: "64px",
-                        objectFit: "contain",
-                        cursor: "pointer",
-                      }}
                     />
                   )}
                 />
@@ -111,7 +125,11 @@ function registerBrandScrollerItem() {
                   }
                   allowedTypes={["image"]}
                   render={({ open }) => (
-                    <Button variant="secondary" onClick={open}>
+                    <Button
+                      variant="secondary"
+                      className="appbuilder-brand-scroller-item-editor__placeholder"
+                      onClick={open}
+                    >
                       Add logo
                     </Button>
                   )}
@@ -190,15 +208,21 @@ function registerBrandScrollerParent() {
         showArrow,
         action,
       } = attributes;
-      const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
-      const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
-      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 18);
+      const subSize = Math.max(
+        toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
+        12,
+      );
+      const btnSize = Math.max(
+        toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
+        11,
+      );
       const radius = toNumber(ImageBorderRadius, DEFAULT_RADIUS);
       const blockProps = useBlockProps({
         className: "appbuilder-brand-scroller-editor",
         style: {
-          background: backgroundColor || DEFAULT_BG,
-          padding: "16px",
+          background: previewBackground(backgroundColor),
+          "--bs-card-radius": `${radius}px`,
         },
       });
 
@@ -335,56 +359,43 @@ function registerBrandScrollerParent() {
             />
           </InspectorControls>
           <div {...blockProps}>
+            <div className="appbuilder-bs-preview__header">
+              {showTitle ? (
+                <h3
+                  className="appbuilder-bs-preview__title"
+                  style={{
+                    fontSize: `${titleSize}px`,
+                    color: previewColor(titleTextColor, PREVIEW_TITLE_COLOR),
+                  }}
+                >
+                  {title || DEFAULT_TITLE}
+                </h3>
+              ) : null}
+              {showSubTitle ? (
+                <p
+                  className="appbuilder-bs-preview__subtitle"
+                  style={{
+                    fontSize: `${subSize}px`,
+                    color: previewColor(
+                      subTitleTextColor,
+                      PREVIEW_SUBTITLE_COLOR,
+                    ),
+                  }}
+                >
+                  {subTitle || DEFAULT_SUBTITLE}
+                </p>
+              ) : null}
+            </div>
             <div
+              className="appbuilder-bs-preview__track"
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                gap: "12px",
-                marginBottom: "12px",
+                "--bs-card-radius": `${radius}px`,
               }}
             >
-              <div>
-                {showTitle ? (
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: `${titleSize}px`,
-                      color: titleTextColor || DEFAULT_TEXT,
-                    }}
-                  >
-                    {title || DEFAULT_TITLE}
-                  </h3>
-                ) : null}
-                {showSubTitle ? (
-                  <p
-                    style={{
-                      margin: "4px 0 0",
-                      fontSize: `${subSize}px`,
-                      color: subTitleTextColor || DEFAULT_TEXT,
-                    }}
-                  >
-                    {subTitle}
-                  </p>
-                ) : null}
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                {showButton ? (
-                  <span
-                    style={{
-                      fontSize: `${btnSize}px`,
-                      color: buttonTextColor || DEFAULT_TEXT,
-                    }}
-                  >
-                    {buttonText || DEFAULT_BUTTON}
-                  </span>
-                ) : null}
-                {showArrow ? <span aria-hidden="true">›</span> : null}
-              </div>
-            </div>
-            <div style={{ borderRadius: `${radius}px`, overflow: "hidden" }}>
               <InnerBlocks
                 allowedBlocks={[BRAND_SCROLLER_ITEM_BLOCK]}
                 template={[
+                  [BRAND_SCROLLER_ITEM_BLOCK, {}],
                   [BRAND_SCROLLER_ITEM_BLOCK, {}],
                   [BRAND_SCROLLER_ITEM_BLOCK, {}],
                 ]}
@@ -393,6 +404,20 @@ function registerBrandScrollerParent() {
                 renderAppender={InnerBlocks.ButtonBlockAppender}
               />
             </div>
+            {showButton ? (
+              <div className="appbuilder-bs-preview__footer">
+                <span
+                  className="appbuilder-bs-preview__view-all"
+                  style={{
+                    fontSize: `${btnSize}px`,
+                    color: previewColor(buttonTextColor, PREVIEW_BUTTON_COLOR),
+                  }}
+                >
+                  {buttonText || DEFAULT_BUTTON}
+                  {showArrow ? <span aria-hidden>→</span> : null}
+                </span>
+              </div>
+            ) : null}
           </div>
         </>
       );

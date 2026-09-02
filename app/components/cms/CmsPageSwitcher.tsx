@@ -49,6 +49,9 @@ const TYPE_SINGULAR: Record<ContentType, string> = {
   footer: "Footer",
 };
 
+const useIsomorphicLayoutEffect =
+  typeof document !== "undefined" ? useLayoutEffect : useEffect;
+
 function useHeaderCenterMount() {
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
 
@@ -162,7 +165,7 @@ export function CmsPageSwitcher({
     });
   }, []);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!open) {
       return;
     }

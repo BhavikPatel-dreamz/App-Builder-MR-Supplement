@@ -13,14 +13,40 @@ import {
 import { ActionBuilder } from "gutenberg-block-kit/actions";
 import { PRODUCT_SCROLLER_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
-const DEFAULT_TITLE = "Most Loved By Our Customers";
-const DEFAULT_SUBTITLE = "Best Sellers";
-const DEFAULT_BUTTON = "VIEW ALL BEST SELLERS";
+const DEFAULT_TITLE = "JUST LANDED";
+const DEFAULT_SUBTITLE = "";
+const DEFAULT_BUTTON = "VIEW ALL";
 const DEFAULT_BG = "#f5f5f5";
 const DEFAULT_TEXT = "#ffffff";
+const PREVIEW_TITLE_COLOR = "#111111";
+const PREVIEW_SUBTITLE_COLOR = "#6b6b6b";
+const PREVIEW_BUTTON_COLOR = "#7cb342";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_SUBTITLE_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
+
+const PREVIEW_PRODUCTS = [
+  {
+    brand: "PRANA ON",
+    name: "POWER PLANT",
+    desc: "Pea, Inchi & Rice Protein.",
+    price: "$24.95",
+  },
+  {
+    brand: "RULE 1",
+    name: "RULE 1 WHEY PROTEIN",
+    desc: "Premium Whey Blend",
+    price: "$24.95",
+  },
+];
+
+function previewColor(value, fallback) {
+  const raw = String(value || "").trim();
+  if (!raw || raw.toLowerCase() === "#ffffff" || raw.toLowerCase() === "#fff") {
+    return fallback;
+  }
+  return raw;
+}
 
 function toNumber(value, fallback) {
   const parsed = Number(value);
@@ -129,14 +155,13 @@ export function registerProductScroller() {
         collection,
         action,
       } = attributes;
-      const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
-      const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
-      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 20);
+      const subSize = Math.max(toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE), 12);
+      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 11);
       const blockProps = useBlockProps({
-        className: "appbuilder-product-scroller-editor",
+        className: "appbuilder-product-scroller-editor appbuilder-ps-preview",
         style: {
           background: backgroundColor || DEFAULT_BG,
-          padding: "16px",
         },
       });
 
@@ -232,43 +257,72 @@ export function registerProductScroller() {
             />
           </InspectorControls>
           <div {...blockProps}>
-            <h3
-              style={{
-                margin: 0,
-                fontSize: `${titleSize}px`,
-                color: titleTextColor || DEFAULT_TEXT,
-              }}
-            >
-              {title || DEFAULT_TITLE}
-            </h3>
-            {subTitle ? (
-              <p
-                style={{
-                  margin: "4px 0 0",
-                  fontSize: `${subSize}px`,
-                  color: subTitleTextColor || DEFAULT_TEXT,
-                }}
-              >
-                {subTitle}
-              </p>
-            ) : null}
-            {buttonText ? (
-              <span
-                style={{
-                  display: "inline-block",
-                  marginTop: "8px",
-                  fontSize: `${btnSize}px`,
-                  color: buttonTextColor || DEFAULT_TEXT,
-                }}
-              >
-                {buttonText}
-              </span>
-            ) : null}
-            {collection?.title ? (
-              <p style={{ margin: "8px 0 0", fontSize: "12px" }}>
-                Collection: {collection.title}
-              </p>
-            ) : null}
+            <div className="appbuilder-ps-preview__header">
+              <div>
+                <h3
+                  className="appbuilder-ps-preview__title"
+                  style={{
+                    fontSize: `${titleSize}px`,
+                    color: previewColor(titleTextColor, PREVIEW_TITLE_COLOR),
+                  }}
+                >
+                  {title || DEFAULT_TITLE}
+                </h3>
+                {subTitle ? (
+                  <p
+                    className="appbuilder-ps-preview__subtitle"
+                    style={{
+                      fontSize: `${subSize}px`,
+                      color: previewColor(
+                        subTitleTextColor,
+                        PREVIEW_SUBTITLE_COLOR,
+                      ),
+                    }}
+                  >
+                    {subTitle}
+                  </p>
+                ) : null}
+              </div>
+              {buttonText ? (
+                <span
+                  className="appbuilder-ps-preview__view-all"
+                  style={{
+                    fontSize: `${btnSize}px`,
+                    color: previewColor(buttonTextColor, PREVIEW_BUTTON_COLOR),
+                  }}
+                >
+                  {buttonText || DEFAULT_BUTTON}
+                  <span aria-hidden>→</span>
+                </span>
+              ) : null}
+            </div>
+            <div className="appbuilder-ps-preview__track">
+              {PREVIEW_PRODUCTS.map((product) => (
+                <div key={product.name} className="appbuilder-ps-preview__card">
+                  <span className="appbuilder-ps-preview__badge">NEW</span>
+                  <div className="appbuilder-ps-preview__image" />
+                  <p className="appbuilder-ps-preview__brand">{product.brand}</p>
+                  <p className="appbuilder-ps-preview__name">{product.name}</p>
+                  <p className="appbuilder-ps-preview__desc">{product.desc}</p>
+                  <div className="appbuilder-ps-preview__meta">
+                    <span className="appbuilder-ps-preview__dot">✓</span>
+                    In Stock
+                    <span className="appbuilder-ps-preview__meta-sep" />
+                    <span className="appbuilder-ps-preview__star">★</span>
+                    200 Reviews
+                  </div>
+                  <div className="appbuilder-ps-preview__footer">
+                    <div>
+                      <span className="appbuilder-ps-preview__from">FROM</span>
+                      <span className="appbuilder-ps-preview__price">
+                        {product.price}
+                      </span>
+                    </div>
+                    <span className="appbuilder-ps-preview__add">ADD</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </>
       );

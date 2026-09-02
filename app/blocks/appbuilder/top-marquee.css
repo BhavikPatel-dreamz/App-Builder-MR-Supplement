@@ -1,0 +1,65 @@
+.appbuilder-top-marquee-editor {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.appbuilder-top-marquee-editor .block-editor-inner-blocks {
+  width: 100%;
+  min-width: 0;
+}
+
+.appbuilder-top-marquee-editor .block-editor-block-list__layout {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  width: max-content;
+  min-width: 100%;
+}
+
+.appbuilder-top-marquee-editor .block-editor-block-list__block {
+  display: flex !important;
+  align-items: center;
+  margin: 0 !important;
+  max-width: none !important;
+  width: auto !important;
+}
+
+.appbuilder-top-marquee-editor.is-showing-divider
+  .block-editor-block-list__layout
+  > .block-editor-block-list__block:not(:first-child)::before {
+  content: "";
+  display: block;
+  width: 1px;
+  height: var(--appbuilder-top-marquee-divider-height, 16px);
+  background: var(--appbuilder-top-marquee-divider-color, #888888);
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+.appbuilder-top-marquee-item-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 14px;
+  white-space: nowrap;
+}
+
+.appbuilder-top-marquee-item-editor__icon {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.appbuilder-top-marquee-item-editor__text {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  line-height: 1.2;
+  font-family: system-ui, -apple-system, sans-serif;
+}

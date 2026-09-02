@@ -21,13 +21,18 @@ import {
 } from "../inspector-shared";
 import { STORY_SECTION_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
-const DEFAULT_TITLE = "Blogs & Insights";
-const DEFAULT_HIGHLIGHT = "Company";
+const DEFAULT_TITLE = "YOUR TRUSTED TRAINING PARTNER";
+const DEFAULT_HIGHLIGHT = "SINCE 2004";
 const DEFAULT_DESCRIPTION =
-  "For over 20 years we've helped Australians achieve their fitness goals with premium supplements.";
-const DEFAULT_BUTTON = "VIEW ALL";
+  "For over 20 years we've helped Australians achieve their fitness goals with premium supplements, expert advice and unbeatable service. We're passionate about training, health and helping you perform at your best every day.";
+const DEFAULT_BUTTON = "OUR STORY";
 const DEFAULT_BG = "#ffffff";
 const DEFAULT_TEXT = "#ffffff";
+const PREVIEW_TITLE_COLOR = "#111111";
+const PREVIEW_HIGHLIGHT_COLOR = "#8bc53f";
+const PREVIEW_DESC_COLOR = "#6b6b6b";
+const PREVIEW_BUTTON_BG = "#8bc53f";
+const PREVIEW_BUTTON_TEXT = "#ffffff";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_DESC_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
@@ -37,6 +42,14 @@ const DEFAULT_RADIUS = 10;
 function toNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function previewColor(value, fallback) {
+  const raw = String(value || "").trim();
+  if (!raw || raw.toLowerCase() === "#ffffff" || raw.toLowerCase() === "#fff") {
+    return fallback;
+  }
+  return raw;
 }
 
 export function registerStorySection() {
@@ -92,23 +105,19 @@ export function registerStorySection() {
         buttonBackgroundColor,
         action,
       } = attributes;
-      const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
-      const highlightSize = toNumber(
-        highlightedTitleFontSize,
-        DEFAULT_HIGHLIGHT_SIZE,
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 20);
+      const highlightSize = Math.max(
+        toNumber(highlightedTitleFontSize, DEFAULT_HIGHLIGHT_SIZE),
+        20,
       );
-      const descSize = toNumber(descriptionFontSize, DEFAULT_DESC_SIZE);
-      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
+      const descSize = Math.max(toNumber(descriptionFontSize, DEFAULT_DESC_SIZE), 12);
+      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 12);
       const imgRadius = toNumber(imageBorderRadius, DEFAULT_RADIUS);
       const btnRadius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
       const blockProps = useBlockProps({
         className: "appbuilder-story-section-editor",
         style: {
           background: backgroundColor || DEFAULT_BG,
-          padding: "16px",
-          display: "flex",
-          gap: "16px",
-          alignItems: "center",
         },
       });
 
@@ -264,68 +273,79 @@ export function registerStorySection() {
             />
           </InspectorControls>
           <div {...blockProps}>
-            {imageUrl ? (
-              <MediaUploadCheck>
-                <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
-                  }
-                  allowedTypes={["image"]}
-                  render={({ open }) => (
-                    <img
-                      src={imageUrl}
-                      alt=""
-                      onClick={open}
-                      style={{
-                        width: 120,
-                        height: 120,
-                        objectFit: "cover",
-                        borderRadius: `${imgRadius}px`,
-                        cursor: "pointer",
-                      }}
-                    />
-                  )}
-                />
-              </MediaUploadCheck>
-            ) : (
-              <MediaUploadCheck>
-                <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
-                  }
-                  allowedTypes={["image"]}
-                  render={({ open }) => (
-                    <Button variant="secondary" onClick={open}>
-                      Add image
-                    </Button>
-                  )}
-                />
-              </MediaUploadCheck>
-            )}
-            <div>
-              <h3 style={{ margin: 0 }}>
+            <div
+              className="appbuilder-ss-preview__image-wrap"
+              style={{ borderRadius: `${imgRadius}px ${imgRadius}px 0 0` }}
+            >
+              {imageUrl ? (
+                <MediaUploadCheck>
+                  <MediaUpload
+                    onSelect={(media) =>
+                      setAttributes(imageAttributesFromMedia(media))
+                    }
+                    allowedTypes={["image"]}
+                    render={({ open }) => (
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        className="appbuilder-ss-preview__image"
+                        onClick={open}
+                      />
+                    )}
+                  />
+                </MediaUploadCheck>
+              ) : (
+                <MediaUploadCheck>
+                  <MediaUpload
+                    onSelect={(media) =>
+                      setAttributes(imageAttributesFromMedia(media))
+                    }
+                    allowedTypes={["image"]}
+                    render={({ open }) => (
+                      <div className="appbuilder-ss-preview__placeholder">
+                        <Button variant="secondary" onClick={open}>
+                          Add image
+                        </Button>
+                      </div>
+                    )}
+                  />
+                </MediaUploadCheck>
+              )}
+            </div>
+            <div className="appbuilder-ss-preview__body">
+              <h3 className="appbuilder-ss-preview__title">
                 <span
                   style={{
                     fontSize: `${titleSize}px`,
-                    color: titleTextColor || DEFAULT_TEXT,
+                    color: previewColor(titleTextColor, PREVIEW_TITLE_COLOR),
                   }}
                 >
-                  {title}{" "}
+                  {title || DEFAULT_TITLE}
                 </span>
-                <span
-                  style={{
-                    fontSize: `${highlightSize}px`,
-                    color: highlightedTitleTextColor || DEFAULT_TEXT,
-                  }}
-                >
-                  {highlightedTitle}
-                </span>
+                {highlightedTitle ? (
+                  <span
+                    className="appbuilder-ss-preview__highlight"
+                    style={{
+                      fontSize: `${highlightSize}px`,
+                      color: previewColor(
+                        highlightedTitleTextColor,
+                        PREVIEW_HIGHLIGHT_COLOR,
+                      ),
+                    }}
+                  >
+                    {highlightedTitle}
+                  </span>
+                ) : null}
               </h3>
               {description ? (
                 <p
+                  className="appbuilder-ss-preview__description"
                   style={{
                     fontSize: `${descSize}px`,
-                    color: descriptionTextColor || DEFAULT_TEXT,
+                    color: previewColor(
+                      descriptionTextColor,
+                      PREVIEW_DESC_COLOR,
+                    ),
                   }}
                 >
                   {description}
@@ -333,16 +353,19 @@ export function registerStorySection() {
               ) : null}
               {buttonText ? (
                 <span
+                  className="appbuilder-ss-preview__button"
                   style={{
-                    display: "inline-block",
                     fontSize: `${btnSize}px`,
-                    color: buttonTextColor || DEFAULT_TEXT,
-                    background: buttonBackgroundColor || DEFAULT_TEXT,
-                    borderRadius: `${btnRadius}px`,
-                    padding: "6px 12px",
+                    color: previewColor(buttonTextColor, PREVIEW_BUTTON_TEXT),
+                    background: previewColor(
+                      buttonBackgroundColor,
+                      PREVIEW_BUTTON_BG,
+                    ),
+                    borderRadius: `${Math.max(btnRadius, 8)}px`,
                   }}
                 >
                   {buttonText}
+                  <span aria-hidden>→</span>
                 </span>
               ) : null}
             </div>

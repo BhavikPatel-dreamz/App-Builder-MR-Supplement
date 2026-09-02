@@ -8,11 +8,7 @@ import {
   MediaUploadCheck,
   PanelColorSettings,
 } from "gutenberg-block-kit/wp/block-editor";
-import {
-  PanelBody,
-  TextControl,
-  Button,
-} from "gutenberg-block-kit/wp/components";
+import { PanelBody, TextControl } from "gutenberg-block-kit/wp/components";
 import { ActionBuilder } from "gutenberg-block-kit/actions";
 import {
   ImagePicker,
@@ -25,12 +21,21 @@ import {
   APPBUILDER_CATEGORY,
 } from "../constants";
 
-const DEFAULT_TITLE = "Blogs & Insights";
-const DEFAULT_HIGHLIGHT = "Company";
-const DEFAULT_SUBTITLE = "Best Sellers";
-const DEFAULT_BUTTON = "VIEW ALL";
+const DEFAULT_TITLE = "MR SUPPLEMENT";
+const DEFAULT_HIGHLIGHT = "REWARDS";
+const DEFAULT_SUBTITLE =
+  "Earn points every time you shop and unlock exclusive rewards.";
+const DEFAULT_BUTTON = "EXPLORE REWARDS";
 const DEFAULT_BG = "#ffffff";
 const DEFAULT_TEXT = "#ffffff";
+const PREVIEW_BG = "#f3f3f3";
+const PREVIEW_TITLE_COLOR = "#111111";
+const PREVIEW_HIGHLIGHT_COLOR = "#8bc53f";
+const PREVIEW_SUBTITLE_COLOR = "#6b6b6b";
+const PREVIEW_BUTTON_COLOR = "#8bc53f";
+const PREVIEW_STEP_BG = "#8bc53f";
+const PREVIEW_STEP_TEXT = "#ffffff";
+const PREVIEW_CONNECTOR = "#8bc53f";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_SUBTITLE_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
@@ -41,6 +46,66 @@ const DEFAULT_BORDER = "#ffffff";
 function toNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function previewColor(value, fallback) {
+  const raw = String(value || "").trim();
+  if (!raw || raw.toLowerCase() === "#ffffff" || raw.toLowerCase() === "#fff") {
+    return fallback;
+  }
+  return raw;
+}
+
+function StepPlaceholderIcon({ stepNumber }) {
+  const n = String(stepNumber || "1");
+  if (n === "2") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <circle cx="12" cy="12" r="9" stroke="#111" strokeWidth="2" />
+        <path
+          d="M12 7v10M9.5 9.5c.4-1 1.4-1.6 2.5-1.6 1.4 0 2.5.8 2.5 2s-1 2-2.5 2H11c-1.5 0-2.5.8-2.5 2s1.2 2 2.6 2c1.2 0 2.2-.6 2.6-1.6"
+          stroke="#111"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+      </svg>
+    );
+  }
+  if (n === "3") {
+    return (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <rect
+          x="4"
+          y="6"
+          width="16"
+          height="12"
+          rx="2"
+          stroke="#111"
+          strokeWidth="2"
+        />
+        <path
+          d="M12 9v6M9.5 13.5 12 16l2.5-2.5"
+          stroke="#111"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    );
+  }
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M5 6h2l1.5 9h9l2-6H8"
+        stroke="#111"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="10" cy="18.5" r="1.5" fill="#111" />
+      <circle cx="17" cy="18.5" r="1.5" fill="#111" />
+    </svg>
+  );
 }
 
 function registerRewardsStepsItem() {
@@ -64,7 +129,6 @@ function registerRewardsStepsItem() {
       const { imageUrl, stepNumber, title, subTitle, action } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-rewards-steps-item-editor",
-        style: { minWidth: "120px", textAlign: "center" },
       });
 
       return (
@@ -101,46 +165,49 @@ function registerRewardsStepsItem() {
             </PanelBody>
           </InspectorControls>
           <div {...blockProps}>
-            {imageUrl ? (
+            <div className="appbuilder-rewards-steps-item-editor__icon-wrap">
               <MediaUploadCheck>
                 <MediaUpload
                   onSelect={(media) =>
                     setAttributes(imageAttributesFromMedia(media))
                   }
                   allowedTypes={["image"]}
-                  render={({ open }) => (
-                    <img
-                      src={imageUrl}
-                      alt=""
-                      onClick={open}
-                      style={{
-                        width: 40,
-                        height: 40,
-                        objectFit: "contain",
-                        cursor: "pointer",
-                      }}
-                    />
-                  )}
-                />
-              </MediaUploadCheck>
-            ) : (
-              <MediaUploadCheck>
-                <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
+                  render={({ open }) =>
+                    imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        onClick={open}
+                        className="appbuilder-rewards-steps-item-editor__icon"
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={open}
+                        className="appbuilder-rewards-steps-item-editor__icon"
+                        style={{
+                          border: 0,
+                          background: "transparent",
+                          padding: 0,
+                          cursor: "pointer",
+                        }}
+                      >
+                        <StepPlaceholderIcon stepNumber={stepNumber} />
+                      </button>
+                    )
                   }
-                  allowedTypes={["image"]}
-                  render={({ open }) => (
-                    <Button variant="secondary" onClick={open}>
-                      Add icon
-                    </Button>
-                  )}
                 />
               </MediaUploadCheck>
-            )}
-            <div style={{ fontWeight: 700 }}>{stepNumber || "1"}</div>
-            <div>{title || "Step title"}</div>
-            {subTitle ? <div>{subTitle}</div> : null}
+            </div>
+            <div className="appbuilder-rewards-steps-item-editor__number">
+              {stepNumber || "1"}
+            </div>
+            <div className="appbuilder-rewards-steps-item-editor__title">
+              {title || "SHOP"}
+            </div>
+            <div className="appbuilder-rewards-steps-item-editor__subtitle">
+              {subTitle || "Shop and earn points."}
+            </div>
           </div>
         </>
       );
@@ -254,11 +321,35 @@ function registerRewardsStepsParent() {
       const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
       const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
       const radius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
+      const previewBg = previewColor(backgroundColor, PREVIEW_BG);
+      const previewTitle = previewColor(titleTextColor, PREVIEW_TITLE_COLOR);
+      const previewHighlight = previewColor(
+        highlightedTitleTextColor,
+        PREVIEW_HIGHLIGHT_COLOR,
+      );
+      const previewSub = previewColor(subTitleTextColor, PREVIEW_SUBTITLE_COLOR);
+      const previewBtn = previewColor(buttonTextColor, PREVIEW_BUTTON_COLOR);
+      const previewBtnBorder = previewColor(
+        buttonBorderColor,
+        PREVIEW_BUTTON_COLOR,
+      );
+      const previewStepBg = previewColor(
+        stepNumberBackgroundColor,
+        PREVIEW_STEP_BG,
+      );
+      const previewStepText = previewColor(
+        stepNumberTextColor,
+        PREVIEW_STEP_TEXT,
+      );
+      const previewConnector = previewColor(connectorColor, PREVIEW_CONNECTOR);
       const blockProps = useBlockProps({
         className: "appbuilder-rewards-steps-editor",
         style: {
-          background: backgroundColor || DEFAULT_BG,
-          padding: "16px",
+          background: previewBg,
+          "--rs-connector": previewConnector,
+          "--rs-step-bg": previewStepBg,
+          "--rs-step-text": previewStepText,
+          "--rs-green": previewHighlight,
         },
       });
 
@@ -418,77 +509,63 @@ function registerRewardsStepsParent() {
             />
           </InspectorControls>
           <div {...blockProps}>
-            <div style={{ marginBottom: "12px" }}>
-              <h3 style={{ margin: 0 }}>
-                <span
-                  style={{
-                    fontSize: `${titleSize}px`,
-                    color: titleTextColor || DEFAULT_TEXT,
-                  }}
-                >
+            <div className="appbuilder-rs-preview__header">
+              <h3 className="appbuilder-rs-preview__title">
+                <span style={{ color: previewTitle }}>
                   {title || DEFAULT_TITLE}{" "}
                 </span>
                 <span
-                  style={{
-                    fontSize: `${highlightSize}px`,
-                    color: highlightedTitleTextColor || DEFAULT_TEXT,
-                  }}
+                  className="appbuilder-rs-preview__highlight"
+                  style={{ color: previewHighlight }}
                 >
-                  {highlightedTitle}
+                  {highlightedTitle || DEFAULT_HIGHLIGHT}
                 </span>
               </h3>
-              {subTitle ? (
-                <p
-                  style={{
-                    margin: "4px 0 0",
-                    fontSize: `${subSize}px`,
-                    color: subTitleTextColor || DEFAULT_TEXT,
-                  }}
-                >
-                  {subTitle}
-                </p>
-              ) : null}
+              <p
+                className="appbuilder-rs-preview__subtitle"
+                style={{ color: previewSub }}
+              >
+                {subTitle || DEFAULT_SUBTITLE}
+              </p>
               {buttonText ? (
                 <span
+                  className="appbuilder-rs-preview__button"
                   style={{
-                    display: "inline-block",
-                    marginTop: "8px",
-                    fontSize: `${btnSize}px`,
-                    color: buttonTextColor || DEFAULT_TEXT,
-                    border: `1px solid ${buttonBorderColor || DEFAULT_BORDER}`,
+                    color: previewBtn,
+                    border: `1.5px solid ${previewBtnBorder}`,
                     borderRadius: `${radius}px`,
-                    padding: "4px 10px",
                   }}
                 >
                   {buttonText}
                 </span>
               ) : null}
             </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                borderTop: `2px solid ${connectorColor || DEFAULT_TEXT}`,
-                paddingTop: "12px",
-              }}
-            >
+            <div className="appbuilder-rs-preview__track">
               <InnerBlocks
                 allowedBlocks={[REWARDS_STEPS_ITEM_BLOCK]}
                 template={[
                   [
                     REWARDS_STEPS_ITEM_BLOCK,
                     {
-                      title: "mrsupplement",
+                      title: "SHOP",
                       stepNumber: "1",
-                      subTitle: "2d",
+                      subTitle: "Shop and earn points.",
                     },
                   ],
                   [
                     REWARDS_STEPS_ITEM_BLOCK,
                     {
-                      title: "mrsupplement",
+                      title: "EARN",
                       stepNumber: "2",
-                      subTitle: "2d",
+                      subTitle: "Earn points with every purchase.",
+                    },
+                  ],
+                  [
+                    REWARDS_STEPS_ITEM_BLOCK,
+                    {
+                      title: "REDEEM",
+                      stepNumber: "3",
+                      subTitle: "Redeem points for discounts!",
                     },
                   ],
                 ]}

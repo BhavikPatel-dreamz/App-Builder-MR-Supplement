@@ -238,7 +238,7 @@ function registerMultimediaScrollerItem() {
 function registerMultimediaScrollerParent() {
   registerBlockType(MULTIMEDIA_SCROLLER_BLOCK, {
     apiVersion: 3,
-    title: "MultiMedia Scroller",
+    title: "MultiMedia Scroller second",
     category: APPBUILDER_CATEGORY,
     icon: "slides",
     supports: { html: false, align: ["wide", "full"] },
@@ -248,7 +248,7 @@ function registerMultimediaScrollerParent() {
       // JSON / mobile contract uses this misspelled key.
       dotIndicatorPosistion: { type: "string", default: DEFAULT_POSITION },
       activeDotColor: { type: "string", default: DEFAULT_ACTIVE_DOT },
-      inActiveDotColor: { type: "string", default: DEFAULT_INACTIVE_DOT },
+      inActiveDotColor: { type: "string", default: "transparent" },
       enableAutoSlide: { type: "boolean", default: true },
       autoSlideDelay: { type: "number", default: DEFAULT_DELAY },
       inActiveDotBorderRadius: { type: "number", default: 5 },
@@ -286,14 +286,14 @@ function registerMultimediaScrollerParent() {
         "--appbuilder-multimedia-scroller-pagination-active":
           activeDotColor || DEFAULT_ACTIVE_DOT,
         "--appbuilder-multimedia-scroller-pagination-inactive":
-          inActiveDotColor || DEFAULT_INACTIVE_DOT,
+          inActiveDotColor || "transparent",
         "--appbuilder-multimedia-scroller-inactive-dot-radius":
           `${inactiveRadius}px`,
         "--appbuilder-multimedia-scroller-inactive-dot-border":
           inActiveDotBorderColor || "#ffffff",
       };
       const blockProps = useBlockProps({
-        className: "appbuilder-multimedia-scroller-editor",
+        className: "appbuilder-multimedia-scroller-editor appbuilder-mms-simple",
         style: dotVars,
       });
 
@@ -400,6 +400,7 @@ function registerMultimediaScrollerParent() {
                   template={[
                     [MULTIMEDIA_SCROLLER_ITEM_BLOCK, {}],
                     [MULTIMEDIA_SCROLLER_ITEM_BLOCK, {}],
+                    [MULTIMEDIA_SCROLLER_ITEM_BLOCK, {}],
                   ]}
                   templateLock={false}
                   renderAppender={InnerBlocks.ButtonBlockAppender}
@@ -442,7 +443,7 @@ function registerMultimediaScrollerParent() {
         : DEFAULT_POSITION;
       const inactiveRadius = toNumber(inActiveDotBorderRadius, 5);
       const blockProps = useBlockProps.save({
-        className: "appbuilder-multimedia-scroller",
+        className: "appbuilder-multimedia-scroller appbuilder-mms-simple",
         "data-show-dot-indicator": String(!!showDotIndicator),
         "data-show-dot-indicator-on-image": String(!!showDotIndicatorOnImage),
         "data-dot-indicator-posistion": alignClass,
@@ -458,7 +459,7 @@ function registerMultimediaScrollerParent() {
           "--appbuilder-multimedia-scroller-pagination-active":
             activeDotColor || DEFAULT_ACTIVE_DOT,
           "--appbuilder-multimedia-scroller-pagination-inactive":
-            inActiveDotColor || DEFAULT_INACTIVE_DOT,
+            inActiveDotColor || "transparent",
           "--appbuilder-multimedia-scroller-inactive-dot-radius":
             `${inactiveRadius}px`,
           "--appbuilder-multimedia-scroller-inactive-dot-border":

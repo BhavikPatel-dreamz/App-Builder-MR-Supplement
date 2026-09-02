@@ -9,7 +9,14 @@ import "../../blocks/appbuilder/menu-items.css";
 import "../../blocks/appbuilder/selected-products.css";
 import "../../blocks/appbuilder/standard-blocks.css";
 import "../../blocks/appbuilder/advanced-multimedia-scroller.css";
+import "../../blocks/appbuilder/multimedia-scroller.css";
 import "../../blocks/appbuilder/expandalbe-categories.css";
+import "../../blocks/appbuilder/top-marquee.css";
+import "../../blocks/appbuilder/products-by-categoris-scroller.css";
+import "../../blocks/appbuilder/brand-scroller.css";
+import "../../blocks/appbuilder/social-feed.css";
+import "../../blocks/appbuilder/story-section.css";
+import "../../blocks/appbuilder/rewards-steps.css";
 import { BlockEditor } from "gutenberg-block-kit/editor";
 import { directUploadMedia } from "../../lib/upload-client";
 

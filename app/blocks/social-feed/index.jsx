@@ -26,11 +26,14 @@ import {
   APPBUILDER_CATEGORY,
 } from "../constants";
 
-const DEFAULT_TITLE = "Blogs & Insights";
-const DEFAULT_SUBTITLE = "Best Sellers";
-const DEFAULT_BUTTON = "VIEW ALL";
+const DEFAULT_TITLE = "FOLLOW @MRSUPPLEMENT";
+const DEFAULT_SUBTITLE = "Real customers, athletes and the latest products.";
+const DEFAULT_BUTTON = "FOLLOW ON INSTAGRAM";
 const DEFAULT_BG = "#ffffff";
 const DEFAULT_TEXT = "#ffffff";
+const PREVIEW_TITLE_COLOR = "#111111";
+const PREVIEW_SUBTITLE_COLOR = "#8a8a8a";
+const PREVIEW_BUTTON_COLOR = "#8bc53f";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_SUBTITLE_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
@@ -39,10 +42,52 @@ const DEFAULT_BORDER_WIDTH = 2;
 const DEFAULT_BORDER = "#ffffff";
 const DEFAULT_CAPTION =
   "Pre-workout pump is unmatched Who's training today? 💪";
+const DEFAULT_CAPTION_TWO = "Rule 1 Whey Protein - V Cream is back in stock!";
 
 function toNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function previewColor(value, fallback) {
+  const raw = String(value || "").trim();
+  if (!raw || raw.toLowerCase() === "#ffffff" || raw.toLowerCase() === "#fff") {
+    return fallback;
+  }
+  return raw;
+}
+
+function TitleWithHandle({ title, className, handleClassName, style }) {
+  const text = title || DEFAULT_TITLE;
+  const at = text.indexOf("@");
+  if (at === -1) {
+    return (
+      <h3 className={className} style={style}>
+        {text}
+      </h3>
+    );
+  }
+  return (
+    <h3 className={className} style={style}>
+      {text.slice(0, at)}
+      <span className={handleClassName}>{text.slice(at)}</span>
+    </h3>
+  );
+}
+
+function InstagramMark() {
+  return (
+    <svg
+      className="appbuilder-social-feed-item-editor__ig"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+    </svg>
+  );
 }
 
 function registerSocialFeedItem() {
@@ -66,7 +111,6 @@ function registerSocialFeedItem() {
       const { imageUrl, userName, caption, postedTime, action } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-social-feed-item-editor",
-        style: { minWidth: "160px" },
       });
 
       return (
@@ -104,47 +148,59 @@ function registerSocialFeedItem() {
             </PanelBody>
           </InspectorControls>
           <div {...blockProps}>
-            {imageUrl ? (
-              <MediaUploadCheck>
-                <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
-                  }
-                  allowedTypes={["image"]}
-                  render={({ open }) => (
-                    <img
-                      src={imageUrl}
-                      alt=""
-                      onClick={open}
-                      style={{
-                        width: "100%",
-                        height: 120,
-                        objectFit: "cover",
-                        cursor: "pointer",
-                      }}
-                    />
-                  )}
-                />
-              </MediaUploadCheck>
-            ) : (
-              <MediaUploadCheck>
-                <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
-                  }
-                  allowedTypes={["image"]}
-                  render={({ open }) => (
-                    <Button variant="secondary" onClick={open}>
-                      Add image
-                    </Button>
-                  )}
-                />
-              </MediaUploadCheck>
-            )}
-            <div style={{ fontSize: 12, fontWeight: 600 }}>
-              {userName || "username"} {postedTime ? `· ${postedTime}` : ""}
+            <div className="appbuilder-social-feed-item-editor__media">
+              {imageUrl ? (
+                <MediaUploadCheck>
+                  <MediaUpload
+                    onSelect={(media) =>
+                      setAttributes(imageAttributesFromMedia(media))
+                    }
+                    allowedTypes={["image"]}
+                    render={({ open }) => (
+                      <img
+                        src={imageUrl}
+                        alt=""
+                        className="appbuilder-social-feed-item-editor__image"
+                        onClick={open}
+                      />
+                    )}
+                  />
+                </MediaUploadCheck>
+              ) : (
+                <MediaUploadCheck>
+                  <MediaUpload
+                    onSelect={(media) =>
+                      setAttributes(imageAttributesFromMedia(media))
+                    }
+                    allowedTypes={["image"]}
+                    render={({ open }) => (
+                      <Button
+                        variant="secondary"
+                        onClick={open}
+                        style={{ width: "100%", height: "100%" }}
+                      >
+                        Add image
+                      </Button>
+                    )}
+                  />
+                </MediaUploadCheck>
+              )}
+              <InstagramMark />
             </div>
-            {caption ? <div style={{ fontSize: 11 }}>{caption}</div> : null}
+            <div className="appbuilder-social-feed-item-editor__body">
+              <div className="appbuilder-social-feed-item-editor__user">
+                <span className="appbuilder-social-feed-item-editor__avatar" />
+                <span className="appbuilder-social-feed-item-editor__username">
+                  {userName || "mrsupplement"}
+                </span>
+              </div>
+              <p className="appbuilder-social-feed-item-editor__caption">
+                {caption || DEFAULT_CAPTION}
+              </p>
+              <div className="appbuilder-social-feed-item-editor__time">
+                {postedTime || "2d"}
+              </div>
+            </div>
           </div>
         </>
       );
@@ -235,16 +291,24 @@ function registerSocialFeedParent() {
         subTitleFontSize,
         action,
       } = attributes;
-      const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
-      const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
-      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 16);
+      const subSize = Math.max(
+        toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
+        12,
+      );
+      const btnSize = Math.max(
+        toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
+        11,
+      );
       const radius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
-      const borderW = toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH);
+      const borderW = Math.max(
+        toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH),
+        1,
+      );
       const blockProps = useBlockProps({
         className: "appbuilder-social-feed-editor",
         style: {
           background: backgroundColor || DEFAULT_BG,
-          padding: "16px",
         },
       });
 
@@ -364,75 +428,76 @@ function registerSocialFeedParent() {
             />
           </InspectorControls>
           <div {...blockProps}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "12px",
-                gap: "12px",
-              }}
-            >
-              <div>
-                <h3
+            <div className="appbuilder-sf-preview__header">
+              <TitleWithHandle
+                title={title}
+                className="appbuilder-sf-preview__title"
+                handleClassName="appbuilder-sf-preview__handle"
+                style={{
+                  fontSize: `${titleSize}px`,
+                  color: previewColor(titleTextColor, PREVIEW_TITLE_COLOR),
+                }}
+              />
+              {subTitle ? (
+                <p
+                  className="appbuilder-sf-preview__subtitle"
                   style={{
-                    margin: 0,
-                    fontSize: `${titleSize}px`,
-                    color: titleTextColor || DEFAULT_TEXT,
+                    fontSize: `${subSize}px`,
+                    color: previewColor(
+                      subTitleTextColor,
+                      PREVIEW_SUBTITLE_COLOR,
+                    ),
                   }}
                 >
-                  {title}
-                </h3>
-                {subTitle ? (
-                  <p
-                    style={{
-                      margin: "4px 0 0",
-                      fontSize: `${subSize}px`,
-                      color: subTitleTextColor || DEFAULT_TEXT,
-                    }}
-                  >
-                    {subTitle}
-                  </p>
-                ) : null}
-              </div>
-              {buttonText ? (
+                  {subTitle}
+                </p>
+              ) : null}
+            </div>
+            <div className="appbuilder-sf-preview__track">
+              <InnerBlocks
+                allowedBlocks={[SOCIAL_FEED_ITEM_BLOCK]}
+                template={[
+                  [
+                    SOCIAL_FEED_ITEM_BLOCK,
+                    {
+                      userName: "mrsupplement",
+                      caption: DEFAULT_CAPTION,
+                      postedTime: "2d",
+                    },
+                  ],
+                  [
+                    SOCIAL_FEED_ITEM_BLOCK,
+                    {
+                      userName: "mrsupplement",
+                      caption: DEFAULT_CAPTION_TWO,
+                      postedTime: "2d",
+                    },
+                  ],
+                ]}
+                orientation="horizontal"
+                templateLock={false}
+                renderAppender={InnerBlocks.ButtonBlockAppender}
+              />
+            </div>
+            {buttonText ? (
+              <div className="appbuilder-sf-preview__footer">
                 <span
+                  className="appbuilder-sf-preview__button"
                   style={{
                     fontSize: `${btnSize}px`,
-                    color: buttonTextColor || DEFAULT_TEXT,
-                    border: `${borderW}px solid ${buttonBorderColor || DEFAULT_BORDER}`,
-                    borderRadius: `${radius}px`,
-                    padding: "4px 10px",
-                    alignSelf: "flex-start",
+                    color: previewColor(buttonTextColor, PREVIEW_BUTTON_COLOR),
+                    border: `${borderW}px solid ${previewColor(
+                      buttonBorderColor,
+                      PREVIEW_BUTTON_COLOR,
+                    )}`,
+                    borderRadius: `${Math.max(radius, 8)}px`,
                   }}
                 >
                   {buttonText}
+                  <span aria-hidden>→</span>
                 </span>
-              ) : null}
-            </div>
-            <InnerBlocks
-              allowedBlocks={[SOCIAL_FEED_ITEM_BLOCK]}
-              template={[
-                [
-                  SOCIAL_FEED_ITEM_BLOCK,
-                  {
-                    userName: "mrsupplement",
-                    caption: DEFAULT_CAPTION,
-                    postedTime: "2d",
-                  },
-                ],
-                [
-                  SOCIAL_FEED_ITEM_BLOCK,
-                  {
-                    userName: "mrsupplement",
-                    caption: DEFAULT_CAPTION,
-                    postedTime: "2d",
-                  },
-                ],
-              ]}
-              orientation="horizontal"
-              templateLock={false}
-              renderAppender={InnerBlocks.ButtonBlockAppender}
-            />
+              </div>
+            ) : null}
           </div>
         </>
       );
