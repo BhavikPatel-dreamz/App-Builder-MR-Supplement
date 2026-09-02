@@ -57,6 +57,8 @@ export default defineConfig({
   ],
   build: {
     assetsInlineLimit: 0,
+    // Gutenberg editor is a single ~19MB client chunk; splitting it is not practical.
+    chunkSizeWarningLimit: 20000,
   },
   resolve: {
     dedupe: ["react", "react-dom", "react-router", "@wordpress/element"],

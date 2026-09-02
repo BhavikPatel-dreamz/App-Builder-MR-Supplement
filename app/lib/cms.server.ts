@@ -311,6 +311,26 @@ async function resolveComponent(
   return component ? serializePublicComponent(component) : null;
 }
 
+/** Published page HTML preview for `/pages/:slug` (no shop filter; latest published). */
+export async function getPublishedPagePreviewBySlug(slug: string) {
+  const page = await db.page.findFirst({
+    where: { slug, status: "published" },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  if (!page) return null;
+
+  return {
+    id: page.id,
+    title: page.title,
+    slug: page.slug,
+    html: page.html,
+    json: page.json,
+    status: page.status,
+    updatedAt: page.updatedAt.toISOString(),
+  };
+}
+
 /** Published page by slug as a public JSON record (mobile API single endpoint). */
 export async function getPublishedPageBySlug(shop: string, slug: string) {
   const page = await db.page.findFirst({

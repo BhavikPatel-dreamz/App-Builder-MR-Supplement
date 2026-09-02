@@ -1,6 +1,7 @@
 import type { LinksFunction, LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { BlockRenderer } from "gutenberg-block-kit/renderer";
+import { getPublishedPagePreviewBySlug } from "../lib/cms.server";
 
 import blockLibraryStyles from "../styles/wp-block-library.css?url";
 import riyasatSharedUiStyles from "../blocks/appbuilder/shared-ui.css?url";
@@ -43,7 +44,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     throw new Response("Not found", { status: 404 });
   }
 
-  const page = await getPublishedPageBySlug(slug);
+  const page = await getPublishedPagePreviewBySlug(slug);
 
   if (!page) {
     throw new Response("Page not found", { status: 404 });
@@ -51,28 +52,6 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 
   return { page };
 };
-
-async function getPublishedPageBySlug(slug: string) {
-  const db = (await import("../db.server")).default;
-  const page = await db.page.findFirst({
-    where: { slug, status: "published" },
-    orderBy: { updatedAt: "desc" },
-  });
-
-  if (!page) {
-    return null;
-  }
-
-  return {
-    id: page.id,
-    title: page.title,
-    slug: page.slug,
-    html: page.html,
-    json: page.json,
-    status: page.status,
-    updatedAt: page.updatedAt.toISOString(),
-  };
-}
 
 export default function PublicCmsPage() {
   const { page } = useLoaderData<typeof loader>();
