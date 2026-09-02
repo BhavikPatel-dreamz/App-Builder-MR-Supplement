@@ -13,6 +13,7 @@ import {
   parseProductRef,
 } from "../lib/settings-resources";
 import { parseBottomTabs, parseTabBackgroundColor } from "../lib/bottom-tabs";
+import { parseHomePageSettings } from "../lib/home-page-settings";
 import { authenticate } from "../shopify.server";
 
 function parseBoolean(value: unknown): boolean {
@@ -45,6 +46,9 @@ function parseSettingsBody(body: unknown): ShopSettingsInput | null {
     todaysAffirmationEntries: Array.isArray(input.todaysAffirmationEntries) ? input.todaysAffirmationEntries : [],
     tabBackgroundColor: parseTabBackgroundColor(input.tabBackgroundColor),
     bottomTabs: parseBottomTabs(input.bottomTabs ?? input.tabs),
+    homePageSettings: parseHomePageSettings(
+      input.homePageSettings ?? input.homePage,
+    ),
   };
 }
 

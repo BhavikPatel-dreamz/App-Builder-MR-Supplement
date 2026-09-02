@@ -15,6 +15,8 @@ import {
 import { directUploadMedia } from "../lib/upload-client";
 import { authenticate } from "../shopify.server";
 import { BottomTabsEditor } from "../components/settings/BottomTabsEditor";
+import { HomePageSettingsEditor } from "../components/settings/HomePageSettingsEditor";
+import { DEFAULT_HOME_PAGE_SETTINGS } from "../lib/home-page-settings";
 
 const twoCol = "1fr 1fr";
 
@@ -358,6 +360,13 @@ export default function AppSettings() {
           </s-box>
         </s-stack>
       </s-section>
+
+      <HomePageSettingsEditor
+        value={settings.homePageSettings || DEFAULT_HOME_PAGE_SETTINGS}
+        pages={cmsPages}
+        onChange={(homePageSettings) => setField("homePageSettings", homePageSettings)}
+        onError={setError}
+      />
 
       <BottomTabsEditor
         tabBackgroundColor={settings.tabBackgroundColor || "#ffffff"}

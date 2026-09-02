@@ -14,6 +14,11 @@ import {
   parseTabBackgroundColor,
   type BottomTabItem,
 } from "./bottom-tabs";
+import {
+  DEFAULT_HOME_PAGE_SETTINGS,
+  parseHomePageSettings,
+  type HomePageSettings,
+} from "./home-page-settings";
 import { invalidateCmsSettingsCache } from "./cms-public-cache.server";
 
 export type ShopSettingsInput = {
@@ -35,6 +40,7 @@ export type ShopSettingsInput = {
   todaysAffirmationEntries: any;
   tabBackgroundColor: string;
   bottomTabs: BottomTabItem[];
+  homePageSettings: HomePageSettings;
 };
 
 export const DEFAULT_SHOP_SETTINGS: ShopSettingsInput = {
@@ -56,6 +62,10 @@ export const DEFAULT_SHOP_SETTINGS: ShopSettingsInput = {
   todaysAffirmationEntries: [],
   tabBackgroundColor: "#ffffff",
   bottomTabs: [],
+  homePageSettings: {
+    ...DEFAULT_HOME_PAGE_SETTINGS,
+    topMarquee: { ...DEFAULT_HOME_PAGE_SETTINGS.topMarquee, items: [] },
+  },
 };
 
 function serializeShopSettings(row: ShopSettings): ShopSettingsInput {
@@ -81,6 +91,9 @@ function serializeShopSettings(row: ShopSettings): ShopSettingsInput {
     ),
     bottomTabs: parseBottomTabs(
       (row as ShopSettings & { bottomTabs?: unknown }).bottomTabs,
+    ),
+    homePageSettings: parseHomePageSettings(
+      (row as ShopSettings & { homePageSettings?: unknown }).homePageSettings,
     ),
   };
 }
@@ -146,6 +159,7 @@ export type PublicShopSettings = {
   };
   tabBackgroundColor: string;
   tabs: BottomTabItem[];
+  homePage: HomePageSettings;
 };
 
 export function buildTodaysMeditationPublicPayload(
@@ -226,6 +240,7 @@ export function toPublicShopSettings(
     todaysAffirmation: buildTodaysAffirmationPublicPayload(settings),
     tabBackgroundColor: parseTabBackgroundColor(settings.tabBackgroundColor),
     tabs: parseBottomTabs(settings.bottomTabs),
+    homePage: parseHomePageSettings(settings.homePageSettings),
   };
 }
 
@@ -283,6 +298,16 @@ export async function repairShopSettingsNulls(): Promise<void> {
   } catch {
     // Column not migrated yet.
   }
+
+  try {
+    await db.$executeRawUnsafe(`
+      UPDATE "ShopSettings"
+      SET "homePageSettings" = COALESCE("homePageSettings", '{}'::jsonb)
+      WHERE "homePageSettings" IS NULL
+    `);
+  } catch {
+    // Column not migrated yet.
+  }
 }
 
 export async function getShopSettings(shop: string): Promise<ShopSettingsInput> {
@@ -304,6 +329,10 @@ export async function getShopSettings(shop: string): Promise<ShopSettingsInput> 
       todaysAffirmationEntries: [],
       tabBackgroundColor: "#ffffff",
       bottomTabs: [],
+      homePageSettings: {
+        ...DEFAULT_HOME_PAGE_SETTINGS,
+        topMarquee: { ...DEFAULT_HOME_PAGE_SETTINGS.topMarquee, items: [] },
+      },
     };
   }
   return serializeShopSettings(row);

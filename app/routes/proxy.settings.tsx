@@ -27,6 +27,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       settings: publicSettings,
       tabBackgroundColor: publicSettings.tabBackgroundColor,
       tabs: publicSettings.tabs,
+      homePage: publicSettings.homePage,
       todaysMeditation: publicSettings.todaysMeditation,
       todaysAffirmation: publicSettings.todaysAffirmation,
     },

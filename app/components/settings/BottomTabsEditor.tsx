@@ -20,7 +20,7 @@ const colorInputStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-function ColorField({
+export function ColorField({
   label,
   value,
   onChange,
@@ -50,7 +50,7 @@ function ColorField({
   );
 }
 
-function IconPickerField({
+export function IconPickerField({
   label,
   url,
   uploading,

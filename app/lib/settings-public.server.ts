@@ -37,6 +37,7 @@ export async function servePublicSettings(request: Request): Promise<Response> {
         success: true as const,
         tabBackgroundColor: publicSettings.tabBackgroundColor,
         tabs: publicSettings.tabs,
+        homePage: publicSettings.homePage,
         settings: publicSettings,
         todaysMeditation: publicSettings.todaysMeditation,
         todaysAffirmation: publicSettings.todaysAffirmation,

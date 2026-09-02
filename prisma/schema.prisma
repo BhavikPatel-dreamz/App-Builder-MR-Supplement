@@ -95,6 +95,7 @@ model ShopSettings {
   todaysAffirmationEntries         Json             @default("[]")
   tabBackgroundColor               String           @default("#ffffff")
   bottomTabs                       Json             @default("[]")
+  homePageSettings                 Json             @default("{}")
   bundle_patches                   bundle_patches[]
   bundles                          bundles[]
 }
