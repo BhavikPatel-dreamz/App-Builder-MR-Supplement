@@ -297,6 +297,11 @@
   flex-shrink: 0;
 }
 
+.appbuilder-multimedia-scroller__dot:not(.is-active) {
+  border-radius: var(--appbuilder-multimedia-scroller-inactive-dot-radius, 50%);
+  border: 1px solid var(--appbuilder-multimedia-scroller-inactive-dot-border, transparent);
+}
+
 .appbuilder-multimedia-scroller__dot:hover:not(.is-active) {
   opacity: 0.8;
   transform: scale(1.2);

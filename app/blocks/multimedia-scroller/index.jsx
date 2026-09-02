@@ -251,6 +251,8 @@ function registerMultimediaScrollerParent() {
       inActiveDotColor: { type: "string", default: DEFAULT_INACTIVE_DOT },
       enableAutoSlide: { type: "boolean", default: true },
       autoSlideDelay: { type: "number", default: DEFAULT_DELAY },
+      inActiveDotBorderRadius: { type: "number", default: 5 },
+      inActiveDotBorderColor: { type: "string", default: "#ffffff" },
     },
     edit: ({ attributes, setAttributes, clientId }) => {
       const {
@@ -261,6 +263,8 @@ function registerMultimediaScrollerParent() {
         inActiveDotColor,
         enableAutoSlide,
         autoSlideDelay,
+        inActiveDotBorderRadius,
+        inActiveDotBorderColor,
       } = attributes;
       const [activeIndex, setActiveIndex] = useState(0);
       const { slideCount, goToSlide } = useCarouselPagination(
@@ -269,6 +273,7 @@ function registerMultimediaScrollerParent() {
         setActiveIndex,
       );
       const delay = toNumber(autoSlideDelay, DEFAULT_DELAY);
+      const inactiveRadius = toNumber(inActiveDotBorderRadius, 5);
       const overlayClass = showDotIndicatorOnImage
         ? "bottom-overlay"
         : "bottom";
@@ -277,14 +282,19 @@ function registerMultimediaScrollerParent() {
       )
         ? dotIndicatorPosistion
         : DEFAULT_POSITION;
+      const dotVars = {
+        "--appbuilder-multimedia-scroller-pagination-active":
+          activeDotColor || DEFAULT_ACTIVE_DOT,
+        "--appbuilder-multimedia-scroller-pagination-inactive":
+          inActiveDotColor || DEFAULT_INACTIVE_DOT,
+        "--appbuilder-multimedia-scroller-inactive-dot-radius":
+          `${inactiveRadius}px`,
+        "--appbuilder-multimedia-scroller-inactive-dot-border":
+          inActiveDotBorderColor || "#ffffff",
+      };
       const blockProps = useBlockProps({
         className: "appbuilder-multimedia-scroller-editor",
-        style: {
-          "--appbuilder-multimedia-scroller-pagination-active":
-            activeDotColor || DEFAULT_ACTIVE_DOT,
-          "--appbuilder-multimedia-scroller-pagination-inactive":
-            inActiveDotColor || DEFAULT_INACTIVE_DOT,
-        },
+        style: dotVars,
       });
 
       return (
@@ -338,6 +348,16 @@ function registerMultimediaScrollerParent() {
                   }
                 />
               ) : null}
+              <TextControl
+                label="Inactive Dot Border Radius"
+                type="number"
+                value={inactiveRadius}
+                onChange={(value) =>
+                  setAttributes({
+                    inActiveDotBorderRadius: toNumber(value, 5),
+                  })
+                }
+              />
             </PanelBody>
             <PanelColorSettings
               title="Dot Colors"
@@ -356,6 +376,14 @@ function registerMultimediaScrollerParent() {
                   onChange: (value) =>
                     setAttributes({
                       inActiveDotColor: value || DEFAULT_INACTIVE_DOT,
+                    }),
+                },
+                {
+                  label: "Inactive Dot Border Color",
+                  value: inActiveDotBorderColor || "#ffffff",
+                  onChange: (value) =>
+                    setAttributes({
+                      inActiveDotBorderColor: value || "#ffffff",
                     }),
                 },
               ]}
@@ -401,6 +429,8 @@ function registerMultimediaScrollerParent() {
         inActiveDotColor,
         enableAutoSlide,
         autoSlideDelay,
+        inActiveDotBorderRadius,
+        inActiveDotBorderColor,
       } = attributes;
       const overlayClass = showDotIndicatorOnImage
         ? "bottom-overlay"
@@ -410,6 +440,7 @@ function registerMultimediaScrollerParent() {
       )
         ? dotIndicatorPosistion
         : DEFAULT_POSITION;
+      const inactiveRadius = toNumber(inActiveDotBorderRadius, 5);
       const blockProps = useBlockProps.save({
         className: "appbuilder-multimedia-scroller",
         "data-show-dot-indicator": String(!!showDotIndicator),
@@ -421,11 +452,17 @@ function registerMultimediaScrollerParent() {
         "data-auto-slide-delay": String(
           toNumber(autoSlideDelay, DEFAULT_DELAY),
         ),
+        "data-inactive-dot-border-radius": String(inactiveRadius),
+        "data-inactive-dot-border-color": inActiveDotBorderColor || "#ffffff",
         style: {
           "--appbuilder-multimedia-scroller-pagination-active":
             activeDotColor || DEFAULT_ACTIVE_DOT,
           "--appbuilder-multimedia-scroller-pagination-inactive":
             inActiveDotColor || DEFAULT_INACTIVE_DOT,
+          "--appbuilder-multimedia-scroller-inactive-dot-radius":
+            `${inactiveRadius}px`,
+          "--appbuilder-multimedia-scroller-inactive-dot-border":
+            inActiveDotBorderColor || "#ffffff",
         },
       });
       return (

@@ -281,18 +281,6 @@ function CarouselSettingsPanels({ attributes, setAttributes }) {
               ]}
               onChange={(value) => setAttributes({ dotAlignment: value })}
             />
-            {showDotIndicatorOnImage ? (
-              <SelectControl
-                label="Dot Overlay Layer"
-                value={dotIndicatorPosition || 'bottom'}
-                options={[
-                  { label: 'Bottom', value: 'bottom' },
-                  { label: 'Bottom Overlay', value: 'bottom-overlay' },
-                  { label: 'Top Overlay', value: 'top-overlay' },
-                ]}
-                onChange={(value) => setAttributes({ dotIndicatorPosition: value })}
-              />
-            ) : null}
             <ColorSettingsPanel
               title="Dot Colors"
               colorSettings={[
@@ -591,7 +579,7 @@ function registerMultimediaScrollerParent() {
       const dotColors = getDotColors(activeDotColor, inActiveDotColor);
       const showArrows = arrowNavigation && slideCount > 1;
       const showDots = showDotIndicator && slideCount > 1;
-      const positionClass = showDotIndicatorOnImage ? dotIndicatorPosition : 'bottom';
+      const positionClass = showDotIndicatorOnImage ? 'bottom-overlay' : 'bottom';
       const heightPx = `${carouselHeight || DEFAULT_CAROUSEL_HEIGHT}px`;
 
       return (
@@ -735,7 +723,7 @@ function registerMultimediaScrollerParent() {
       } = attributes;
 
       const dotColors = getDotColors(activeDotColor, inActiveDotColor);
-      const positionClass = showDotIndicatorOnImage ? dotIndicatorPosition : 'bottom';
+      const positionClass = showDotIndicatorOnImage ? 'bottom-overlay' : 'bottom';
       const heightPx = `${carouselHeight || DEFAULT_CAROUSEL_HEIGHT}px`;
       const blockProps = useBlockProps.save({
         className: 'appbuilder-multimedia-scroller',
