@@ -235,7 +235,6 @@ function CarouselSettingsPanels({ attributes, setAttributes }) {
     carouselHeight,
     showDotIndicator,
     showDotIndicatorOnImage,
-    dotIndicatorPosition,
     dotAlignment,
     activeDotColor,
     inActiveDotColor,
@@ -267,7 +266,6 @@ function CarouselSettingsPanels({ attributes, setAttributes }) {
           <>
             <ToggleControl
               label="Show Dot Indicator On Image"
-              help="Overlay dots on top of media"
               checked={!!showDotIndicatorOnImage}
               onChange={(value) => setAttributes({ showDotIndicatorOnImage: value })}
             />
@@ -534,7 +532,7 @@ function registerMultimediaScrollerItem() {
 function registerMultimediaScrollerParent() {
   registerBlockType(ADVANCED_MULTIMEDIA_SCROLLER_BLOCK, {
     apiVersion: 3,
-    title: 'Multimedia Scroller',
+    title: 'Advanced Multimedia Scroller',
     description: 'Full-width hero carousel with arrow navigation and auto-slide.',
     category: APPBUILDER_CATEGORY,
     icon: MultimediaScrollerIcon,

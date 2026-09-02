@@ -204,7 +204,6 @@ function registerProductsByCategorisScrollerParent() {
       showSubTitle: { type: "boolean", default: true },
       showButton: { type: "boolean", default: true },
       buttonText: { type: "string", default: DEFAULT_BUTTON },
-      action: { type: "object", default: {} },
       numberOfProduct: { type: "number", default: DEFAULT_PRODUCTS },
       backgroundColor: { type: "string", default: DEFAULT_BG },
       titleFontSize: { type: "number", default: DEFAULT_TITLE_SIZE },
@@ -222,7 +221,6 @@ function registerProductsByCategorisScrollerParent() {
         showSubTitle,
         showButton,
         buttonText,
-        action,
         numberOfProduct,
         backgroundColor,
         titleFontSize,
@@ -325,11 +323,6 @@ function registerProductsByCategorisScrollerParent() {
                         buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
                       })
                     }
-                  />
-                  <ActionBuilder
-                    label="Action"
-                    value={action ?? {}}
-                    onChange={(next) => setAttributes({ action: next })}
                   />
                 </>
               ) : null}
@@ -496,7 +489,6 @@ function registerProductsByCategorisScrollerParent() {
         showSubTitle,
         showButton,
         buttonText,
-        action,
         numberOfProduct,
         backgroundColor,
         titleFontSize,
@@ -530,7 +522,6 @@ function registerProductsByCategorisScrollerParent() {
           toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
         ),
         "data-button-text-color": buttonTextColor || DEFAULT_TEXT,
-        "data-action": JSON.stringify(action ?? {}),
         style: { background: backgroundColor || DEFAULT_BG },
       });
       return (

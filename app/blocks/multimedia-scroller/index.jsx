@@ -238,7 +238,7 @@ function registerMultimediaScrollerItem() {
 function registerMultimediaScrollerParent() {
   registerBlockType(MULTIMEDIA_SCROLLER_BLOCK, {
     apiVersion: 3,
-    title: "MultiMedia Scroller second",
+    title: "MultiMedia Scroller",
     category: APPBUILDER_CATEGORY,
     icon: "slides",
     supports: { html: false, align: ["wide", "full"] },
@@ -248,7 +248,7 @@ function registerMultimediaScrollerParent() {
       // JSON / mobile contract uses this misspelled key.
       dotIndicatorPosistion: { type: "string", default: DEFAULT_POSITION },
       activeDotColor: { type: "string", default: DEFAULT_ACTIVE_DOT },
-      inActiveDotColor: { type: "string", default: "transparent" },
+      inActiveDotColor: { type: "string", default: DEFAULT_INACTIVE_DOT },
       enableAutoSlide: { type: "boolean", default: true },
       autoSlideDelay: { type: "number", default: DEFAULT_DELAY },
       inActiveDotBorderRadius: { type: "number", default: 5 },
