@@ -179,6 +179,34 @@ function registerMultimediaScrollerItem() {
                 onSelect={(next) => setAttributes({ media: next })}
                 onClear={() => setAttributes(clearItemMediaAttributes())}
               />
+              <TextControl
+                label="Image Width"
+                type="number"
+                value={mediaDimension(media?.imageWidth)}
+                onChange={(value) =>
+                  setAttributes({
+                    media: {
+                      ...(media ?? {}),
+                      imageWidth: mediaDimension(value),
+                      imageHeight: mediaDimension(media?.imageHeight),
+                    },
+                  })
+                }
+              />
+              <TextControl
+                label="Image Height"
+                type="number"
+                value={mediaDimension(media?.imageHeight)}
+                onChange={(value) =>
+                  setAttributes({
+                    media: {
+                      ...(media ?? {}),
+                      imageWidth: mediaDimension(media?.imageWidth),
+                      imageHeight: mediaDimension(value),
+                    },
+                  })
+                }
+              />
               <ActionBuilder
                 label="Action"
                 value={action ?? {}}

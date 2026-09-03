@@ -17,6 +17,7 @@ import {
   Button,
   SelectControl,
   RangeControl,
+  TextControl,
 } from 'gutenberg-block-kit/wp/components';
 import { useSelect, useDispatch } from 'gutenberg-block-kit/wp/data';
 import { ActionBuilder } from 'gutenberg-block-kit/actions';
@@ -250,6 +251,42 @@ function SlideMediaDisplay({ media, onOpen }) {
   );
 }
 
+function patchMediaSize(media, key, value) {
+  return {
+    media: {
+      url: media?.url ?? '',
+      type: media?.type ?? '',
+      imageWidth:
+        key === 'imageWidth'
+          ? mediaDimension(value)
+          : mediaDimension(media?.imageWidth),
+      imageHeight:
+        key === 'imageHeight'
+          ? mediaDimension(value)
+          : mediaDimension(media?.imageHeight),
+    },
+  };
+}
+
+function MediaSizeFields({ media, onChange }) {
+  return (
+    <>
+      <TextControl
+        label="Image Width"
+        type="number"
+        value={mediaDimension(media?.imageWidth)}
+        onChange={(value) => onChange(patchMediaSize(media, 'imageWidth', value))}
+      />
+      <TextControl
+        label="Image Height"
+        type="number"
+        value={mediaDimension(media?.imageHeight)}
+        onChange={(value) => onChange(patchMediaSize(media, 'imageHeight', value))}
+      />
+    </>
+  );
+}
+
 function CarouselSettingsPanels({ attributes, setAttributes }) {
   const {
     showDotIndicator,
@@ -257,7 +294,6 @@ function CarouselSettingsPanels({ attributes, setAttributes }) {
     dotAlignment,
     activeDotColor,
     inActiveDotColor,
-    arrowNavigation,
     enableAutoSlide,
     autoSlideDelay,
   } = attributes || {};
@@ -316,14 +352,6 @@ function CarouselSettingsPanels({ attributes, setAttributes }) {
             />
           </>
         ) : null}
-      </PanelBody>
-
-      <PanelBody title="Navigation" initialOpen={true}>
-        <ToggleControl
-          label="Arrow Navigation"
-          checked={!!arrowNavigation}
-          onChange={(value) => setAttributes({ arrowNavigation: value })}
-        />
       </PanelBody>
 
       <PanelBody title="Auto Slide" initialOpen={true}>
@@ -418,6 +446,14 @@ function registerMultimediaScrollerItem() {
                             : updateBlockAttributes(block.clientId, clearMedia())
                         }
                       />
+                      <MediaSizeFields
+                        media={bMedia}
+                        onChange={(next) =>
+                          isCurrent
+                            ? setAttributes(next)
+                            : updateBlockAttributes(block.clientId, next)
+                        }
+                      />
                       <div style={{ marginTop: '12px' }}>
                         <ActionBuilder
                           label="Tap action"
@@ -448,6 +484,10 @@ function registerMultimediaScrollerItem() {
                     media={media}
                     onSelect={(next) => setAttributes(next)}
                     onClear={() => setAttributes(clearMedia())}
+                  />
+                  <MediaSizeFields
+                    media={media}
+                    onChange={(next) => setAttributes(next)}
                   />
                   <div style={{ marginTop: '12px' }}>
                     <ActionBuilder
@@ -553,7 +593,6 @@ function registerMultimediaScrollerParent() {
       dotAlignment: { type: 'string', default: 'center' },
       activeDotColor: { type: 'string', default: DEFAULT_ACTIVE_DOT_COLOR },
       inActiveDotColor: { type: 'string', default: DEFAULT_INACTIVE_DOT_COLOR },
-      arrowNavigation: { type: 'boolean', default: true },
       enableAutoSlide: { type: 'boolean', default: true },
       autoSlideDelay: { type: 'number', default: 3000 },
     },
@@ -566,7 +605,6 @@ function registerMultimediaScrollerParent() {
         dotAlignment,
         activeDotColor,
         inActiveDotColor,
-        arrowNavigation,
       } = attributes;
 
       const blockProps = useBlockProps({ className: 'appbuilder-multimedia-scroller-editor' });
@@ -581,7 +619,6 @@ function registerMultimediaScrollerParent() {
       );
 
       const dotColors = getDotColors(activeDotColor, inActiveDotColor);
-      const showArrows = arrowNavigation && slideCount > 1;
       const showDots = showDotIndicator && slideCount > 1;
       const positionClass = showDotIndicatorOnImage ? 'bottom-overlay' : 'bottom';
       const heightPx = `${DEFAULT_CAROUSEL_HEIGHT}px`;
@@ -604,6 +641,10 @@ function registerMultimediaScrollerParent() {
                       media={media}
                       onSelect={(next) => updateBlockAttributes(block.clientId, next)}
                       onClear={() => updateBlockAttributes(block.clientId, clearMedia())}
+                    />
+                    <MediaSizeFields
+                      media={media}
+                      onChange={(next) => updateBlockAttributes(block.clientId, next)}
                     />
                     <div style={{ marginTop: '12px' }}>
                       <ActionBuilder
@@ -673,7 +714,7 @@ function registerMultimediaScrollerParent() {
                 />
               </div>
 
-              {showArrows ? (
+              {slideCount > 1 ? (
                 <>
                   <button
                     type="button"
@@ -720,7 +761,6 @@ function registerMultimediaScrollerParent() {
         dotAlignment,
         activeDotColor,
         inActiveDotColor,
-        arrowNavigation,
         enableAutoSlide,
         autoSlideDelay,
       } = attributes;
@@ -734,7 +774,6 @@ function registerMultimediaScrollerParent() {
         'data-dots-on-image': showDotIndicatorOnImage ? 'true' : 'false',
         'data-dot-position': dotIndicatorPosition,
         'data-dot-alignment': dotAlignment || 'center',
-        'data-arrow-navigation': arrowNavigation ? 'true' : 'false',
         'data-auto-slide': enableAutoSlide ? 'true' : 'false',
         'data-auto-slide-delay': enableAutoSlide ? String(autoSlideDelay) : '0',
         'data-active-dot-color': activeDotColor || DEFAULT_ACTIVE_DOT_COLOR,
@@ -751,24 +790,6 @@ function registerMultimediaScrollerParent() {
           <div className="appbuilder-multimedia-scroller__track">
             <InnerBlocks.Content />
           </div>
-          {arrowNavigation ? (
-            <>
-              <button
-                type="button"
-                className="appbuilder-multimedia-scroller__arrow appbuilder-multimedia-scroller__arrow--prev"
-                aria-label="Previous slide"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                className="appbuilder-multimedia-scroller__arrow appbuilder-multimedia-scroller__arrow--next"
-                aria-label="Next slide"
-              >
-                ›
-              </button>
-            </>
-          ) : null}
           {showDotIndicator ? (
             <div
               className={`appbuilder-multimedia-scroller__pagination appbuilder-multimedia-scroller__pagination--${positionClass} appbuilder-multimedia-scroller__pagination--${dotAlignment || 'center'}`}
