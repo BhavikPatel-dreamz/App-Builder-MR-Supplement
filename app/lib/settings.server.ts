@@ -1,4 +1,4 @@
-import type { ShopSettings } from "../generated/prisma/client";
+import type { ShopSettings } from "@prisma/client";
 
 import db from "../db.server";
 import {

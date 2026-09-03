@@ -17,7 +17,6 @@
     "target": "ES2022",
     "baseUrl": ".",
     "paths": {
-      "@prisma/client": ["app/generated/prisma/client.ts"],
       "gutenberg-block-kit/actions": ["app/lib/gutenberg-actions.ts"],
       "gutenberg-block-kit/actions-kit": [
         "node_modules/gutenberg-block-kit/dist/actions.mjs"

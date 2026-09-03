@@ -9,7 +9,6 @@ node_modules
 /public/build/
 /public/_dev
 /app/public/build
-/app/generated/prisma
 /prisma/dev.sqlite
 /prisma/dev.sqlite-journal
 database.sqlite
