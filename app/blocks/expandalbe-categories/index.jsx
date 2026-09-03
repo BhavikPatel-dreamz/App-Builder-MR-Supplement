@@ -132,24 +132,6 @@ function getChildContainerStyle(rootAttr) {
   };
 }
 
-function ExpandalbeCategoriesIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z"
-      />
-    </svg>
-  );
-}
-
 function ChevronDownIcon({ size = 16, color = 'currentColor' }) {
   return (
     <svg
@@ -728,7 +710,7 @@ function registerExpandalbeCategoriesParent() {
     title: 'Expandable Categories',
     description: 'A parent category layout with expandable child category cards.',
     category: APPBUILDER_CATEGORY,
-    icon: ExpandalbeCategoriesIcon,
+    icon: 'category',
     keywords: ['expandable', 'categories', 'catalog', 'subcategories'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {

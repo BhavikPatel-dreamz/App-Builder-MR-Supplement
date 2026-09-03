@@ -256,7 +256,7 @@ function registerSocialFeedParent() {
     apiVersion: 3,
     title: "Social Feed",
     category: APPBUILDER_CATEGORY,
-    icon: "instagram",
+    icon: "share",
     supports: { html: false, align: ["wide", "full"] },
     attributes: {
       backgroundColor: { type: "string", default: DEFAULT_BG },

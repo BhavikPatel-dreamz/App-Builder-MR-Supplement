@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { registerBlockType } from "gutenberg-block-kit/wp/blocks";
+import { registerBlockType, createBlock } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
   InnerBlocks,
@@ -9,6 +9,7 @@ import {
   PanelColorSettings,
 } from "gutenberg-block-kit/wp/block-editor";
 import {
+  Button,
   PanelBody,
   TextControl,
   ToggleControl,
@@ -16,8 +17,10 @@ import {
 import { ActionBuilder } from "gutenberg-block-kit/actions";
 import {
   ImagePicker,
-  imageAttributesFromMedia,
-  clearImageAttributes,
+  getImageUrl,
+  contentTabStyle,
+  useChildBlocks,
+  ParentBlockBackButton,
 } from "../inspector-shared";
 import {
   CATEGORIES_SCROLLER_BLOCK,
@@ -35,20 +38,103 @@ const DEFAULT_SUBTITLE_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
 const DEFAULT_RADIUS = 10;
 const DEFAULT_ITEM_TITLE = "Set";
+const DEFAULT_IMAGE_SIZE = 300;
 
 function toNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function CategoriesScrollerIcon() {
+async function pickCollection() {
+  const picker =
+    typeof window !== "undefined" ? window.shopify?.resourcePicker : null;
+  if (!picker) return null;
+  try {
+    const selection = await picker({ type: "collection", multiple: false });
+    const collection = selection?.[0];
+    if (!collection) return null;
+    return {
+      collectionId: collection.id,
+      handle: collection.handle,
+      title: collection.title,
+    };
+  } catch (err) {
+    console.error("ResourcePicker collection error:", err);
+    return null;
+  }
+}
+
+function CollectionPicker({ collection, onChange }) {
+  const hasCollection = Boolean(collection?.collectionId);
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-      <path
-        fill="currentColor"
-        d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z"
+    <div style={{ marginBottom: "12px" }}>
+      {hasCollection ? (
+        <p style={{ fontSize: "13px", margin: "0 0 8px" }}>
+          {collection.title || collection.handle || collection.collectionId}
+        </p>
+      ) : (
+        <p style={{ fontSize: "13px", color: "#6d7175", margin: "0 0 8px" }}>
+          No collection selected
+        </p>
+      )}
+      <Button
+        variant="secondary"
+        onClick={async () => {
+          const next = await pickCollection();
+          if (next) onChange(next);
+        }}
+      >
+        {hasCollection ? "Change collection" : "Select collection"}
+      </Button>
+      {hasCollection ? (
+        <Button
+          variant="link"
+          isDestructive
+          onClick={() => onChange({})}
+          style={{ marginLeft: "8px" }}
+        >
+          Clear
+        </Button>
+      ) : null}
+    </div>
+  );
+}
+
+function getItemImageStyle(imageWidth, imageHeight) {
+  const width = toNumber(imageWidth, DEFAULT_IMAGE_SIZE);
+  const height = toNumber(imageHeight, DEFAULT_IMAGE_SIZE);
+  return {
+    width: `${width > 0 ? width : DEFAULT_IMAGE_SIZE}px`,
+    height: `${height > 0 ? height : DEFAULT_IMAGE_SIZE}px`,
+    maxWidth: "100%",
+    objectFit: "cover",
+  };
+}
+
+function setItemImageUrl(setAttributes, media) {
+  setAttributes({ imageUrl: getImageUrl(media) });
+}
+
+function ImageSizeFields({ imageWidth, imageHeight, onChange }) {
+  return (
+    <>
+      <TextControl
+        label="Image Width"
+        type="number"
+        value={toNumber(imageWidth, DEFAULT_IMAGE_SIZE)}
+        onChange={(value) =>
+          onChange({ imageWidth: toNumber(value, DEFAULT_IMAGE_SIZE) })
+        }
       />
-    </svg>
+      <TextControl
+        label="Image Height"
+        type="number"
+        value={toNumber(imageHeight, DEFAULT_IMAGE_SIZE)}
+        onChange={(value) =>
+          onChange({ imageHeight: toNumber(value, DEFAULT_IMAGE_SIZE) })
+        }
+      />
+    </>
   );
 }
 
@@ -62,13 +148,14 @@ function registerCategoryScrollerItem() {
     supports: { html: false, reusable: false },
     attributes: {
       imageUrl: { type: "string", default: "" },
-      imageWidth: { type: "number", default: 0 },
-      imageHeight: { type: "number", default: 0 },
+      imageWidth: { type: "number", default: DEFAULT_IMAGE_SIZE },
+      imageHeight: { type: "number", default: DEFAULT_IMAGE_SIZE },
       showTitle: { type: "boolean", default: true },
       title: { type: "string", default: DEFAULT_ITEM_TITLE },
       subTitle: { type: "string", default: DEFAULT_SUBTITLE },
       showSubTitle: { type: "boolean", default: true },
       showImageSubtitle: { type: "boolean", default: true },
+      collection: { type: "object", default: {} },
       titleTextColor: { type: "string", default: DEFAULT_TEXT },
       titleFontSize: { type: "number", default: DEFAULT_TITLE_SIZE },
       subTitleTextColor: { type: "string", default: DEFAULT_TEXT },
@@ -76,14 +163,17 @@ function registerCategoryScrollerItem() {
       showArrow: { type: "boolean", default: true },
       action: { type: "object", default: {} },
     },
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const {
         imageUrl,
+        imageWidth,
+        imageHeight,
         showTitle,
         title,
         subTitle,
         showSubTitle,
         showImageSubtitle,
+        collection,
         titleTextColor,
         titleFontSize,
         subTitleTextColor,
@@ -94,6 +184,7 @@ function registerCategoryScrollerItem() {
       const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
       const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
       const showItemSubtitle = showImageSubtitle ?? showSubTitle;
+      const imageStyle = getItemImageStyle(imageWidth, imageHeight);
       const blockProps = useBlockProps({
         className: "appbuilder-categories-scroller-item-editor",
         style: { minWidth: "140px" },
@@ -101,14 +192,25 @@ function registerCategoryScrollerItem() {
 
       return (
         <>
-          <InspectorControls>
-            <PanelBody title="Category Item" initialOpen>
+          <InspectorControls group="content">
+            <div style={contentTabStyle}>
+              <ParentBlockBackButton clientId={clientId} />
+              <PanelBody title="Image Size" initialOpen>
+                <ImageSizeFields
+                  imageWidth={imageWidth}
+                  imageHeight={imageHeight}
+                  onChange={(next) => setAttributes(next)}
+                />
+              </PanelBody>
+              <PanelBody title="Category Item" initialOpen>
               <ImagePicker
                 imageUrl={imageUrl}
-                onSelect={(media) =>
-                  setAttributes(imageAttributesFromMedia(media))
-                }
-                onClear={() => setAttributes(clearImageAttributes())}
+                onSelect={(media) => setItemImageUrl(setAttributes, media)}
+                onClear={() => setAttributes({ imageUrl: "" })}
+              />
+              <CollectionPicker
+                collection={collection ?? {}}
+                onChange={(next) => setAttributes({ collection: next ?? {} })}
               />
               <ToggleControl
                 label="Show Title"
@@ -176,7 +278,10 @@ function registerCategoryScrollerItem() {
                 value={action ?? {}}
                 onChange={(next) => setAttributes({ action: next })}
               />
-            </PanelBody>
+              </PanelBody>
+            </div>
+          </InspectorControls>
+          <InspectorControls>
             <PanelColorSettings
               title="Colors"
               colorSettings={[
@@ -201,15 +306,14 @@ function registerCategoryScrollerItem() {
             {imageUrl ? (
               <MediaUploadCheck>
                 <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
-                  }
+                  onSelect={(media) => setItemImageUrl(setAttributes, media)}
                   allowedTypes={["image"]}
                   render={({ open }) => (
                     <img
                       src={imageUrl}
                       alt=""
                       className="appbuilder-categories-scroller-item-editor__image"
+                      style={imageStyle}
                       onClick={open}
                     />
                   )}
@@ -218,14 +322,13 @@ function registerCategoryScrollerItem() {
             ) : (
               <MediaUploadCheck>
                 <MediaUpload
-                  onSelect={(media) =>
-                    setAttributes(imageAttributesFromMedia(media))
-                  }
+                  onSelect={(media) => setItemImageUrl(setAttributes, media)}
                   allowedTypes={["image"]}
                   render={({ open }) => (
                     <button
                       type="button"
                       className="appbuilder-categories-scroller-item-editor__image-btn"
+                      style={imageStyle}
                       onClick={open}
                     >
                       Add image
@@ -255,6 +358,13 @@ function registerCategoryScrollerItem() {
                 {subTitle}
               </div>
             ) : null}
+            <div className="appbuilder-categories-scroller-item-editor__size-fields">
+              <ImageSizeFields
+                imageWidth={imageWidth}
+                imageHeight={imageHeight}
+                onChange={(next) => setAttributes(next)}
+              />
+            </div>
           </div>
         </>
       );
@@ -269,6 +379,7 @@ function registerCategoryScrollerItem() {
         subTitle,
         showSubTitle,
         showImageSubtitle,
+        collection,
         titleTextColor,
         titleFontSize,
         subTitleTextColor,
@@ -276,11 +387,17 @@ function registerCategoryScrollerItem() {
         showArrow,
         action,
       } = attributes;
+      const imageStyle = getItemImageStyle(imageWidth, imageHeight);
       const blockProps = useBlockProps.save({
         className: "appbuilder-categories-scroller__item",
         "data-image-url": imageUrl ?? "",
-        "data-image-width": String(imageWidth ?? 0),
-        "data-image-height": String(imageHeight ?? 0),
+        "data-image-width": String(
+          toNumber(imageWidth, DEFAULT_IMAGE_SIZE),
+        ),
+        "data-image-height": String(
+          toNumber(imageHeight, DEFAULT_IMAGE_SIZE),
+        ),
+        "data-collection": JSON.stringify(collection ?? {}),
         "data-show-title": String(!!showTitle),
         "data-title": title ?? "",
         "data-subtitle": subTitle ?? "",
@@ -306,6 +423,7 @@ function registerCategoryScrollerItem() {
               src={imageUrl}
               alt=""
               className="appbuilder-categories-scroller__image"
+              style={imageStyle}
             />
           ) : null}
           {showTitle && title ? (
@@ -322,7 +440,7 @@ function registerCategoryScrollerParent() {
     apiVersion: 3,
     title: "Categories Scroller",
     category: APPBUILDER_CATEGORY,
-    icon: CategoriesScrollerIcon,
+    icon: "category",
     supports: { html: false, align: ["wide", "full"] },
     attributes: {
       title: { type: "string", default: DEFAULT_TITLE },
@@ -341,7 +459,7 @@ function registerCategoryScrollerParent() {
       ImageBorderRadius: { type: "number", default: DEFAULT_RADIUS },
       action: { type: "object", default: {} },
     },
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const {
         title,
         subTitle,
@@ -363,6 +481,8 @@ function registerCategoryScrollerParent() {
       const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
       const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
       const radius = toNumber(ImageBorderRadius, DEFAULT_RADIUS);
+      const { childBlocks, childCount, insertBlock, updateBlockAttributes } =
+        useChildBlocks(clientId);
       const blockProps = useBlockProps({
         className: "appbuilder-categories-scroller-editor",
         style: {
@@ -374,7 +494,8 @@ function registerCategoryScrollerParent() {
 
       return (
         <>
-          <InspectorControls>
+          <InspectorControls group="content">
+            <div style={contentTabStyle}>
             <PanelBody title="Header" initialOpen>
               <ToggleControl
                 label="Show Title"
@@ -467,6 +588,55 @@ function registerCategoryScrollerParent() {
                 }
               />
             </PanelBody>
+            {childBlocks.map((block, index) => {
+              const item = block.attributes ?? {};
+              return (
+                <PanelBody
+                  key={block.clientId}
+                  title={
+                    item.title
+                      ? `Item: ${item.title}`
+                      : `Category item ${index + 1}`
+                  }
+                  initialOpen={index === 0}
+                >
+                  <ImagePicker
+                    imageUrl={item.imageUrl}
+                    onSelect={(media) =>
+                      updateBlockAttributes(block.clientId, {
+                        imageUrl: getImageUrl(media),
+                      })
+                    }
+                    onClear={() =>
+                      updateBlockAttributes(block.clientId, { imageUrl: "" })
+                    }
+                  />
+                  <ImageSizeFields
+                    imageWidth={item.imageWidth}
+                    imageHeight={item.imageHeight}
+                    onChange={(next) =>
+                      updateBlockAttributes(block.clientId, next)
+                    }
+                  />
+                </PanelBody>
+              );
+            })}
+            <Button
+              variant="primary"
+              onClick={() =>
+                insertBlock(
+                  createBlock(CATEGORIES_SCROLLER_ITEM_BLOCK, {}),
+                  childCount,
+                  clientId,
+                )
+              }
+              style={{ width: "100%", justifyContent: "center" }}
+            >
+              Add category item
+            </Button>
+            </div>
+          </InspectorControls>
+          <InspectorControls>
             <PanelColorSettings
               title="Colors"
               colorSettings={[

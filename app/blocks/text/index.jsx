@@ -28,31 +28,13 @@ function toNonNegativeNumber(value, fallback) {
   return parsed;
 }
 
-function TextIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M4 5h16v3h-1.5V6.5h-5V19h2.5v1.5h-8V19H10.5V6.5h-5V8H4V5z"
-      />
-    </svg>
-  );
-}
-
 export function registerStandardText() {
   registerBlockType(STANDARD_TEXT_BLOCK, {
     apiVersion: 3,
     title: 'Text',
     description: 'Plain text with typography, spacing and action settings.',
     category: APPBUILDER_CATEGORY,
-    icon: TextIcon,
+    icon: 'editor-paragraph',
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
       text: { type: 'string', default: DEFAULT_TEXT },

@@ -27,24 +27,6 @@ import {
 
 const DEFAULT_BACKGROUND_COLOR = '#FFFFFF';
 
-function DrawerMenuIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"
-      />
-    </svg>
-  );
-}
-
 function IconField({ icon, onChange, onClear }) {
   return (
     <ImagePicker
@@ -289,7 +271,7 @@ function registerMenuItemsParent() {
     title: 'Drawer Menu',
     description: 'Mobile drawer navigation with icons, labels and nested sub items.',
     category: APPBUILDER_CATEGORY,
-    icon: DrawerMenuIcon,
+    icon: 'menu',
     keywords: ['menu', 'drawer', 'navigation', 'nav'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {

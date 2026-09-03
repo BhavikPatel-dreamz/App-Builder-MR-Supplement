@@ -13,31 +13,13 @@ import { STANDARD_SPACER_BLOCK, APPBUILDER_CATEGORY } from '../constants';
 const DEFAULT_HEIGHT = 20;
 const DEFAULT_BACKGROUND = '#ffffff';
 
-function StandardSpacerIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M3 8h18v2H3V8zm0 6h18v2H3v-2z"
-      />
-    </svg>
-  );
-}
-
 export function registerStandardSpacer() {
   registerBlockType(STANDARD_SPACER_BLOCK, {
     apiVersion: 3,
     title: 'Spacer',
     description: 'Adjustable spacer with height, background color, and action.',
     category: APPBUILDER_CATEGORY,
-    icon: StandardSpacerIcon,
+    icon: 'leftright',
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
       height: { type: 'number', default: DEFAULT_HEIGHT },

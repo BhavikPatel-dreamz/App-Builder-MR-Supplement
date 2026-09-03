@@ -26,27 +26,6 @@ import {
   APPBUILDER_CATEGORY,
 } from '../constants';
 
-function ImageSliderIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M3 6h4v12H3V6zm5 1h8v10H8V7zm9-1h4v12h-4V6z"
-      />
-    </svg>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Child: core/image-slider-item — one slide (image + label + tap action)
-// ---------------------------------------------------------------------------
 function registerImageSliderItem() {
   registerBlockType(IMAGE_SLIDER_ITEM_BLOCK, {
     apiVersion: 3,
@@ -174,7 +153,7 @@ function registerImageSliderParent() {
     title: 'Image Slider',
     description: 'A titled, horizontally scrolling row of image slides.',
     category: APPBUILDER_CATEGORY,
-    icon: ImageSliderIcon,
+    icon: 'images-alt2',
     keywords: ['slider', 'scroller', 'images', 'products'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {

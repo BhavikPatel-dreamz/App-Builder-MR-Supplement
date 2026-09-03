@@ -108,23 +108,12 @@ function CollectionPicker({ collection, onChange }) {
   );
 }
 
-function ProductScrollerIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-      <path
-        fill="currentColor"
-        d="M3 5h5v14H3V5zm6 0h6v14H9V5zm7 0h5v14h-5V5z"
-      />
-    </svg>
-  );
-}
-
 export function registerProductScroller() {
   registerBlockType(PRODUCT_SCROLLER_BLOCK, {
     apiVersion: 3,
     title: "Product Scroller",
     category: APPBUILDER_CATEGORY,
-    icon: ProductScrollerIcon,
+    icon: "products",
     supports: { html: false, align: ["wide", "full"] },
     attributes: {
       title: { type: "string", default: DEFAULT_TITLE },

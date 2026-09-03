@@ -47,24 +47,6 @@ function getPlaceholderTexts(placeholders) {
   return placeholders.map((item) => item?.text?.trim()).filter(Boolean);
 }
 
-function SearchBarBlockIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M10 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.32 13.68-4.3-4.3a8.04 8.04 0 0 0 1.42-1.42l4.3 4.3-1.42 1.42z"
-      />
-    </svg>
-  );
-}
-
 function SearchBarGlyph({ className, style, onClick }) {
   return (
     <svg
@@ -226,7 +208,7 @@ export function registerStandardSearchBar() {
     title: 'Search Bar',
     description: 'Search input with icon, rotating placeholders, colors and action.',
     category: APPBUILDER_CATEGORY,
-    icon: SearchBarBlockIcon,
+    icon: 'search',
     keywords: ['search', 'bar', 'input', 'find'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {

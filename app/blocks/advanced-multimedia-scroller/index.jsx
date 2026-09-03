@@ -105,27 +105,6 @@ function isSlideVideo(media) {
   });
 }
 
-function MultimediaScrollerIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M4 5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm0 2v9h16V7H4z"
-      />
-      <circle cx="9" cy="19.5" r="1.1" fill="currentColor" />
-      <circle cx="12" cy="19.5" r="1.1" fill="currentColor" />
-      <circle cx="15" cy="19.5" r="1.1" fill="currentColor" />
-    </svg>
-  );
-}
-
 function SlideMediaPicker({
   media,
   onSelect,
@@ -583,7 +562,7 @@ function registerMultimediaScrollerParent() {
     title: 'Advanced Multimedia Scroller',
     description: 'Full-width hero carousel with arrow navigation and auto-slide.',
     category: APPBUILDER_CATEGORY,
-    icon: MultimediaScrollerIcon,
+    icon: 'slides',
     keywords: ['carousel', 'hero', 'slider', 'images', 'video', 'multimedia'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {

@@ -65,31 +65,13 @@ function getBannerPlaceholderStyle(imageWidth, imageHeight) {
   return style;
 }
 
-function StandardBannerIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="currentColor"
-        d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2v10h16V7H4zm2 2h8v2H6V9z"
-      />
-    </svg>
-  );
-}
-
 export function registerStandardBanner() {
   registerBlockType(STANDARD_BANNER_BLOCK, {
     apiVersion: 3,
     title: 'Banner',
     description: 'Standard banner with selectable image and action.',
     category: APPBUILDER_CATEGORY,
-    icon: StandardBannerIcon,
+    icon: 'cover-image',
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
       imageUrl: { type: 'string', default: '' },
