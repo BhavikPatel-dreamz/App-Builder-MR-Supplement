@@ -121,6 +121,7 @@ function ImageSizeFields({ imageWidth, imageHeight, onChange }) {
       <TextControl
         label="Image Width"
         type="number"
+        min={0}
         value={toNumber(imageWidth, DEFAULT_IMAGE_SIZE)}
         onChange={(value) =>
           onChange({ imageWidth: toNumber(value, DEFAULT_IMAGE_SIZE) })
@@ -129,6 +130,7 @@ function ImageSizeFields({ imageWidth, imageHeight, onChange }) {
       <TextControl
         label="Image Height"
         type="number"
+        min={0}
         value={toNumber(imageHeight, DEFAULT_IMAGE_SIZE)}
         onChange={(value) =>
           onChange({ imageHeight: toNumber(value, DEFAULT_IMAGE_SIZE) })
@@ -227,6 +229,7 @@ function registerCategoryScrollerItem() {
                   <TextControl
                     label="Title Font Size"
                     type="number"
+                    min={0}
                     value={titleSize}
                     onChange={(value) =>
                       setAttributes({
@@ -256,6 +259,7 @@ function registerCategoryScrollerItem() {
                   <TextControl
                     label="SubTitle Font Size"
                     type="number"
+                    min={0}
                     value={subSize}
                     onChange={(value) =>
                       setAttributes({
@@ -512,6 +516,7 @@ function registerCategoryScrollerParent() {
                   <TextControl
                     label="Title Font Size"
                     type="number"
+                    min={0}
                     value={titleSize}
                     onChange={(value) =>
                       setAttributes({
@@ -536,6 +541,7 @@ function registerCategoryScrollerParent() {
                   <TextControl
                     label="SubTitle Font Size"
                     type="number"
+                    min={0}
                     value={subSize}
                     onChange={(value) =>
                       setAttributes({
@@ -563,6 +569,7 @@ function registerCategoryScrollerParent() {
                   <TextControl
                     label="Button Font Size"
                     type="number"
+                    min={0}
                     value={btnSize}
                     onChange={(value) =>
                       setAttributes({
@@ -580,6 +587,7 @@ function registerCategoryScrollerParent() {
               <TextControl
                 label="Image Border Radius"
                 type="number"
+                min={0}
                 value={radius}
                 onChange={(value) =>
                   setAttributes({

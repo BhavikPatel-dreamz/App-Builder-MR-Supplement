@@ -110,6 +110,7 @@ export function registerBlogList() {
               <TextControl
                 label="Title Font Size"
                 type="number"
+                min={0}
                 value={titleSize}
                 onChange={(value) =>
                   setAttributes({
@@ -127,6 +128,7 @@ export function registerBlogList() {
               <TextControl
                 label="Highlighted Title Font Size"
                 type="number"
+                min={0}
                 value={highlightSize}
                 onChange={(value) =>
                   setAttributes({
@@ -145,6 +147,7 @@ export function registerBlogList() {
               <TextControl
                 label="SubTitle Font Size"
                 type="number"
+                min={0}
                 value={subSize}
                 onChange={(value) =>
                   setAttributes({
@@ -155,6 +158,7 @@ export function registerBlogList() {
               <TextControl
                 label="Button Font Size"
                 type="number"
+                min={0}
                 value={btnSize}
                 onChange={(value) =>
                   setAttributes({
@@ -165,6 +169,7 @@ export function registerBlogList() {
               <TextControl
                 label="Button Border Radius"
                 type="number"
+                min={0}
                 value={radius}
                 onChange={(value) =>
                   setAttributes({
@@ -175,6 +180,7 @@ export function registerBlogList() {
               <TextControl
                 label="Button Border Width"
                 type="number"
+                min={0}
                 value={borderW}
                 onChange={(value) =>
                   setAttributes({

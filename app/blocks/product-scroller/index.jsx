@@ -151,7 +151,7 @@ export function registerProductScroller() {
       const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
       const subSize = Math.max(toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),0);
       const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 0);
-      const productCount = Math.max(toNumber(numberOfProduct, DEFAULT_PRODUCTS), 1);
+      const productCount = Math.max(toNumber(numberOfProduct, DEFAULT_PRODUCTS), 0);
       const blockProps = useBlockProps({
         className: "appbuilder-product-scroller-editor appbuilder-ps-preview",
         style: {
@@ -182,6 +182,7 @@ export function registerProductScroller() {
               <TextControl
                 label="Title Font Size"
                 type="number"
+                min={0}
                 value={titleSize}
                 onChange={(value) =>
                   setAttributes({
@@ -192,6 +193,7 @@ export function registerProductScroller() {
               <TextControl
                 label="SubTitle Font Size"
                 type="number"
+                min={0}
                 value={subSize}
                 onChange={(value) =>
                   setAttributes({
@@ -202,6 +204,7 @@ export function registerProductScroller() {
               <TextControl
                 label="Button Font Size"
                 type="number"
+                min={0}
                 value={btnSize}
                 onChange={(value) =>
                   setAttributes({
@@ -216,12 +219,13 @@ export function registerProductScroller() {
               <TextControl
                 label="Number Of Product"
                 type="number"
+                min={0}
                 value={productCount}
                 onChange={(value) =>
                   setAttributes({
                     numberOfProduct: Math.max(
                       toNumber(value, DEFAULT_PRODUCTS),
-                      1,
+                      0,
                     ),
                   })
                 }
@@ -375,7 +379,7 @@ export function registerProductScroller() {
         "data-collection": JSON.stringify(collection ?? {}),
         "data-action": JSON.stringify(action ?? {}),
         "data-number-of-product": String(
-          Math.max(toNumber(numberOfProduct, DEFAULT_PRODUCTS), 1),
+          Math.max(toNumber(numberOfProduct, DEFAULT_PRODUCTS), 0),
         ),
         style: { background: backgroundColor || DEFAULT_BG },
       });

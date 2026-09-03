@@ -40,6 +40,7 @@ export function registerStandardSpacer() {
                 <TextControl
                   label="Height"
                   type="number"
+                  min={0}
                   value={String(spacerHeight)}
                   onChange={(value) =>
                     setAttributes({

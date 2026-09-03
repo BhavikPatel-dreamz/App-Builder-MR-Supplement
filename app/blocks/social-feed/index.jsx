@@ -291,19 +291,19 @@ function registerSocialFeedParent() {
         subTitleFontSize,
         action,
       } = attributes;
-      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 16);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
       const subSize = Math.max(
         toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
-        12,
+        0,
       );
       const btnSize = Math.max(
         toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
-        11,
+        0,
       );
       const radius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
       const borderW = Math.max(
         toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH),
-        1,
+        0,
       );
       const blockProps = useBlockProps({
         className: "appbuilder-social-feed-editor",
@@ -334,6 +334,7 @@ function registerSocialFeedParent() {
               <TextControl
                 label="Title Font Size"
                 type="number"
+                min={0}
                 value={titleSize}
                 onChange={(value) =>
                   setAttributes({
@@ -344,6 +345,7 @@ function registerSocialFeedParent() {
               <TextControl
                 label="SubTitle Font Size"
                 type="number"
+                min={0}
                 value={subSize}
                 onChange={(value) =>
                   setAttributes({
@@ -354,6 +356,7 @@ function registerSocialFeedParent() {
               <TextControl
                 label="Button Font Size"
                 type="number"
+                min={0}
                 value={btnSize}
                 onChange={(value) =>
                   setAttributes({
@@ -364,6 +367,7 @@ function registerSocialFeedParent() {
               <TextControl
                 label="Button Border Radius"
                 type="number"
+                min={0}
                 value={radius}
                 onChange={(value) =>
                   setAttributes({
@@ -374,6 +378,7 @@ function registerSocialFeedParent() {
               <TextControl
                 label="Button Border Width"
                 type="number"
+                min={0}
                 value={borderW}
                 onChange={(value) =>
                   setAttributes({

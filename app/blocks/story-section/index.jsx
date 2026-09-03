@@ -105,13 +105,13 @@ export function registerStorySection() {
         buttonBackgroundColor,
         action,
       } = attributes;
-      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 20);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
       const highlightSize = Math.max(
         toNumber(highlightedTitleFontSize, DEFAULT_HIGHLIGHT_SIZE),
-        20,
+        0,
       );
-      const descSize = Math.max(toNumber(descriptionFontSize, DEFAULT_DESC_SIZE), 12);
-      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 12);
+      const descSize = Math.max(toNumber(descriptionFontSize, DEFAULT_DESC_SIZE), 0);
+      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 0);
       const imgRadius = toNumber(imageBorderRadius, DEFAULT_RADIUS);
       const btnRadius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
       const blockProps = useBlockProps({
@@ -135,6 +135,7 @@ export function registerStorySection() {
               <TextControl
                 label="Image Border Radius"
                 type="number"
+                min={0}
                 value={imgRadius}
                 onChange={(value) =>
                   setAttributes({
@@ -168,6 +169,7 @@ export function registerStorySection() {
               <TextControl
                 label="Title Font Size"
                 type="number"
+                min={0}
                 value={titleSize}
                 onChange={(value) =>
                   setAttributes({
@@ -178,6 +180,7 @@ export function registerStorySection() {
               <TextControl
                 label="Highlighted Title Font Size"
                 type="number"
+                min={0}
                 value={highlightSize}
                 onChange={(value) =>
                   setAttributes({
@@ -191,6 +194,7 @@ export function registerStorySection() {
               <TextControl
                 label="Description Font Size"
                 type="number"
+                min={0}
                 value={descSize}
                 onChange={(value) =>
                   setAttributes({
@@ -201,6 +205,7 @@ export function registerStorySection() {
               <TextControl
                 label="Button Font Size"
                 type="number"
+                min={0}
                 value={btnSize}
                 onChange={(value) =>
                   setAttributes({
@@ -211,6 +216,7 @@ export function registerStorySection() {
               <TextControl
                 label="Button Border Radius"
                 type="number"
+                min={0}
                 value={btnRadius}
                 onChange={(value) =>
                   setAttributes({

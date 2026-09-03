@@ -182,6 +182,7 @@ function registerMultimediaScrollerItem() {
               <TextControl
                 label="Image Width"
                 type="number"
+                min={0}
                 value={mediaDimension(media?.imageWidth)}
                 onChange={(value) =>
                   setAttributes({
@@ -196,6 +197,7 @@ function registerMultimediaScrollerItem() {
               <TextControl
                 label="Image Height"
                 type="number"
+                min={0}
                 value={mediaDimension(media?.imageHeight)}
                 onChange={(value) =>
                   setAttributes({
@@ -393,6 +395,7 @@ function registerMultimediaScrollerParent() {
                 <TextControl
                   label="Auto Slide Delay"
                   type="number"
+                  min={0}
                   value={delay}
                   onChange={(value) =>
                     setAttributes({
@@ -404,6 +407,7 @@ function registerMultimediaScrollerParent() {
               <TextControl
                 label="Inactive Dot Border Radius"
                 type="number"
+                min={0}
                 value={inactiveRadius}
                 onChange={(value) =>
                   setAttributes({

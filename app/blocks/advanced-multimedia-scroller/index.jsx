@@ -253,12 +253,14 @@ function MediaSizeFields({ media, onChange }) {
       <TextControl
         label="Image Width"
         type="number"
+        min={0}
         value={mediaDimension(media?.imageWidth)}
         onChange={(value) => onChange(patchMediaSize(media, 'imageWidth', value))}
       />
       <TextControl
         label="Image Height"
         type="number"
+        min={0}
         value={mediaDimension(media?.imageHeight)}
         onChange={(value) => onChange(patchMediaSize(media, 'imageHeight', value))}
       />

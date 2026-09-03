@@ -210,14 +210,14 @@ function registerBrandScrollerParent() {
         action,
       } = attributes;
       const { childCount, insertBlock } = useChildBlocks(clientId);
-      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 18);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
       const subSize = Math.max(
         toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
-        12,
+        0,
       );
       const btnSize = Math.max(
         toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
-        11,
+        0,
       );
       const radius = toNumber(ImageBorderRadius, DEFAULT_RADIUS);
       const blockProps = useBlockProps({
@@ -247,6 +247,7 @@ function registerBrandScrollerParent() {
                   <TextControl
                     label="Title Font Size"
                     type="number"
+                    min={0}
                     value={titleSize}
                     onChange={(value) =>
                       setAttributes({
@@ -271,6 +272,7 @@ function registerBrandScrollerParent() {
                   <TextControl
                     label="SubTitle Font Size"
                     type="number"
+                    min={0}
                     value={subSize}
                     onChange={(value) =>
                       setAttributes({
@@ -298,6 +300,7 @@ function registerBrandScrollerParent() {
                   <TextControl
                     label="Button Font Size"
                     type="number"
+                    min={0}
                     value={btnSize}
                     onChange={(value) =>
                       setAttributes({
@@ -315,6 +318,7 @@ function registerBrandScrollerParent() {
               <TextControl
                 label="Image Border Radius"
                 type="number"
+                min={0}
                 value={radius}
                 onChange={(value) =>
                   setAttributes({

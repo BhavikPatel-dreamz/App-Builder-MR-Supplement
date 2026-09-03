@@ -231,9 +231,9 @@ function registerProductsByCategorisScrollerParent() {
         buttonTextColor,
       } = attributes;
 
-      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 20);
-      const subSize = Math.max(toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE), 12);
-      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 11);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
+      const subSize = Math.max(toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE), 0);
+      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 0);
       const productCount = toNumber(numberOfProduct, DEFAULT_PRODUCTS);
       const previewCards = PREVIEW_PRODUCTS.slice(
         0,
@@ -266,6 +266,7 @@ function registerProductsByCategorisScrollerParent() {
                   <TextControl
                     label="Title Font Size"
                     type="number"
+                    min={0}
                     value={titleSize}
                     onChange={(value) =>
                       setAttributes({
@@ -290,6 +291,7 @@ function registerProductsByCategorisScrollerParent() {
                   <TextControl
                     label="SubTitle Font Size"
                     type="number"
+                    min={0}
                     value={subSize}
                     onChange={(value) =>
                       setAttributes({
@@ -317,6 +319,7 @@ function registerProductsByCategorisScrollerParent() {
                   <TextControl
                     label="Button Font Size"
                     type="number"
+                    min={0}
                     value={btnSize}
                     onChange={(value) =>
                       setAttributes({
@@ -329,6 +332,7 @@ function registerProductsByCategorisScrollerParent() {
               <TextControl
                 label="Number of Products"
                 type="number"
+                min={0}
                 value={productCount}
                 onChange={(value) =>
                   setAttributes({

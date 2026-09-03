@@ -382,6 +382,7 @@ function registerRewardsStepsParent() {
               <TextControl
                 label="Title Font Size"
                 type="number"
+                min={0}
                 value={titleSize}
                 onChange={(value) =>
                   setAttributes({
@@ -392,6 +393,7 @@ function registerRewardsStepsParent() {
               <TextControl
                 label="Highlighted Title Font Size"
                 type="number"
+                min={0}
                 value={highlightSize}
                 onChange={(value) =>
                   setAttributes({
@@ -405,6 +407,7 @@ function registerRewardsStepsParent() {
               <TextControl
                 label="SubTitle Font Size"
                 type="number"
+                min={0}
                 value={subSize}
                 onChange={(value) =>
                   setAttributes({
@@ -415,6 +418,7 @@ function registerRewardsStepsParent() {
               <TextControl
                 label="Button Font Size"
                 type="number"
+                min={0}
                 value={btnSize}
                 onChange={(value) =>
                   setAttributes({
@@ -425,6 +429,7 @@ function registerRewardsStepsParent() {
               <TextControl
                 label="Button Border Radius"
                 type="number"
+                min={0}
                 value={radius}
                 onChange={(value) =>
                   setAttributes({

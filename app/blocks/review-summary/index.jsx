@@ -78,6 +78,7 @@ export function registerReviewSummary() {
               <TextControl
                 label="Number of Reviews to show"
                 type="number"
+                min={0}
                 value={reviews}
                 onChange={(value) =>
                   setAttributes({
@@ -88,6 +89,7 @@ export function registerReviewSummary() {
               <TextControl
                 label="Title Font Size"
                 type="number"
+                min={0}
                 value={titleSize}
                 onChange={(value) =>
                   setAttributes({
@@ -98,6 +100,7 @@ export function registerReviewSummary() {
               <TextControl
                 label="SubTitle Font Size"
                 type="number"
+                min={0}
                 value={subSize}
                 onChange={(value) =>
                   setAttributes({

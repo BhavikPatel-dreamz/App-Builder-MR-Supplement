@@ -94,6 +94,7 @@ function registerTopMarqueeItem() {
               <TextControl
                 label="Text Font Size"
                 type="number"
+                min={0}
                 value={fontSize}
                 onChange={(value) =>
                   setAttributes({
@@ -163,7 +164,7 @@ function registerTopMarqueeItem() {
               className="appbuilder-top-marquee-item-editor__text"
               style={{
                 color: textColor || DEFAULT_TEXT_COLOR,
-                fontSize: `${Math.max(fontSize, 11)}px`,
+                fontSize: `${Math.max(toNumber(fontSize, 0), 0)}px`,
               }}
             >
               {text || "Marquee text"}
@@ -270,6 +271,7 @@ function registerTopMarqueeParent() {
               <TextControl
                 label="Auto Slide Delay"
                 type="number"
+                min={0}
                 value={delay}
                 onChange={(value) =>
                   setAttributes({
@@ -280,6 +282,7 @@ function registerTopMarqueeParent() {
               <TextControl
                 label="Block Height"
                 type="number"
+                min={0}
                 value={height}
                 onChange={(value) =>
                   setAttributes({
@@ -296,6 +299,7 @@ function registerTopMarqueeParent() {
                 <TextControl
                   label="Divider Height"
                   type="number"
+                  min={0}
                   value={dividerH}
                   onChange={(value) =>
                     setAttributes({
