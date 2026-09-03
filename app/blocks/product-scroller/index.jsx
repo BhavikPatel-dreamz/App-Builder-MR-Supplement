@@ -11,6 +11,7 @@ import {
   Button,
 } from "gutenberg-block-kit/wp/components";
 import { ActionBuilder } from "gutenberg-block-kit/actions";
+import { contentTabStyle } from "../inspector-shared";
 import { PRODUCT_SCROLLER_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
 const DEFAULT_TITLE = "JUST LANDED";
@@ -24,6 +25,7 @@ const PREVIEW_BUTTON_COLOR = "#7cb342";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_SUBTITLE_SIZE = 12;
 const DEFAULT_BUTTON_SIZE = 10;
+const DEFAULT_PRODUCTS = 10;
 
 const PREVIEW_PRODUCTS = [
   {
@@ -128,6 +130,7 @@ export function registerProductScroller() {
       buttonTextColor: { type: "string", default: DEFAULT_TEXT },
       collection: { type: "object", default: {} },
       action: { type: "object", default: {} },
+      numberOfProduct: { type: "number", default: DEFAULT_PRODUCTS },
     },
     edit: ({ attributes, setAttributes }) => {
       const {
@@ -143,10 +146,12 @@ export function registerProductScroller() {
         buttonTextColor,
         collection,
         action,
+        numberOfProduct,
       } = attributes;
-      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 20);
-      const subSize = Math.max(toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE), 12);
-      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 11);
+      const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
+      const subSize = Math.max(toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),0);
+      const btnSize = Math.max(toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE), 0);
+      const productCount = Math.max(toNumber(numberOfProduct, DEFAULT_PRODUCTS), 1);
       const blockProps = useBlockProps({
         className: "appbuilder-product-scroller-editor appbuilder-ps-preview",
         style: {
@@ -156,7 +161,8 @@ export function registerProductScroller() {
 
       return (
         <>
-          <InspectorControls>
+          <InspectorControls group="content">
+            <div style={contentTabStyle}>
             <PanelBody title="Product Scroller" initialOpen>
               <TextControl
                 label="Title"
@@ -207,12 +213,28 @@ export function registerProductScroller() {
                 collection={collection}
                 onChange={(next) => setAttributes({ collection: next })}
               />
+              <TextControl
+                label="Number Of Product"
+                type="number"
+                value={productCount}
+                onChange={(value) =>
+                  setAttributes({
+                    numberOfProduct: Math.max(
+                      toNumber(value, DEFAULT_PRODUCTS),
+                      1,
+                    ),
+                  })
+                }
+              />
               <ActionBuilder
                 label="Action"
                 value={action ?? {}}
                 onChange={(next) => setAttributes({ action: next })}
               />
             </PanelBody>
+            </div>
+          </InspectorControls>
+          <InspectorControls>
             <PanelColorSettings
               title="Colors"
               colorSettings={[
@@ -330,6 +352,7 @@ export function registerProductScroller() {
         buttonTextColor,
         collection,
         action,
+        numberOfProduct,
       } = attributes;
       const blockProps = useBlockProps.save({
         className: "appbuilder-product-scroller",
@@ -351,6 +374,9 @@ export function registerProductScroller() {
         "data-button-text-color": buttonTextColor || DEFAULT_TEXT,
         "data-collection": JSON.stringify(collection ?? {}),
         "data-action": JSON.stringify(action ?? {}),
+        "data-number-of-product": String(
+          Math.max(toNumber(numberOfProduct, DEFAULT_PRODUCTS), 1),
+        ),
         style: { background: backgroundColor || DEFAULT_BG },
       });
       return (
