@@ -10,12 +10,12 @@ import { ActionBuilder } from "gutenberg-block-kit/actions";
 import { REVIEW_SUMMARY_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
 const DEFAULT_TITLE = "Blogs & Insights";
-const DEFAULT_BUTTON = "VIEW ALL";
+const DEFAULT_SUBTITLE =
+  "Rated Excellent on Trustpilot with over 18,000 verified reviews.";
 const DEFAULT_BG = "#ffffff";
 const DEFAULT_TEXT = "#ffffff";
 const DEFAULT_TITLE_SIZE = 12;
 const DEFAULT_SUBTITLE_SIZE = 12;
-const DEFAULT_BUTTON_SIZE = 10;
 const DEFAULT_REVIEWS = 10;
 
 function toNumber(value, fallback) {
@@ -33,11 +33,9 @@ export function registerReviewSummary() {
     attributes: {
       backgroundColor: { type: "string", default: DEFAULT_BG },
       title: { type: "string", default: DEFAULT_TITLE },
-      buttonText: { type: "string", default: DEFAULT_BUTTON },
-      buttonTextColor: { type: "string", default: DEFAULT_TEXT },
-      buttonFontSize: { type: "number", default: DEFAULT_BUTTON_SIZE },
       titleTextColor: { type: "string", default: DEFAULT_TEXT },
       titleFontSize: { type: "number", default: DEFAULT_TITLE_SIZE },
+      subTitleText: { type: "string", default: DEFAULT_SUBTITLE },
       subTitleTextColor: { type: "string", default: DEFAULT_TEXT },
       subTitleFontSize: { type: "number", default: DEFAULT_SUBTITLE_SIZE },
       numberOfReviews: { type: "number", default: DEFAULT_REVIEWS },
@@ -47,11 +45,9 @@ export function registerReviewSummary() {
       const {
         backgroundColor,
         title,
-        buttonText,
-        buttonTextColor,
-        buttonFontSize,
         titleTextColor,
         titleFontSize,
+        subTitleText,
         subTitleTextColor,
         subTitleFontSize,
         numberOfReviews,
@@ -59,7 +55,6 @@ export function registerReviewSummary() {
       } = attributes;
       const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
       const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
-      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
       const reviews = toNumber(numberOfReviews, DEFAULT_REVIEWS);
       const blockProps = useBlockProps({
         className: "appbuilder-review-summary-editor",
@@ -74,6 +69,11 @@ export function registerReviewSummary() {
                 label="Title"
                 value={title}
                 onChange={(value) => setAttributes({ title: value })}
+              />
+              <TextControl
+                label="Sub Title"
+                value={subTitleText}
+                onChange={(value) => setAttributes({ subTitleText: value })}
               />
               <TextControl
                 label="Number of Reviews to show"
@@ -102,21 +102,6 @@ export function registerReviewSummary() {
                 onChange={(value) =>
                   setAttributes({
                     subTitleFontSize: toNumber(value, DEFAULT_SUBTITLE_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Text"
-                value={buttonText}
-                onChange={(value) => setAttributes({ buttonText: value })}
-              />
-              <TextControl
-                label="Button Font Size"
-                type="number"
-                value={btnSize}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
                   })
                 }
               />
@@ -149,12 +134,6 @@ export function registerReviewSummary() {
                       subTitleTextColor: value || DEFAULT_TEXT,
                     }),
                 },
-                {
-                  label: "Button Text Color",
-                  value: buttonTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
-                },
               ]}
             />
           </InspectorControls>
@@ -166,11 +145,9 @@ export function registerReviewSummary() {
       const {
         backgroundColor,
         title,
-        buttonText,
-        buttonTextColor,
-        buttonFontSize,
         titleTextColor,
         titleFontSize,
+        subTitleText,
         subTitleTextColor,
         subTitleFontSize,
         numberOfReviews,
@@ -180,15 +157,11 @@ export function registerReviewSummary() {
         className: "appbuilder-review-summary",
         "data-background-color": backgroundColor || DEFAULT_BG,
         "data-title": title ?? "",
-        "data-button-text": buttonText ?? "",
-        "data-button-text-color": buttonTextColor || DEFAULT_TEXT,
-        "data-button-font-size": String(
-          toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
-        ),
         "data-title-text-color": titleTextColor || DEFAULT_TEXT,
         "data-title-font-size": String(
           toNumber(titleFontSize, DEFAULT_TITLE_SIZE),
         ),
+        "data-subtitle-text": subTitleText ?? "",
         "data-subtitle-text-color": subTitleTextColor || DEFAULT_TEXT,
         "data-subtitle-font-size": String(
           toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),

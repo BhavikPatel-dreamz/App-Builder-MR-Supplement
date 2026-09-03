@@ -48,12 +48,30 @@ function getDotColors(activeDotColor, inActiveDotColor) {
   };
 }
 
+function mediaDimension(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 function mediaFromSelection(selected) {
+  const imageWidth = mediaDimension(selected?.width);
+  const imageHeight = mediaDimension(selected?.height);
   return {
     media: {
       url: selected?.url ?? selected?.src ?? '',
       type: selected?.mime ?? selected?.type ?? '',
+      imageWidth,
+      imageHeight,
     },
+  };
+}
+
+function mediaForSave(media) {
+  return {
+    url: media?.url ?? '',
+    type: media?.type ?? '',
+    imageWidth: mediaDimension(media?.imageWidth ?? media?.width),
+    imageHeight: mediaDimension(media?.imageHeight ?? media?.height),
   };
 }
 
@@ -62,6 +80,8 @@ function clearMedia() {
     media: {
       url: '',
       type: '',
+      imageWidth: 0,
+      imageHeight: 0,
     },
   };
 }
@@ -232,7 +252,6 @@ function SlideMediaDisplay({ media, onOpen }) {
 
 function CarouselSettingsPanels({ attributes, setAttributes }) {
   const {
-    carouselHeight,
     showDotIndicator,
     showDotIndicatorOnImage,
     dotAlignment,
@@ -245,17 +264,6 @@ function CarouselSettingsPanels({ attributes, setAttributes }) {
 
   return (
     <>
-      <PanelBody title="Height & Layout" initialOpen={true}>
-        <RangeControl
-          label="Slide Height (px)"
-          value={carouselHeight || DEFAULT_CAROUSEL_HEIGHT}
-          onChange={(value) => setAttributes({ carouselHeight: Math.max(150, value) })}
-          min={150}
-          max={800}
-          step={10}
-        />
-      </PanelBody>
-
       <PanelBody title="Indicators" initialOpen={true}>
         <ToggleControl
           label="Show Dot Indicator"
@@ -496,7 +504,7 @@ function registerMultimediaScrollerItem() {
       const mediaUrl = getMediaUrl(media);
       const blockProps = useBlockProps.save({
         className: 'appbuilder-multimedia-scroller__slide',
-        'data-media': JSON.stringify(media ?? {}),
+        'data-media': JSON.stringify(mediaForSave(media)),
         'data-action': JSON.stringify(action ?? {}),
       });
 
@@ -539,7 +547,6 @@ function registerMultimediaScrollerParent() {
     keywords: ['carousel', 'hero', 'slider', 'images', 'video', 'multimedia'],
     supports: { html: false, align: ['wide', 'full'] },
     attributes: {
-      carouselHeight: { type: 'number', default: DEFAULT_CAROUSEL_HEIGHT },
       showDotIndicator: { type: 'boolean', default: true },
       showDotIndicatorOnImage: { type: 'boolean', default: false },
       dotIndicatorPosition: { type: 'string', default: 'bottom' },
@@ -553,7 +560,6 @@ function registerMultimediaScrollerParent() {
 
     edit: ({ attributes, setAttributes, clientId }) => {
       const {
-        carouselHeight,
         showDotIndicator,
         showDotIndicatorOnImage,
         dotIndicatorPosition,
@@ -578,7 +584,7 @@ function registerMultimediaScrollerParent() {
       const showArrows = arrowNavigation && slideCount > 1;
       const showDots = showDotIndicator && slideCount > 1;
       const positionClass = showDotIndicatorOnImage ? 'bottom-overlay' : 'bottom';
-      const heightPx = `${carouselHeight || DEFAULT_CAROUSEL_HEIGHT}px`;
+      const heightPx = `${DEFAULT_CAROUSEL_HEIGHT}px`;
 
       return (
         <>
@@ -708,7 +714,6 @@ function registerMultimediaScrollerParent() {
 
     save: ({ attributes }) => {
       const {
-        carouselHeight,
         showDotIndicator,
         showDotIndicatorOnImage,
         dotIndicatorPosition,
@@ -722,10 +727,9 @@ function registerMultimediaScrollerParent() {
 
       const dotColors = getDotColors(activeDotColor, inActiveDotColor);
       const positionClass = showDotIndicatorOnImage ? 'bottom-overlay' : 'bottom';
-      const heightPx = `${carouselHeight || DEFAULT_CAROUSEL_HEIGHT}px`;
+      const heightPx = `${DEFAULT_CAROUSEL_HEIGHT}px`;
       const blockProps = useBlockProps.save({
         className: 'appbuilder-multimedia-scroller',
-        'data-carousel-height': String(carouselHeight || DEFAULT_CAROUSEL_HEIGHT),
         'data-show-dots': showDotIndicator ? 'true' : 'false',
         'data-dots-on-image': showDotIndicatorOnImage ? 'true' : 'false',
         'data-dot-position': dotIndicatorPosition,
