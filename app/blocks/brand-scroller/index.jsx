@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { registerBlockType } from "gutenberg-block-kit/wp/blocks";
+import { registerBlockType, createBlock } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
   InnerBlocks,
@@ -19,6 +19,7 @@ import {
   ImagePicker,
   imageAttributesFromMedia,
   clearImageAttributes,
+  useChildBlocks,
 } from "../inspector-shared";
 import {
   BRAND_SCROLLER_BLOCK,
@@ -68,7 +69,7 @@ function registerBrandScrollerItem() {
     category: APPBUILDER_CATEGORY,
     parent: [BRAND_SCROLLER_BLOCK],
     icon: "format-image",
-    supports: { html: false, reusable: false },
+    supports: { html: false, reusable: false, multiple: true },
     attributes: {
       imageUrl: { type: "string", default: "" },
       imageWidth: { type: "number", default: 0 },
@@ -189,7 +190,7 @@ function registerBrandScrollerParent() {
       showArrow: { type: "boolean", default: true },
       action: { type: "object", default: {} },
     },
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const {
         title,
         subTitle,
@@ -208,6 +209,7 @@ function registerBrandScrollerParent() {
         showArrow,
         action,
       } = attributes;
+      const { childCount, insertBlock } = useChildBlocks(clientId);
       const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 18);
       const subSize = Math.max(
         toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
@@ -325,6 +327,19 @@ function registerBrandScrollerParent() {
                 checked={!!showArrow}
                 onChange={(value) => setAttributes({ showArrow: value })}
               />
+              <Button
+                variant="primary"
+                onClick={() =>
+                  insertBlock(
+                    createBlock(BRAND_SCROLLER_ITEM_BLOCK, {}),
+                    childCount,
+                    clientId,
+                  )
+                }
+                style={{ width: "100%", justifyContent: "center", marginTop: "8px" }}
+              >
+                Add brand
+              </Button>
             </PanelBody>
             <PanelColorSettings
               title="Colors"
@@ -401,7 +416,7 @@ function registerBrandScrollerParent() {
                 ]}
                 orientation="horizontal"
                 templateLock={false}
-                renderAppender={InnerBlocks.ButtonBlockAppender}
+                renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
               />
             </div>
             {showButton ? (

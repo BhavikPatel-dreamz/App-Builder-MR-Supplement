@@ -38,12 +38,38 @@ function toNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function mediaDimension(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 function mediaFromSelection(selected) {
+  const width = mediaDimension(selected?.width);
+  const height = mediaDimension(selected?.height);
   return {
     url: selected?.url ?? selected?.src ?? "",
     type: selected?.mime ?? selected?.type ?? "",
-    width: selected?.width ?? 0,
-    height: selected?.height ?? 0,
+    width,
+    height,
+    ImageWidth: width,
+    ImageHeight: height,
+  };
+}
+
+function itemMediaAttributes(selected) {
+  const media = mediaFromSelection(selected);
+  return {
+    media,
+    imageWidth: media.width,
+    imageHeight: media.height,
+  };
+}
+
+function clearItemMediaAttributes() {
+  return {
+    media: {},
+    imageWidth: 0,
+    imageHeight: 0,
   };
 }
 
@@ -137,6 +163,8 @@ function registerMultimediaScrollerItem() {
     supports: { html: false, reusable: false },
     attributes: {
       media: { type: "object", default: {} },
+      imageWidth: { type: "number", default: 0 },
+      imageHeight: { type: "number", default: 0 },
       action: { type: "object", default: {} },
     },
     edit: ({ attributes, setAttributes }) => {
@@ -152,8 +180,14 @@ function registerMultimediaScrollerItem() {
             <PanelBody title="Slide" initialOpen>
               <SlideMediaPicker
                 media={media}
-                onSelect={(next) => setAttributes({ media: next })}
-                onClear={() => setAttributes({ media: {} })}
+                onSelect={(next) =>
+                  setAttributes({
+                    media: next,
+                    imageWidth: mediaDimension(next?.width),
+                    imageHeight: mediaDimension(next?.height),
+                  })
+                }
+                onClear={() => setAttributes(clearItemMediaAttributes())}
               />
               <ActionBuilder
                 label="Action"
@@ -166,7 +200,7 @@ function registerMultimediaScrollerItem() {
             <MediaUploadCheck>
               <MediaUpload
                 onSelect={(selected) =>
-                  setAttributes({ media: mediaFromSelection(selected) })
+                  setAttributes(itemMediaAttributes(selected))
                 }
                 allowedTypes={["image", "video"]}
                 render={({ open }) =>
@@ -204,11 +238,24 @@ function registerMultimediaScrollerItem() {
       );
     },
     save: ({ attributes }) => {
-      const { media, action } = attributes;
+      const { media, action, imageWidth, imageHeight } = attributes;
       const mediaUrl = getMediaUrl(media);
+      const width = mediaDimension(imageWidth ?? media?.ImageWidth ?? media?.width);
+      const height = mediaDimension(
+        imageHeight ?? media?.ImageHeight ?? media?.height,
+      );
+      const mediaPayload = {
+        ...(media ?? {}),
+        width,
+        height,
+        ImageWidth: width,
+        ImageHeight: height,
+      };
       const blockProps = useBlockProps.save({
         className: "appbuilder-multimedia-scroller-item",
-        "data-media": JSON.stringify(media ?? {}),
+        "data-media": JSON.stringify(mediaPayload),
+        "data-image-width": String(width),
+        "data-image-height": String(height),
         "data-action": JSON.stringify(action ?? {}),
       });
       return (

@@ -41,10 +41,10 @@
   .block-editor-block-list__layout {
   display: flex !important;
   flex-direction: row !important;
-  flex-wrap: nowrap !important;
+  flex-wrap: wrap !important;
   align-items: stretch;
   gap: 12px;
-  overflow-x: auto;
+  overflow: visible;
   margin: 0;
   padding: 2px 0 6px;
 }
@@ -56,6 +56,35 @@
   max-width: none !important;
   width: auto !important;
   flex: 0 0 auto;
+}
+
+.appbuilder-brand-scroller-editor
+  .appbuilder-bs-preview__track
+  .block-list-appender,
+.appbuilder-brand-scroller-editor
+  .appbuilder-bs-preview__track
+  .block-editor-block-list__block:has(.block-list-appender) {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 88px;
+  width: auto !important;
+}
+
+.appbuilder-brand-scroller-editor
+  .appbuilder-bs-preview__track
+  .block-editor-button-block-appender,
+.appbuilder-brand-scroller-editor
+  .appbuilder-bs-preview__track
+  .block-list-appender__toggle {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  padding: 0 !important;
+  background: #fff !important;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
 }
 
 .appbuilder-brand-scroller-item-editor {

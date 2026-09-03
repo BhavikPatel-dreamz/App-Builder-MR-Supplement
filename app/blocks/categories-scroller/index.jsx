@@ -12,7 +12,6 @@ import {
   PanelBody,
   TextControl,
   ToggleControl,
-  Button,
 } from "gutenberg-block-kit/wp/components";
 import { ActionBuilder } from "gutenberg-block-kit/actions";
 import {
@@ -40,61 +39,6 @@ const DEFAULT_ITEM_TITLE = "Set";
 function toNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-async function pickCollection() {
-  const picker =
-    typeof window !== "undefined" ? window.shopify?.resourcePicker : null;
-  if (!picker) return null;
-  try {
-    const selection = await picker({ type: "collection", multiple: false });
-    const collection = selection?.[0];
-    if (!collection) return null;
-    return {
-      collectionId: collection.id,
-      handle: collection.handle,
-      title: collection.title,
-    };
-  } catch (err) {
-    console.error("ResourcePicker collection error:", err);
-    return null;
-  }
-}
-
-function CollectionPicker({ collection, onChange }) {
-  const hasCollection = Boolean(collection?.collectionId);
-  return (
-    <div style={{ marginBottom: "12px" }}>
-      {hasCollection ? (
-        <p style={{ fontSize: "13px", margin: "0 0 8px" }}>
-          {collection.title || collection.handle || collection.collectionId}
-        </p>
-      ) : (
-        <p style={{ fontSize: "13px", color: "#6d7175", margin: "0 0 8px" }}>
-          No collection selected
-        </p>
-      )}
-      <Button
-        variant="secondary"
-        onClick={async () => {
-          const next = await pickCollection();
-          if (next) onChange(next);
-        }}
-      >
-        {hasCollection ? "Change collection" : "Select collection"}
-      </Button>
-      {hasCollection ? (
-        <Button
-          variant="link"
-          isDestructive
-          onClick={() => onChange({})}
-          style={{ marginLeft: "8px" }}
-        >
-          Clear
-        </Button>
-      ) : null}
-    </div>
-  );
 }
 
 function CategoriesScrollerIcon() {
@@ -125,16 +69,11 @@ function registerCategoryScrollerItem() {
       subTitle: { type: "string", default: DEFAULT_SUBTITLE },
       showSubTitle: { type: "boolean", default: true },
       showImageSubtitle: { type: "boolean", default: true },
-      showButton: { type: "boolean", default: true },
-      buttonText: { type: "string", default: DEFAULT_BUTTON },
-      buttonTextColor: { type: "string", default: DEFAULT_TEXT },
-      buttonFontSize: { type: "number", default: DEFAULT_BUTTON_SIZE },
       titleTextColor: { type: "string", default: DEFAULT_TEXT },
       titleFontSize: { type: "number", default: DEFAULT_TITLE_SIZE },
       subTitleTextColor: { type: "string", default: DEFAULT_TEXT },
       subTitleFontSize: { type: "number", default: DEFAULT_SUBTITLE_SIZE },
       showArrow: { type: "boolean", default: true },
-      collection: { type: "object", default: {} },
       action: { type: "object", default: {} },
     },
     edit: ({ attributes, setAttributes }) => {
@@ -145,21 +84,15 @@ function registerCategoryScrollerItem() {
         subTitle,
         showSubTitle,
         showImageSubtitle,
-        showButton,
-        buttonText,
-        buttonTextColor,
-        buttonFontSize,
         titleTextColor,
         titleFontSize,
         subTitleTextColor,
         subTitleFontSize,
         showArrow,
-        collection,
         action,
       } = attributes;
       const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
       const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
-      const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
       const showItemSubtitle = showImageSubtitle ?? showSubTitle;
       const blockProps = useBlockProps({
         className: "appbuilder-categories-scroller-item-editor",
@@ -176,10 +109,6 @@ function registerCategoryScrollerItem() {
                   setAttributes(imageAttributesFromMedia(media))
                 }
                 onClear={() => setAttributes(clearImageAttributes())}
-              />
-              <CollectionPicker
-                collection={collection}
-                onChange={(next) => setAttributes({ collection: next })}
               />
               <ToggleControl
                 label="Show Title"
@@ -238,30 +167,6 @@ function registerCategoryScrollerItem() {
                 </>
               ) : null}
               <ToggleControl
-                label="Show Button"
-                checked={!!showButton}
-                onChange={(value) => setAttributes({ showButton: value })}
-              />
-              {showButton ? (
-                <>
-                  <TextControl
-                    label="Button Text"
-                    value={buttonText}
-                    onChange={(value) => setAttributes({ buttonText: value })}
-                  />
-                  <TextControl
-                    label="Button Font Size"
-                    type="number"
-                    value={btnSize}
-                    onChange={(value) =>
-                      setAttributes({
-                        buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
-                      })
-                    }
-                  />
-                </>
-              ) : null}
-              <ToggleControl
                 label="Show Arrow"
                 checked={!!showArrow}
                 onChange={(value) => setAttributes({ showArrow: value })}
@@ -288,12 +193,6 @@ function registerCategoryScrollerItem() {
                     setAttributes({
                       subTitleTextColor: value || DEFAULT_TEXT,
                     }),
-                },
-                {
-                  label: "Button Text Color",
-                  value: buttonTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
                 },
               ]}
             />
@@ -370,16 +269,11 @@ function registerCategoryScrollerItem() {
         subTitle,
         showSubTitle,
         showImageSubtitle,
-        showButton,
-        buttonText,
-        buttonTextColor,
-        buttonFontSize,
         titleTextColor,
         titleFontSize,
         subTitleTextColor,
         subTitleFontSize,
         showArrow,
-        collection,
         action,
       } = attributes;
       const blockProps = useBlockProps.save({
@@ -394,12 +288,6 @@ function registerCategoryScrollerItem() {
         "data-show-image-subtitle": String(
           !!(showImageSubtitle ?? showSubTitle),
         ),
-        "data-show-button": String(!!showButton),
-        "data-button-text": buttonText ?? "",
-        "data-button-text-color": buttonTextColor || DEFAULT_TEXT,
-        "data-button-font-size": String(
-          toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
-        ),
         "data-title-text-color": titleTextColor || DEFAULT_TEXT,
         "data-title-font-size": String(
           toNumber(titleFontSize, DEFAULT_TITLE_SIZE),
@@ -409,7 +297,6 @@ function registerCategoryScrollerItem() {
           toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
         ),
         "data-show-arrow": String(!!showArrow),
-        "data-collection": JSON.stringify(collection ?? {}),
         "data-action": JSON.stringify(action ?? {}),
       });
       return (
