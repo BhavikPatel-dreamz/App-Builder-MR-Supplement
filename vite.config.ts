@@ -1,7 +1,14 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { gutenbergBlockKitVite } from 'gutenberg-block-kit/vite';
+
+const prismaClient = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "app/generated/prisma/client.ts",
+);
 
 
 // Related: https://github.com/remix-run/remix/issues/2835#issuecomment-1144102176
@@ -61,6 +68,10 @@ export default defineConfig({
     chunkSizeWarningLimit: 20000,
   },
   resolve: {
+    alias: {
+      // Shopify session storage still imports from @prisma/client (Prisma 6).
+      "@prisma/client": prismaClient,
+    },
     dedupe: ["react", "react-dom", "react-router", "@wordpress/element"],
   },
   optimizeDeps: {

@@ -35,7 +35,8 @@
     "@hot-updater/core": "0.35.8",
     "@hot-updater/plugin-core": "0.35.8",
     "@hot-updater/server": "0.35.8",
-    "@prisma/client": "^6.16.3",
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
     "@react-router/dev": "^7.18.0",
     "@react-router/fs-routes": "^7.18.0",
     "@react-router/node": "^7.18.0",
@@ -48,7 +49,7 @@
     "isbot": "^5.1.31",
     "kysely": "^0.28.2",
     "pg": "^8.13.1",
-    "prisma": "^6.16.3",
+    "prisma": "7.10.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.6.0",
@@ -94,6 +95,14 @@
       "mime": "3.0.0"
     }
   },
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "@prisma/client": "6 || 7",
+        "prisma": "6 || 7"
+      }
+    }
+  },
   "author": "ubuntu",
-  "packageManager": "pnpm@11.25.0+sha512.5cde925b4f075f725eb71fbae18a42ffe784524789f19b61c731cb8721ec28aaee160e01a8d5af4fedb2a42cdbf300efe23db356b0d4a17b4d63e11f8ab7c956"
+  "packageManager": "pnpm@12.3.1+sha512.3c14c15408d1489d350f8ed7f93361d26cc707054f6849a4eea3bb7407ff4fe4564b413a1c421a773a176ab1168a8df1c7d548f2cd0dc7d344f58c4e680a5b18"
 }

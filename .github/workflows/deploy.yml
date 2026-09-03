@@ -43,6 +43,11 @@ jobs:
     needs: validate
     runs-on: [self-hosted]
     steps:
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 12.3.1
+
       - name: Setup Node
         uses: actions/setup-node@v5
         with:

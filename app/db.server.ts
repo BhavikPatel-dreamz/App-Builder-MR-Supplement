@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "./generated/prisma/client";
 
 //test
 declare global {
@@ -13,7 +14,18 @@ function isStalePrismaClient(client: PrismaClient): boolean {
 }
 
 function createPrismaClient() {
-  return new PrismaClient();
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  const adapter = new PrismaPg({
+    connectionString,
+    // Match Prisma 6's 5s acquire timeout; node-pg defaults to waiting forever.
+    connectionTimeoutMillis: 5000,
+  });
+
+  return new PrismaClient({ adapter });
 }
 
 function resolvePrismaClient(): PrismaClient {
