@@ -9,7 +9,7 @@
     "deploy": "shopify app deploy",
     "config:use": "shopify app config use",
     "env": "shopify app env",
-    "start": "react-router-serve ./build/server/index.js",
+    "start": "node --import dotenv/config ./node_modules/@react-router/serve/bin.js ./build/server/index.js",
     "docker-start": "npm run setup && npm run start",
     "setup": "prisma generate && prisma migrate deploy && npm run ota:migrate",
     "ota:migrate": "hot-updater db migrate ./app/lib/ota/hotUpdaterInstance.server.ts --yes",

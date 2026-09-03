@@ -14,6 +14,15 @@ function isStalePrismaClient(client: PrismaClient): boolean {
   return PRISMA_DELEGATES.some((name) => !(name in client));
 }
 
+function postgresConnectionString(url: string): string {
+  // node-pg currently treats require/prefer/verify-ca as verify-full and warns.
+  // Keep today's behavior by making that explicit.
+  return url.replace(
+    /([?&]sslmode=)(require|prefer|verify-ca)\b/gi,
+    "$1verify-full",
+  );
+}
+
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -21,7 +30,7 @@ function createPrismaClient() {
   }
 
   const adapter = new PrismaPg({
-    connectionString,
+    connectionString: postgresConnectionString(connectionString),
     // Match Prisma 6's 5s acquire timeout; node-pg defaults to waiting forever.
     connectionTimeoutMillis: 5000,
   });
