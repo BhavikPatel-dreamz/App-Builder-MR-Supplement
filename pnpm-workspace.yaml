@@ -11,3 +11,11 @@ minimumReleaseAgeExclude:
   - gutenberg-block-kit@1.1.4
   - gutenberg-block-kit@1.1.5
   - gutenberg-block-kit@1.1.6
+engineStrict: true
+shamefullyHoist: true
+peerDependencyRules:
+  allowedVersions:
+    '@prisma/client': '6 || 7'
+    prisma: '6 || 7'
+    react: '*'
+    react-dom: '*'

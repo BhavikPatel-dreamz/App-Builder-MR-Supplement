@@ -68,10 +68,13 @@ export default defineConfig({
     chunkSizeWarningLimit: 20000,
   },
   resolve: {
-    alias: {
-      // Shopify session storage still imports from @prisma/client (Prisma 6).
-      "@prisma/client": prismaClient,
-    },
+    alias: [
+      {
+        // Exact match only: generated client still imports @prisma/client/runtime/*.
+        find: /^@prisma\/client$/,
+        replacement: prismaClient,
+      },
+    ],
     dedupe: ["react", "react-dom", "react-router", "@wordpress/element"],
   },
   optimizeDeps: {
