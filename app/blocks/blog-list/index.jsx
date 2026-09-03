@@ -7,6 +7,7 @@ import {
 } from "gutenberg-block-kit/wp/block-editor";
 import { PanelBody, TextControl } from "gutenberg-block-kit/wp/components";
 import { ActionBuilder } from "gutenberg-block-kit/actions";
+import { contentTabStyle } from "../inspector-shared";
 import { BLOG_LIST_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
 const DEFAULT_TITLE = "Blogs & Insights";
@@ -18,6 +19,10 @@ const DEFAULT_BUTTON_SIZE = 10;
 const DEFAULT_RADIUS = 10;
 const DEFAULT_BORDER_WIDTH = 2;
 const DEFAULT_BORDER = "#ffffff";
+const DEFAULT_HIGHLIGHT = "Company";
+const DEFAULT_HIGHLIGHT_SIZE = 10;
+const DEFAULT_SUBTITLE = "Best Sellers";
+const DEFAULT_SUBTITLE_SIZE = 12;
 
 function toNumber(value, fallback) {
   const parsed = Number(value);
@@ -42,6 +47,15 @@ export function registerBlogList() {
       buttonBorderRadius: { type: "number", default: DEFAULT_RADIUS },
       buttonBorderColor: { type: "string", default: DEFAULT_BORDER },
       buttonBorderWidth: { type: "number", default: DEFAULT_BORDER_WIDTH },
+      highlightedTitle: { type: "string", default: DEFAULT_HIGHLIGHT },
+      highlightedTitleFontSize: {
+        type: "number",
+        default: DEFAULT_HIGHLIGHT_SIZE,
+      },
+      highlightedTitleTextColor: { type: "string", default: DEFAULT_TEXT },
+      subTitle: { type: "string", default: DEFAULT_SUBTITLE },
+      subTitleFontSize: { type: "number", default: DEFAULT_SUBTITLE_SIZE },
+      subTitleTextColor: { type: "string", default: DEFAULT_TEXT },
       action: { type: "object", default: {} },
     },
     edit: ({ attributes, setAttributes }) => {
@@ -56,12 +70,23 @@ export function registerBlogList() {
         buttonBorderRadius,
         buttonBorderColor,
         buttonBorderWidth,
+        highlightedTitle,
+        highlightedTitleFontSize,
+        highlightedTitleTextColor,
+        subTitle,
+        subTitleFontSize,
+        subTitleTextColor,
         action,
       } = attributes;
       const titleSize = toNumber(titleFontSize, DEFAULT_TITLE_SIZE);
       const btnSize = toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE);
       const radius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
       const borderW = toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH);
+      const highlightSize = toNumber(
+        highlightedTitleFontSize,
+        DEFAULT_HIGHLIGHT_SIZE,
+      );
+      const subSize = toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE);
       const blockProps = useBlockProps({
         className: "appbuilder-blog-list-editor",
         style: { minHeight: "8px" },
@@ -69,7 +94,8 @@ export function registerBlogList() {
 
       return (
         <>
-          <InspectorControls>
+          <InspectorControls group="content">
+            <div style={contentTabStyle}>
             <PanelBody title="Blogs List" initialOpen>
               <TextControl
                 label="Title"
@@ -88,6 +114,41 @@ export function registerBlogList() {
                 onChange={(value) =>
                   setAttributes({
                     titleFontSize: toNumber(value, DEFAULT_TITLE_SIZE),
+                  })
+                }
+              />
+              <TextControl
+                label="Highlighted Title"
+                value={highlightedTitle}
+                onChange={(value) =>
+                  setAttributes({ highlightedTitle: value })
+                }
+              />
+              <TextControl
+                label="Highlighted Title Font Size"
+                type="number"
+                value={highlightSize}
+                onChange={(value) =>
+                  setAttributes({
+                    highlightedTitleFontSize: toNumber(
+                      value,
+                      DEFAULT_HIGHLIGHT_SIZE,
+                    ),
+                  })
+                }
+              />
+              <TextControl
+                label="SubTitle"
+                value={subTitle}
+                onChange={(value) => setAttributes({ subTitle: value })}
+              />
+              <TextControl
+                label="SubTitle Font Size"
+                type="number"
+                value={subSize}
+                onChange={(value) =>
+                  setAttributes({
+                    subTitleFontSize: toNumber(value, DEFAULT_SUBTITLE_SIZE),
                   })
                 }
               />
@@ -127,6 +188,9 @@ export function registerBlogList() {
                 onChange={(next) => setAttributes({ action: next })}
               />
             </PanelBody>
+            </div>
+          </InspectorControls>
+          <InspectorControls>
             <PanelColorSettings
               title="Colors"
               colorSettings={[
@@ -141,6 +205,22 @@ export function registerBlogList() {
                   value: titleTextColor || DEFAULT_TEXT,
                   onChange: (value) =>
                     setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
+                },
+                {
+                  label: "Highlighted Title Text Color",
+                  value: highlightedTitleTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({
+                      highlightedTitleTextColor: value || DEFAULT_TEXT,
+                    }),
+                },
+                {
+                  label: "SubTitle Text Color",
+                  value: subTitleTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({
+                      subTitleTextColor: value || DEFAULT_TEXT,
+                    }),
                 },
                 {
                   label: "Button Text Color",
@@ -175,6 +255,12 @@ export function registerBlogList() {
         buttonBorderRadius,
         buttonBorderColor,
         buttonBorderWidth,
+        highlightedTitle,
+        highlightedTitleFontSize,
+        highlightedTitleTextColor,
+        subTitle,
+        subTitleFontSize,
+        subTitleTextColor,
         action,
       } = attributes;
       const blockProps = useBlockProps.save({
@@ -197,6 +283,17 @@ export function registerBlogList() {
         "data-button-border-width": String(
           toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH),
         ),
+        "data-highlighted-title": highlightedTitle ?? "",
+        "data-highlighted-title-font-size": String(
+          toNumber(highlightedTitleFontSize, DEFAULT_HIGHLIGHT_SIZE),
+        ),
+        "data-highlighted-title-text-color":
+          highlightedTitleTextColor || DEFAULT_TEXT,
+        "data-subtitle": subTitle ?? "",
+        "data-subtitle-font-size": String(
+          toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
+        ),
+        "data-subtitle-text-color": subTitleTextColor || DEFAULT_TEXT,
         "data-action": JSON.stringify(action ?? {}),
       });
       return <div {...blockProps} />;
