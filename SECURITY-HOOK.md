@@ -15,9 +15,8 @@ Working reference repos (latest hook):
 
 | Layer | When it runs | Needs developer setup? |
 | --- | --- | --- |
-| Local pre-commit | Every `git commit` | No git config. Installed by `npm install` / `pnpm install` |
-| GitHub Action | Every push and pull request | No |
-| Deploy / Vercel | Before build or server deploy | No — scan must pass or the rest is skipped |
+| Local pre-commit | Every `git commit` | Optional. Installed by `npm install` / `pnpm install` |
+| Deploy GitHub Action | On `main` only, on the VPS before install | No — scan must pass or the rest is skipped |
 
 Git **cannot** turn on local hooks from a clone/pull (that would be remote code execution).
 That is why `prepare` writes `.git/hooks/pre-commit` after install, and why GitHub always scans.
@@ -83,85 +82,21 @@ npm install          # or: pnpm install
 git commit ...       # scan runs automatically — no git config
 ```
 
-If they commit **without** install, local hook will not run. GitHub still scans on push.
+If they commit **without** install, local hook will not run. Deploy still scans on `main`.
 
 ---
 
-## 3. GitHub Action (required)
+## 3. GitHub Action (deploy only)
 
-Create `.github/workflows/security-precommit.yml`:
+Do **not** scan on every push or pull request. Run the scan in the **deploy** workflow on `main`, after code is synced to the server and **before** `pnpm install` / build.
 
-```yaml
-# Runs the same security hook as local pre-commit.
-# Git cannot enable local commit hooks from a pull (that would be RCE).
-name: Security pre-commit scan
-
-on:
-  push:
-  pull_request:
-  workflow_call:
-
-jobs:
-  scan:
-    name: Virus / malware scan
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-      - name: Run malware indicator + scanner
-        run: |
-          set -euo pipefail
-          bash .githooks/pre-commit --ci
-          echo "Security scan passed."
-```
-
-In GitHub: **Settings → Branches → required status checks** → add
-`Security pre-commit scan` / `Virus / malware scan`.
+See `.github/workflows/deploy.yml`.
 
 ---
 
 ## 4. Gate GitHub deploy (VPS / self-hosted)
 
-If the repo has a deploy workflow, the scan job must run **first**.
-If it fails, **skip** build and deploy (do not pull the server).
-
-```yaml
-jobs:
-  security-scan:
-    name: Virus / malware scan
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-      - name: Run malware indicator + scanner
-        run: |
-          set -euo pipefail
-          bash .githooks/pre-commit --ci
-
-  build:
-    needs: security-scan
-    if: ${{ needs.security-scan.result == 'success' }}
-    # ... existing build job ...
-
-  deploy:
-    needs: [security-scan, build]
-    if: ${{ needs.security-scan.result == 'success' && needs.build.result == 'success' }}
-    # ... existing deploy job ...
-```
-
-On the server, after `git reset` / sync and **before** install/build, scan again.
+Validate on GitHub first. Scan on the server after `git reset` / sync and **before** install/build.
 If that fails, restore the previous commit and skip restart.
 
 ```yaml
@@ -198,7 +133,7 @@ Prefix the existing `build` script so a hosted build scans first:
 
 If the scan fails, Vercel does not ship that commit.
 
-Optional: Vercel Git settings → require the GitHub check `Security pre-commit scan`.
+Optional: Vercel Git settings → require a passing deploy/build check.
 
 Amplify / other CI: run `bash .githooks/pre-commit --ci` in **preBuild**, before `npm ci` / `npm run build`.
 
@@ -208,14 +143,14 @@ Amplify / other CI: run `bash .githooks/pre-commit --ci` in **preBuild**, before
 
 - [ ] Copy `.githooks/pre-commit` and `chmod +x`
 - [ ] Add `prepare` + `security:scan` in `package.json`
-- [ ] Add `.github/workflows/security-precommit.yml`
+- [ ] Do **not** add a per-push / per-PR scan workflow
 - [ ] Do **not** add `*.woff2` to `.gitignore`
-- [ ] If the repo deploys from GitHub: `needs: security-scan` so build/deploy skip on failure
+- [ ] If the repo deploys from GitHub: scan on the VPS after sync, before install
 - [ ] If the repo deploys on Vercel: scan inside `build` when `VERCEL=1`
 - [ ] Run `bash .githooks/pre-commit --install`
 - [ ] Verify: `bash .githooks/pre-commit --ci`
-- [ ] Commit and push the hook + workflow (not `.git/hooks/`)
-- [ ] Mark the GitHub scan as a required check
+- [ ] Commit and push the hook + deploy workflow (not `.git/hooks/`)
+- [ ] Protect `main`: require a pull request, block force pushes
 
 ---
 
