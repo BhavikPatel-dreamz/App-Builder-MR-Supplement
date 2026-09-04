@@ -62,6 +62,11 @@ if [ "${1:-}" = "--ci" ] || [ "${GITHUB_ACTIONS:-}" = "true" ] || [ "${CI:-}" = 
   CI_MODE=1
 fi
 
+# Local git commit: do not scan. Scan only when called with --ci (deploy).
+if [ "$CI_MODE" = "0" ]; then
+  exit 0
+fi
+
 # ----------------------------------------------------------------------------
 # PATH fix — GUI git clients launch hooks with a minimal PATH
 # ----------------------------------------------------------------------------

@@ -4,7 +4,6 @@
   "scripts": {
     "build": "bash -c 'if [ \"${VERCEL:-}\" = \"1\" ] || [ \"${GITHUB_ACTIONS:-}\" = \"true\" ]; then bash .githooks/pre-commit --ci; fi' && prisma generate && prisma migrate deploy && react-router build",
     "security:scan": "bash .githooks/pre-commit --ci",
-    "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && bash .githooks/pre-commit --install || true",
     "dev": "shopify app dev --tunnel-url=https://bhavik.dynamicdreamz.net:3000",
     "config:link": "shopify app config link",
     "generate": "shopify app generate",
