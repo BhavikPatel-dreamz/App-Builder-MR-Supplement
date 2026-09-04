@@ -302,6 +302,19 @@
   margin-bottom: 14px;
 }
 
+.appbuilder-ps-preview__title,
+.appbuilder-ps-preview__subtitle,
+.appbuilder-ps-preview__view-all {
+  border: none;
+  background: transparent;
+  outline: none;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .appbuilder-ps-preview__title {
   margin: 0;
   font-size: 22px;
@@ -313,20 +326,24 @@
 }
 
 .appbuilder-ps-preview__subtitle {
+  display: block;
   margin: 4px 0 0;
   font-size: 12px;
   color: #6b6b6b;
 }
 
 .appbuilder-ps-preview__view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  display: block;
+  width: auto;
+  min-width: 140px;
+  max-width: 220px;
+  text-align: right;
   white-space: nowrap;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  flex-shrink: 0;
   color: var(--ps-green);
   margin-top: 4px;
 }

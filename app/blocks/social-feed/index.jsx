@@ -1,12 +1,11 @@
 // @ts-nocheck
-import { registerBlockType } from "gutenberg-block-kit/wp/blocks";
+import { registerBlockType, createBlock } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
   InnerBlocks,
   InspectorControls,
   MediaUpload,
   MediaUploadCheck,
-  PanelColorSettings,
 } from "gutenberg-block-kit/wp/block-editor";
 import {
   PanelBody,
@@ -19,6 +18,10 @@ import {
   ImagePicker,
   imageAttributesFromMedia,
   clearImageAttributes,
+  ColorSettingsPanel,
+  contentTabStyle,
+  useChildBlocks,
+  ParentBlockBackButton,
 } from "../inspector-shared";
 import {
   SOCIAL_FEED_BLOCK,
@@ -40,6 +43,8 @@ const DEFAULT_BUTTON_SIZE = 10;
 const DEFAULT_RADIUS = 10;
 const DEFAULT_BORDER_WIDTH = 2;
 const DEFAULT_BORDER = "#ffffff";
+const DEFAULT_HIGHLIGHT = "";
+const DEFAULT_HIGHLIGHT_SIZE = 10;
 const DEFAULT_CAPTION =
   "Pre-workout pump is unmatched Who's training today? 💪";
 const DEFAULT_CAPTION_TWO = "Rule 1 Whey Protein - V Cream is back in stock!";
@@ -107,7 +112,7 @@ function registerSocialFeedItem() {
       postedTime: { type: "string", default: "" },
       action: { type: "object", default: {} },
     },
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const { imageUrl, userName, caption, postedTime, action } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-social-feed-item-editor",
@@ -115,6 +120,41 @@ function registerSocialFeedItem() {
 
       return (
         <>
+          <InspectorControls group="content">
+            <div style={contentTabStyle}>
+              <ParentBlockBackButton clientId={clientId} />
+              <PanelBody title="Post" initialOpen>
+                <ImagePicker
+                  imageUrl={imageUrl}
+                  onSelect={(media) =>
+                    setAttributes(imageAttributesFromMedia(media))
+                  }
+                  onClear={() => setAttributes(clearImageAttributes())}
+                />
+                <TextControl
+                  label="Username"
+                  value={userName}
+                  onChange={(value) => setAttributes({ userName: value })}
+                />
+                <TextareaControl
+                  label="Caption"
+                  value={caption}
+                  rows={3}
+                  onChange={(value) => setAttributes({ caption: value })}
+                />
+                <TextControl
+                  label="Posted Time"
+                  value={postedTime}
+                  onChange={(value) => setAttributes({ postedTime: value })}
+                />
+                <ActionBuilder
+                  label="Action"
+                  value={action ?? {}}
+                  onChange={(next) => setAttributes({ action: next })}
+                />
+              </PanelBody>
+            </div>
+          </InspectorControls>
           <InspectorControls>
             <PanelBody title="Post" initialOpen>
               <ImagePicker
@@ -190,16 +230,37 @@ function registerSocialFeedItem() {
             <div className="appbuilder-social-feed-item-editor__body">
               <div className="appbuilder-social-feed-item-editor__user">
                 <span className="appbuilder-social-feed-item-editor__avatar" />
-                <span className="appbuilder-social-feed-item-editor__username">
-                  {userName || "mrsupplement"}
-                </span>
+                <input
+                  className="appbuilder-social-feed-item-editor__username"
+                  type="text"
+                  value={userName}
+                  placeholder="mrsupplement"
+                  onChange={(event) =>
+                    setAttributes({ userName: event.target.value })
+                  }
+                  onClick={(event) => event.stopPropagation()}
+                />
               </div>
-              <p className="appbuilder-social-feed-item-editor__caption">
-                {caption || DEFAULT_CAPTION}
-              </p>
-              <div className="appbuilder-social-feed-item-editor__time">
-                {postedTime || "2d"}
-              </div>
+              <textarea
+                className="appbuilder-social-feed-item-editor__caption"
+                value={caption}
+                placeholder={DEFAULT_CAPTION}
+                rows={2}
+                onChange={(event) =>
+                  setAttributes({ caption: event.target.value })
+                }
+                onClick={(event) => event.stopPropagation()}
+              />
+              <input
+                className="appbuilder-social-feed-item-editor__time"
+                type="text"
+                value={postedTime}
+                placeholder="2d"
+                onChange={(event) =>
+                  setAttributes({ postedTime: event.target.value })
+                }
+                onClick={(event) => event.stopPropagation()}
+              />
             </div>
           </div>
         </>
@@ -272,9 +333,15 @@ function registerSocialFeedParent() {
       buttonBorderWidth: { type: "number", default: DEFAULT_BORDER_WIDTH },
       subTitleTextColor: { type: "string", default: DEFAULT_TEXT },
       subTitleFontSize: { type: "number", default: DEFAULT_SUBTITLE_SIZE },
+      highlightedTitle: { type: "string", default: DEFAULT_HIGHLIGHT },
+      highlightedTitleFontSize: {
+        type: "number",
+        default: DEFAULT_HIGHLIGHT_SIZE,
+      },
+      highlightedTitleTextColor: { type: "string", default: DEFAULT_TEXT },
       action: { type: "object", default: {} },
     },
-    edit: ({ attributes, setAttributes }) => {
+    edit: ({ attributes, setAttributes, clientId }) => {
       const {
         backgroundColor,
         title,
@@ -289,8 +356,12 @@ function registerSocialFeedParent() {
         buttonBorderWidth,
         subTitleTextColor,
         subTitleFontSize,
+        highlightedTitle,
+        highlightedTitleFontSize,
+        highlightedTitleTextColor,
         action,
       } = attributes;
+      const { childCount, insertBlock } = useChildBlocks(clientId);
       const titleSize = Math.max(toNumber(titleFontSize, DEFAULT_TITLE_SIZE), 0);
       const subSize = Math.max(
         toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
@@ -300,10 +371,184 @@ function registerSocialFeedParent() {
         toNumber(buttonFontSize, DEFAULT_BUTTON_SIZE),
         0,
       );
+      const highlightSize = Math.max(
+        toNumber(highlightedTitleFontSize, DEFAULT_HIGHLIGHT_SIZE),
+        0,
+      );
       const radius = toNumber(buttonBorderRadius, DEFAULT_RADIUS);
       const borderW = Math.max(
         toNumber(buttonBorderWidth, DEFAULT_BORDER_WIDTH),
         0,
+      );
+      const inspector = (
+        <>
+          <PanelBody title="Highlighted Title" initialOpen>
+            <TextControl
+              label="Highlighted Title"
+              value={highlightedTitle}
+              onChange={(value) => setAttributes({ highlightedTitle: value })}
+            />
+            <TextControl
+              label="Highlighted Title Font Size"
+              type="number"
+              min={0}
+              value={highlightSize}
+              onChange={(value) =>
+                setAttributes({
+                  highlightedTitleFontSize: toNumber(
+                    value,
+                    DEFAULT_HIGHLIGHT_SIZE,
+                  ),
+                })
+              }
+            />
+          </PanelBody>
+          <PanelBody title="Header" initialOpen>
+            <TextControl
+              label="Title"
+              value={title}
+              onChange={(value) => setAttributes({ title: value })}
+            />
+            <TextControl
+              label="Title Font Size"
+              type="number"
+              min={0}
+              value={titleSize}
+              onChange={(value) =>
+                setAttributes({
+                  titleFontSize: toNumber(value, DEFAULT_TITLE_SIZE),
+                })
+              }
+            />
+            <TextControl
+              label="SubTitle"
+              value={subTitle}
+              onChange={(value) => setAttributes({ subTitle: value })}
+            />
+            <TextControl
+              label="SubTitle Font Size"
+              type="number"
+              min={0}
+              value={subSize}
+              onChange={(value) =>
+                setAttributes({
+                  subTitleFontSize: toNumber(value, DEFAULT_SUBTITLE_SIZE),
+                })
+              }
+            />
+            <TextControl
+              label="Button Text"
+              value={buttonText}
+              onChange={(value) => setAttributes({ buttonText: value })}
+            />
+            <TextControl
+              label="Button Font Size"
+              type="number"
+              min={0}
+              value={btnSize}
+              onChange={(value) =>
+                setAttributes({
+                  buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
+                })
+              }
+            />
+            <TextControl
+              label="Button Border Radius"
+              type="number"
+              min={0}
+              value={radius}
+              onChange={(value) =>
+                setAttributes({
+                  buttonBorderRadius: toNumber(value, DEFAULT_RADIUS),
+                })
+              }
+            />
+            <TextControl
+              label="Button Border Width"
+              type="number"
+              min={0}
+              value={borderW}
+              onChange={(value) =>
+                setAttributes({
+                  buttonBorderWidth: toNumber(value, DEFAULT_BORDER_WIDTH),
+                })
+              }
+            />
+            <ActionBuilder
+              label="Action"
+              value={action ?? {}}
+              onChange={(next) => setAttributes({ action: next })}
+            />
+            <Button
+              variant="primary"
+              onClick={() =>
+                insertBlock(
+                  createBlock(SOCIAL_FEED_ITEM_BLOCK, {
+                    userName: "mrsupplement",
+                    caption: DEFAULT_CAPTION,
+                    postedTime: "2d",
+                  }),
+                  childCount,
+                  clientId,
+                )
+              }
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                marginTop: "8px",
+              }}
+            >
+              Add post
+            </Button>
+          </PanelBody>
+          <ColorSettingsPanel
+            title="Colors"
+            colorSettings={[
+              {
+                label: "Background Color",
+                value: backgroundColor || DEFAULT_BG,
+                onChange: (value) =>
+                  setAttributes({ backgroundColor: value || DEFAULT_BG }),
+              },
+              {
+                label: "Title Text Color",
+                value: titleTextColor || DEFAULT_TEXT,
+                onChange: (value) =>
+                  setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
+              },
+              {
+                label: "Highlighted Title Text Color",
+                value: highlightedTitleTextColor || DEFAULT_TEXT,
+                onChange: (value) =>
+                  setAttributes({
+                    highlightedTitleTextColor: value || DEFAULT_TEXT,
+                  }),
+              },
+              {
+                label: "SubTitle Text Color",
+                value: subTitleTextColor || DEFAULT_TEXT,
+                onChange: (value) =>
+                  setAttributes({
+                    subTitleTextColor: value || DEFAULT_TEXT,
+                  }),
+              },
+              {
+                label: "Button Text Color",
+                value: buttonTextColor || DEFAULT_TEXT,
+                onChange: (value) =>
+                  setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
+              },
+              {
+                label: "Button Border Color",
+                value: buttonBorderColor || DEFAULT_BORDER,
+                onChange: (value) =>
+                  setAttributes({
+                    buttonBorderColor: value || DEFAULT_BORDER,
+                  }),
+              },
+            ]}
+          />
+        </>
       );
       const blockProps = useBlockProps({
         className: "appbuilder-social-feed-editor",
@@ -314,124 +559,10 @@ function registerSocialFeedParent() {
 
       return (
         <>
-          <InspectorControls>
-            <PanelBody title="Header" initialOpen>
-              <TextControl
-                label="Title"
-                value={title}
-                onChange={(value) => setAttributes({ title: value })}
-              />
-              <TextControl
-                label="SubTitle"
-                value={subTitle}
-                onChange={(value) => setAttributes({ subTitle: value })}
-              />
-              <TextControl
-                label="Button Text"
-                value={buttonText}
-                onChange={(value) => setAttributes({ buttonText: value })}
-              />
-              <TextControl
-                label="Title Font Size"
-                type="number"
-                min={0}
-                value={titleSize}
-                onChange={(value) =>
-                  setAttributes({
-                    titleFontSize: toNumber(value, DEFAULT_TITLE_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="SubTitle Font Size"
-                type="number"
-                min={0}
-                value={subSize}
-                onChange={(value) =>
-                  setAttributes({
-                    subTitleFontSize: toNumber(value, DEFAULT_SUBTITLE_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Font Size"
-                type="number"
-                min={0}
-                value={btnSize}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Border Radius"
-                type="number"
-                min={0}
-                value={radius}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonBorderRadius: toNumber(value, DEFAULT_RADIUS),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Border Width"
-                type="number"
-                min={0}
-                value={borderW}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonBorderWidth: toNumber(value, DEFAULT_BORDER_WIDTH),
-                  })
-                }
-              />
-              <ActionBuilder
-                label="Action"
-                value={action ?? {}}
-                onChange={(next) => setAttributes({ action: next })}
-              />
-            </PanelBody>
-            <PanelColorSettings
-              title="Colors"
-              colorSettings={[
-                {
-                  label: "Background Color",
-                  value: backgroundColor || DEFAULT_BG,
-                  onChange: (value) =>
-                    setAttributes({ backgroundColor: value || DEFAULT_BG }),
-                },
-                {
-                  label: "Title Text Color",
-                  value: titleTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
-                },
-                {
-                  label: "SubTitle Text Color",
-                  value: subTitleTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({
-                      subTitleTextColor: value || DEFAULT_TEXT,
-                    }),
-                },
-                {
-                  label: "Button Text Color",
-                  value: buttonTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
-                },
-                {
-                  label: "Button Border Color",
-                  value: buttonBorderColor || DEFAULT_BORDER,
-                  onChange: (value) =>
-                    setAttributes({
-                      buttonBorderColor: value || DEFAULT_BORDER,
-                    }),
-                },
-              ]}
-            />
+          <InspectorControls group="content">
+            <div style={contentTabStyle}>{inspector}</div>
           </InspectorControls>
+          <InspectorControls>{inspector}</InspectorControls>
           <div {...blockProps}>
             <div className="appbuilder-sf-preview__header">
               <TitleWithHandle
@@ -443,6 +574,20 @@ function registerSocialFeedParent() {
                   color: previewColor(titleTextColor, PREVIEW_TITLE_COLOR),
                 }}
               />
+              {highlightedTitle ? (
+                <p
+                  className="appbuilder-sf-preview__highlight"
+                  style={{
+                    fontSize: `${highlightSize}px`,
+                    color: previewColor(
+                      highlightedTitleTextColor,
+                      PREVIEW_BUTTON_COLOR,
+                    ),
+                  }}
+                >
+                  {highlightedTitle}
+                </p>
+              ) : null}
               {subTitle ? (
                 <p
                   className="appbuilder-sf-preview__subtitle"
@@ -481,7 +626,7 @@ function registerSocialFeedParent() {
                 ]}
                 orientation="horizontal"
                 templateLock={false}
-                renderAppender={InnerBlocks.ButtonBlockAppender}
+                renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
               />
             </div>
             {buttonText ? (
@@ -495,7 +640,7 @@ function registerSocialFeedParent() {
                       buttonBorderColor,
                       PREVIEW_BUTTON_COLOR,
                     )}`,
-                    borderRadius: `${Math.max(radius, 8)}px`,
+                    borderRadius: `${Math.max(radius, 0)}px`,
                   }}
                 >
                   {buttonText}
@@ -522,6 +667,9 @@ function registerSocialFeedParent() {
         buttonBorderWidth,
         subTitleTextColor,
         subTitleFontSize,
+        highlightedTitle,
+        highlightedTitleFontSize,
+        highlightedTitleTextColor,
         action,
       } = attributes;
       const blockProps = useBlockProps.save({
@@ -549,6 +697,12 @@ function registerSocialFeedParent() {
         "data-subtitle-font-size": String(
           toNumber(subTitleFontSize, DEFAULT_SUBTITLE_SIZE),
         ),
+        "data-highlighted-title": highlightedTitle ?? "",
+        "data-highlighted-title-font-size": String(
+          toNumber(highlightedTitleFontSize, DEFAULT_HIGHLIGHT_SIZE),
+        ),
+        "data-highlighted-title-text-color":
+          highlightedTitleTextColor || DEFAULT_TEXT,
         "data-action": JSON.stringify(action ?? {}),
         style: { background: backgroundColor || DEFAULT_BG },
       });
@@ -556,6 +710,11 @@ function registerSocialFeedParent() {
         <div {...blockProps}>
           {title ? (
             <h3 className="appbuilder-social-feed__title">{title}</h3>
+          ) : null}
+          {highlightedTitle ? (
+            <p className="appbuilder-social-feed__highlighted-title">
+              {highlightedTitle}
+            </p>
           ) : null}
           {subTitle ? (
             <p className="appbuilder-social-feed__subtitle">{subTitle}</p>

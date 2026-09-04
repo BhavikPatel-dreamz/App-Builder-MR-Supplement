@@ -3,7 +3,6 @@ import { registerBlockType } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
   InspectorControls,
-  PanelColorSettings,
 } from "gutenberg-block-kit/wp/block-editor";
 import {
   PanelBody,
@@ -11,12 +10,12 @@ import {
   Button,
 } from "gutenberg-block-kit/wp/components";
 import { ActionBuilder } from "gutenberg-block-kit/actions";
-import { contentTabStyle } from "../inspector-shared";
+import { contentTabStyle, ColorSettingsPanel } from "../inspector-shared";
 import { PRODUCT_SCROLLER_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
-const DEFAULT_TITLE = "JUST LANDED";
-const DEFAULT_SUBTITLE = "";
-const DEFAULT_BUTTON = "VIEW ALL";
+const DEFAULT_TITLE = "Most Loved By Our Customers";
+const DEFAULT_SUBTITLE = "Best Sellers";
+const DEFAULT_BUTTON = "VIEW ALL BEST SELLERS";
 const DEFAULT_BG = "#f5f5f5";
 const DEFAULT_TEXT = "#ffffff";
 const PREVIEW_TITLE_COLOR = "#111111";
@@ -165,6 +164,20 @@ export function registerProductScroller() {
             <div style={contentTabStyle}>
             <PanelBody title="Product Scroller" initialOpen>
               <TextControl
+                label="Number Of Product"
+                type="number"
+                min={0}
+                value={productCount}
+                onChange={(value) =>
+                  setAttributes({
+                    numberOfProduct: Math.max(
+                      toNumber(value, DEFAULT_PRODUCTS),
+                      0,
+                    ),
+                  })
+                }
+              />
+              <TextControl
                 label="Title"
                 value={title}
                 onChange={(value) => setAttributes({ title: value })}
@@ -216,6 +229,47 @@ export function registerProductScroller() {
                 collection={collection}
                 onChange={(next) => setAttributes({ collection: next })}
               />
+              <ActionBuilder
+                label="Action"
+                value={action ?? {}}
+                onChange={(next) => setAttributes({ action: next })}
+              />
+            </PanelBody>
+            <ColorSettingsPanel
+              title="Colors"
+              colorSettings={[
+                {
+                  label: "Background Color",
+                  value: backgroundColor || DEFAULT_BG,
+                  onChange: (value) =>
+                    setAttributes({ backgroundColor: value || DEFAULT_BG }),
+                },
+                {
+                  label: "Title Text Color",
+                  value: titleTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
+                },
+                {
+                  label: "SubTitle Text Color",
+                  value: subTitleTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({
+                      subTitleTextColor: value || DEFAULT_TEXT,
+                    }),
+                },
+                {
+                  label: "Button Text Color",
+                  value: buttonTextColor || DEFAULT_TEXT,
+                  onChange: (value) =>
+                    setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
+                },
+              ]}
+            />
+            </div>
+          </InspectorControls>
+          <InspectorControls>
+            <PanelBody title="Product Scroller" initialOpen>
               <TextControl
                 label="Number Of Product"
                 type="number"
@@ -230,16 +284,32 @@ export function registerProductScroller() {
                   })
                 }
               />
+              <TextControl
+                label="Title"
+                value={title}
+                onChange={(value) => setAttributes({ title: value })}
+              />
+              <TextControl
+                label="SubTitle"
+                value={subTitle}
+                onChange={(value) => setAttributes({ subTitle: value })}
+              />
+              <TextControl
+                label="Button Text"
+                value={buttonText}
+                onChange={(value) => setAttributes({ buttonText: value })}
+              />
+              <CollectionPicker
+                collection={collection}
+                onChange={(next) => setAttributes({ collection: next })}
+              />
               <ActionBuilder
                 label="Action"
                 value={action ?? {}}
                 onChange={(next) => setAttributes({ action: next })}
               />
             </PanelBody>
-            </div>
-          </InspectorControls>
-          <InspectorControls>
-            <PanelColorSettings
+            <ColorSettingsPanel
               title="Colors"
               colorSettings={[
                 {
@@ -274,42 +344,52 @@ export function registerProductScroller() {
           <div {...blockProps}>
             <div className="appbuilder-ps-preview__header">
               <div>
-                <h3
+                <input
                   className="appbuilder-ps-preview__title"
+                  type="text"
+                  value={title}
+                  placeholder={DEFAULT_TITLE}
+                  onChange={(event) =>
+                    setAttributes({ title: event.target.value })
+                  }
+                  onClick={(event) => event.stopPropagation()}
                   style={{
                     fontSize: `${titleSize}px`,
                     color: previewColor(titleTextColor, PREVIEW_TITLE_COLOR),
                   }}
-                >
-                  {title || DEFAULT_TITLE}
-                </h3>
-                {subTitle ? (
-                  <p
-                    className="appbuilder-ps-preview__subtitle"
-                    style={{
-                      fontSize: `${subSize}px`,
-                      color: previewColor(
-                        subTitleTextColor,
-                        PREVIEW_SUBTITLE_COLOR,
-                      ),
-                    }}
-                  >
-                    {subTitle}
-                  </p>
-                ) : null}
-              </div>
-              {buttonText ? (
-                <span
-                  className="appbuilder-ps-preview__view-all"
+                />
+                <input
+                  className="appbuilder-ps-preview__subtitle"
+                  type="text"
+                  value={subTitle}
+                  placeholder={DEFAULT_SUBTITLE}
+                  onChange={(event) =>
+                    setAttributes({ subTitle: event.target.value })
+                  }
+                  onClick={(event) => event.stopPropagation()}
                   style={{
-                    fontSize: `${btnSize}px`,
-                    color: previewColor(buttonTextColor, PREVIEW_BUTTON_COLOR),
+                    fontSize: `${subSize}px`,
+                    color: previewColor(
+                      subTitleTextColor,
+                      PREVIEW_SUBTITLE_COLOR,
+                    ),
                   }}
-                >
-                  {buttonText || DEFAULT_BUTTON}
-                  <span aria-hidden>→</span>
-                </span>
-              ) : null}
+                />
+              </div>
+              <input
+                className="appbuilder-ps-preview__view-all"
+                type="text"
+                value={buttonText}
+                placeholder={DEFAULT_BUTTON}
+                onChange={(event) =>
+                  setAttributes({ buttonText: event.target.value })
+                }
+                onClick={(event) => event.stopPropagation()}
+                style={{
+                  fontSize: `${btnSize}px`,
+                  color: previewColor(buttonTextColor, PREVIEW_BUTTON_COLOR),
+                }}
+              />
             </div>
             <div className="appbuilder-ps-preview__track">
               {PREVIEW_PRODUCTS.map((product) => (

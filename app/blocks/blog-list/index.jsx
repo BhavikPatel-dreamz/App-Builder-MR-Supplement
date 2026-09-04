@@ -3,11 +3,10 @@ import { registerBlockType } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
   InspectorControls,
-  PanelColorSettings,
 } from "gutenberg-block-kit/wp/block-editor";
 import { PanelBody, TextControl } from "gutenberg-block-kit/wp/components";
 import { ActionBuilder } from "gutenberg-block-kit/actions";
-import { contentTabStyle } from "../inspector-shared";
+import { ColorSettingsPanel, contentTabStyle } from "../inspector-shared";
 import { BLOG_LIST_BLOCK, APPBUILDER_CATEGORY } from "../constants";
 
 const DEFAULT_TITLE = "Blogs & Insights";
@@ -27,6 +26,181 @@ const DEFAULT_SUBTITLE_SIZE = 12;
 function toNumber(value, fallback) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function BlogListInspector({
+  backgroundColor,
+  title,
+  buttonText,
+  buttonTextColor,
+  titleTextColor,
+  buttonBorderRadius,
+  buttonBorderColor,
+  buttonBorderWidth,
+  highlightedTitle,
+  highlightedTitleTextColor,
+  subTitle,
+  subTitleTextColor,
+  action,
+  titleSize,
+  btnSize,
+  radius,
+  borderW,
+  highlightSize,
+  subSize,
+  setAttributes,
+}) {
+  return (
+    <>
+      <PanelBody title="Highlighted Title" initialOpen>
+        <TextControl
+          label="Highlighted Title"
+          value={highlightedTitle}
+          onChange={(value) => setAttributes({ highlightedTitle: value })}
+        />
+        <TextControl
+          label="Highlighted Title Font Size"
+          type="number"
+          min={0}
+          value={highlightSize}
+          onChange={(value) =>
+            setAttributes({
+              highlightedTitleFontSize: toNumber(
+                value,
+                DEFAULT_HIGHLIGHT_SIZE,
+              ),
+            })
+          }
+        />
+      </PanelBody>
+      <PanelBody title="SubTitle" initialOpen>
+        <TextControl
+          label="SubTitle"
+          value={subTitle}
+          onChange={(value) => setAttributes({ subTitle: value })}
+        />
+        <TextControl
+          label="SubTitle Font Size"
+          type="number"
+          min={0}
+          value={subSize}
+          onChange={(value) =>
+            setAttributes({
+              subTitleFontSize: toNumber(value, DEFAULT_SUBTITLE_SIZE),
+            })
+          }
+        />
+      </PanelBody>
+      <PanelBody title="Blogs List" initialOpen>
+        <TextControl
+          label="Title"
+          value={title}
+          onChange={(value) => setAttributes({ title: value })}
+        />
+        <TextControl
+          label="Title Font Size"
+          type="number"
+          min={0}
+          value={titleSize}
+          onChange={(value) =>
+            setAttributes({
+              titleFontSize: toNumber(value, DEFAULT_TITLE_SIZE),
+            })
+          }
+        />
+        <TextControl
+          label="Button Text"
+          value={buttonText}
+          onChange={(value) => setAttributes({ buttonText: value })}
+        />
+        <TextControl
+          label="Button Font Size"
+          type="number"
+          min={0}
+          value={btnSize}
+          onChange={(value) =>
+            setAttributes({
+              buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
+            })
+          }
+        />
+        <TextControl
+          label="Button Border Radius"
+          type="number"
+          min={0}
+          value={radius}
+          onChange={(value) =>
+            setAttributes({
+              buttonBorderRadius: toNumber(value, DEFAULT_RADIUS),
+            })
+          }
+        />
+        <TextControl
+          label="Button Border Width"
+          type="number"
+          min={0}
+          value={borderW}
+          onChange={(value) =>
+            setAttributes({
+              buttonBorderWidth: toNumber(value, DEFAULT_BORDER_WIDTH),
+            })
+          }
+        />
+        <ActionBuilder
+          label="Action"
+          value={action ?? {}}
+          onChange={(next) => setAttributes({ action: next })}
+        />
+      </PanelBody>
+      <ColorSettingsPanel
+        title="Colors"
+        colorSettings={[
+          {
+            label: "Background Color",
+            value: backgroundColor || DEFAULT_BG,
+            onChange: (value) =>
+              setAttributes({ backgroundColor: value || DEFAULT_BG }),
+          },
+          {
+            label: "Title Text Color",
+            value: titleTextColor || DEFAULT_TEXT,
+            onChange: (value) =>
+              setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
+          },
+          {
+            label: "Highlighted Title Text Color",
+            value: highlightedTitleTextColor || DEFAULT_TEXT,
+            onChange: (value) =>
+              setAttributes({
+                highlightedTitleTextColor: value || DEFAULT_TEXT,
+              }),
+          },
+          {
+            label: "SubTitle Text Color",
+            value: subTitleTextColor || DEFAULT_TEXT,
+            onChange: (value) =>
+              setAttributes({
+                subTitleTextColor: value || DEFAULT_TEXT,
+              }),
+          },
+          {
+            label: "Button Text Color",
+            value: buttonTextColor || DEFAULT_TEXT,
+            onChange: (value) =>
+              setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
+          },
+          {
+            label: "Button Border Color",
+            value: buttonBorderColor || DEFAULT_BORDER,
+            onChange: (value) =>
+              setAttributes({
+                buttonBorderColor: value || DEFAULT_BORDER,
+              }),
+          },
+        ]}
+      />
+    </>
+  );
 }
 
 export function registerBlogList() {
@@ -92,160 +266,52 @@ export function registerBlogList() {
         style: { minHeight: "8px" },
       });
 
+      const inspectorProps = {
+        backgroundColor,
+        title,
+        buttonText,
+        buttonTextColor,
+        titleTextColor,
+        buttonBorderRadius,
+        buttonBorderColor,
+        buttonBorderWidth,
+        highlightedTitle,
+        highlightedTitleTextColor,
+        subTitle,
+        subTitleTextColor,
+        action,
+        titleSize,
+        btnSize,
+        radius,
+        borderW,
+        highlightSize,
+        subSize,
+        setAttributes,
+      };
+
       return (
         <>
           <InspectorControls group="content">
             <div style={contentTabStyle}>
-            <PanelBody title="Blogs List" initialOpen>
-              <TextControl
-                label="Title"
-                value={title}
-                onChange={(value) => setAttributes({ title: value })}
-              />
-              <TextControl
-                label="Button Text"
-                value={buttonText}
-                onChange={(value) => setAttributes({ buttonText: value })}
-              />
-              <TextControl
-                label="Title Font Size"
-                type="number"
-                min={0}
-                value={titleSize}
-                onChange={(value) =>
-                  setAttributes({
-                    titleFontSize: toNumber(value, DEFAULT_TITLE_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="Highlighted Title"
-                value={highlightedTitle}
-                onChange={(value) =>
-                  setAttributes({ highlightedTitle: value })
-                }
-              />
-              <TextControl
-                label="Highlighted Title Font Size"
-                type="number"
-                min={0}
-                value={highlightSize}
-                onChange={(value) =>
-                  setAttributes({
-                    highlightedTitleFontSize: toNumber(
-                      value,
-                      DEFAULT_HIGHLIGHT_SIZE,
-                    ),
-                  })
-                }
-              />
-              <TextControl
-                label="SubTitle"
-                value={subTitle}
-                onChange={(value) => setAttributes({ subTitle: value })}
-              />
-              <TextControl
-                label="SubTitle Font Size"
-                type="number"
-                min={0}
-                value={subSize}
-                onChange={(value) =>
-                  setAttributes({
-                    subTitleFontSize: toNumber(value, DEFAULT_SUBTITLE_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Font Size"
-                type="number"
-                min={0}
-                value={btnSize}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonFontSize: toNumber(value, DEFAULT_BUTTON_SIZE),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Border Radius"
-                type="number"
-                min={0}
-                value={radius}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonBorderRadius: toNumber(value, DEFAULT_RADIUS),
-                  })
-                }
-              />
-              <TextControl
-                label="Button Border Width"
-                type="number"
-                min={0}
-                value={borderW}
-                onChange={(value) =>
-                  setAttributes({
-                    buttonBorderWidth: toNumber(value, DEFAULT_BORDER_WIDTH),
-                  })
-                }
-              />
-              <ActionBuilder
-                label="Action"
-                value={action ?? {}}
-                onChange={(next) => setAttributes({ action: next })}
-              />
-            </PanelBody>
+              <BlogListInspector {...inspectorProps} />
             </div>
           </InspectorControls>
           <InspectorControls>
-            <PanelColorSettings
-              title="Colors"
-              colorSettings={[
-                {
-                  label: "Background Color",
-                  value: backgroundColor || DEFAULT_BG,
-                  onChange: (value) =>
-                    setAttributes({ backgroundColor: value || DEFAULT_BG }),
-                },
-                {
-                  label: "Title Text Color",
-                  value: titleTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({ titleTextColor: value || DEFAULT_TEXT }),
-                },
-                {
-                  label: "Highlighted Title Text Color",
-                  value: highlightedTitleTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({
-                      highlightedTitleTextColor: value || DEFAULT_TEXT,
-                    }),
-                },
-                {
-                  label: "SubTitle Text Color",
-                  value: subTitleTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({
-                      subTitleTextColor: value || DEFAULT_TEXT,
-                    }),
-                },
-                {
-                  label: "Button Text Color",
-                  value: buttonTextColor || DEFAULT_TEXT,
-                  onChange: (value) =>
-                    setAttributes({ buttonTextColor: value || DEFAULT_TEXT }),
-                },
-                {
-                  label: "Button Border Color",
-                  value: buttonBorderColor || DEFAULT_BORDER,
-                  onChange: (value) =>
-                    setAttributes({
-                      buttonBorderColor: value || DEFAULT_BORDER,
-                    }),
-                },
-              ]}
-            />
+            <BlogListInspector {...inspectorProps} />
           </InspectorControls>
-          <div {...blockProps} />
+          <div {...blockProps}>
+            <div
+              style={{
+                padding: "12px",
+                border: "1px dashed #c3c4c7",
+                borderRadius: "4px",
+                color: "#6b7280",
+                fontSize: "13px",
+              }}
+            >
+              Blogs List
+            </div>
+          </div>
         </>
       );
     },
