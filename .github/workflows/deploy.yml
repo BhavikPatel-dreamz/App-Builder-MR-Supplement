@@ -7,7 +7,8 @@ on:
 env:
   VPS_APP_PATH: "/var/www/html/App-Builder-Supplement"
   PM2_PROCESS_NAME: "App-Builder-Supplement"
-  
+  PORT: "3500"
+
 jobs:
   # 1. Validate on GitHub's own runner FIRST — nothing on the server is touched yet.
   validate:
@@ -100,10 +101,101 @@ jobs:
 
       - name: Start App
         run: |
-          cd "${{ env.VPS_APP_PATH }}"
-          if pm2 list | grep -q "${{ env.PM2_PROCESS_NAME }}"; then
-              pm2 restart "${{ env.PM2_PROCESS_NAME }}"
+          set -euo pipefail
+          APP_PATH="${{ env.VPS_APP_PATH }}"
+          PROCESS_NAME="${{ env.PM2_PROCESS_NAME }}"
+          PORT="${{ env.PORT }}"
+          cd "$APP_PATH"
+          export PORT
+
+          listen_pids() {
+            if command -v ss >/dev/null 2>&1; then
+              ss -lptn "sport = :${PORT}" 2>/dev/null | grep -oE 'pid=[0-9]+' | cut -d= -f2 | sort -u || true
+            elif command -v lsof >/dev/null 2>&1; then
+              lsof -t -iTCP:"${PORT}" -sTCP:LISTEN 2>/dev/null | sort -u || true
+            elif command -v fuser >/dev/null 2>&1; then
+              fuser "${PORT}/tcp" 2>/dev/null | tr -s '[:space:]' '\n' | grep -E '^[0-9]+$' | sort -u || true
+            else
+              echo "ERROR: Cannot check port ${PORT} (ss, lsof, and fuser are all missing)." >&2
+              exit 1
+            fi
+          }
+
+          our_tree_pids() {
+            local root
+            root="$(pm2 pid "$PROCESS_NAME" 2>/dev/null | tr -d '[:space:]' || true)"
+            if [ -z "$root" ] || [ "$root" = "0" ]; then
+              return 0
+            fi
+            echo "$root"
+            collect_descendants() {
+              local parent="$1" child
+              for child in $(pgrep -P "$parent" 2>/dev/null || true); do
+                echo "$child"
+                collect_descendants "$child"
+              done
+            }
+            collect_descendants "$root"
+          }
+
+          is_our_pid() {
+            local pid="$1"
+            if [ -n "${OUR_PIDS:-}" ] && echo "$OUR_PIDS" | grep -qx "$pid"; then
+              return 0
+            fi
+            local cwd
+            cwd="$(readlink -f "/proc/${pid}/cwd" 2>/dev/null || true)"
+            [ -n "$cwd" ] && [ "$cwd" = "$APP_PATH" ]
+          }
+
+          report_conflict() {
+            local pid="$1"
+            local cmd cwd
+            cmd="$(ps -p "$pid" -o args= 2>/dev/null || echo unknown)"
+            cwd="$(readlink -f "/proc/${pid}/cwd" 2>/dev/null || echo unknown)"
+            echo "============================================"
+            echo "ERROR: Port ${PORT} is already in use by another process."
+            echo "This deploy will not start ${PROCESS_NAME} on a port owned by another repo."
+            echo
+            echo "  Port:              ${PORT}"
+            echo "  Conflicting PID:   ${pid}"
+            echo "  Command:           ${cmd}"
+            echo "  Working directory: ${cwd}"
+            echo "  Our PM2 process:   ${PROCESS_NAME}"
+            echo "  Our app path:      ${APP_PATH}"
+            echo
+            echo "Free port ${PORT} or stop the other app, then re-run deploy."
+            echo "============================================"
+            exit 1
+          }
+
+          OUR_PIDS="$(our_tree_pids | sort -u || true)"
+          for pid in $(listen_pids); do
+            if is_our_pid "$pid"; then
+              echo "Port ${PORT} is held by ${PROCESS_NAME} (pid ${pid}) — restart is allowed."
+              continue
+            fi
+            report_conflict "$pid"
+          done
+
+          if pm2 describe "$PROCESS_NAME" >/dev/null 2>&1; then
+            echo "Restarting ${PROCESS_NAME} with PORT=${PORT}"
+            pm2 restart "$PROCESS_NAME" --update-env
           else
-              pm2 start npm --name "${{ env.PM2_PROCESS_NAME }}" -- start
+            echo "Starting ${PROCESS_NAME} with PORT=${PORT}"
+            pm2 start npm --name "$PROCESS_NAME" -- start
           fi
           pm2 save
+
+          PM2_ID="$(pm2 id "$PROCESS_NAME" | tr -d '[][:space:]')"
+          if [ -z "$PM2_ID" ]; then
+            echo "ERROR: ${PROCESS_NAME} did not register with PM2 after start."
+            exit 1
+          fi
+          if ! pm2 env "$PM2_ID" | grep -E -q "^PORT[=:][[:space:]]*${PORT}$"; then
+            echo "ERROR: ${PROCESS_NAME} is not running with PORT=${PORT}."
+            echo "PM2 environment:"
+            pm2 env "$PM2_ID" || true
+            exit 1
+          fi
+          echo "PM2 process ${PROCESS_NAME} is running with PORT=${PORT}"
