@@ -24,15 +24,14 @@ import { graphQLErrorBody } from "../lib/graphql-response.server";
 import { randomUUID } from "crypto";
 
 /**
- * Direct Storefront GraphQL endpoint — no App Proxy, no HMAC, no DB lookup.
+ * Direct Storefront GraphQL endpoint — no HMAC, no DB lookup.
  *
  * URL: https://appbuilder.dreamzapps.com/graphql
  *
- * Contrast with /proxy/graphql (App Proxy → HMAC verify → Postgres session
- * lookup → Admin API): this route talks straight to Shopify's Storefront API
- * using the public, read-only Storefront token from env, and is CORS-enabled
- * so any browser can call it cross-origin. It reuses the same Redis cache
- * layer (keys namespaced separately).
+ * Talks straight to Shopify's Storefront API using the public, read-only
+ * Storefront token from env, and is CORS-enabled so any browser can call it
+ * cross-origin. It reuses the same Redis cache layer (keys namespaced
+ * separately).
  *
  * Two request shapes:
  *

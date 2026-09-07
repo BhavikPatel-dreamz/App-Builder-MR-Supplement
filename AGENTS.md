@@ -64,9 +64,15 @@ npx react-router build                   # must exit 0
 grep -rl "wp-runtime" build/server/      # must print nothing (SSR clean)
 ```
 
-## Shopify app proxy
+## Public CMS API
 
-Storefront/mobile requests to `https://{shop}.myshopify.com/apps/cms/...` are signed by Shopify and forwarded to `https://appbuilder-builder.vercel.app/proxy/...`. The mobile app fetches published page JSON through these signed URLs. See `shopify.app.toml` `[app_proxy]` section.
+The native app reads published pages and settings directly from the app host (no Shopify App Proxy):
+
+- `GET https://appbuilder.dreamzapps.com/cms/pages`
+- `GET https://appbuilder.dreamzapps.com/cms/pages/{slug}`
+- `GET https://appbuilder.dreamzapps.com/cms/settings`
+
+Optional: `?shop=example.myshopify.com` or `SHOPIFY_STOREFRONT_DOMAIN`.
 
 ## Webhooks
 
@@ -99,4 +105,4 @@ Shopify Dev MCP is configured in `.mcp.json`. Claude Code has it disabled in `.c
 | `app/shopify.server.ts` | Shopify app singleton config |
 | `app/components/cms/CmsEditorShell.tsx` | Main CMS editor mount (client-only block loading) |
 | `app/components/cms/actionsConfig.ts` | Shopify-specific action definitions for block buttons |
-| `shopify.app.toml` | App config, webhooks, proxy, access scopes |
+| `shopify.app.toml` | App config, webhooks, access scopes |

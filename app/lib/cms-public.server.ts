@@ -48,7 +48,7 @@ function serverTiming(timings?: CacheTimings): string {
 
 /**
  * Shop for public CMS reads: `?shop=` or `SHOPIFY_STOREFRONT_DOMAIN`
- * (same env as /graphql — no App Proxy HMAC).
+ * (same env as /graphql).
  */
 export function resolvePublicCmsShop(request: Request): string | null {
   const url = new URL(request.url);

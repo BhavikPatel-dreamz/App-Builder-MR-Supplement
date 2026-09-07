@@ -66,9 +66,8 @@ export function HomePageSettingsEditor({
     <s-section heading="Home Page">
       <s-stack direction="block" gap="base">
         <s-paragraph>
-          Homepage options for the native app. Saved on GET /cms/settings and
-          App Proxy /proxy/settings. More homepage sections can be added here
-          later.
+          Homepage options for the native app. Saved on GET /cms/settings.
+          More homepage sections can be added here later.
         </s-paragraph>
 
         <s-box padding="base" border="base" borderRadius="base">

@@ -33,7 +33,6 @@ Query strings (`sha256`, `variables`, `shop`, `cache`) are part of the cache key
 | `/auth`, `/auth/*` | OAuth |
 | `/api/*` | Admin APIs (session cookies) |
 | `/webhooks/*` | Must always hit origin |
-| `/proxy/*` | App Proxy HMAC query string; would poison/fragment cache |
 | `/pages/*` | HTML preview, not the native JSON API |
 | **POST** `/graphql` | Registers queries; not edge-cacheable |
 
@@ -112,8 +111,7 @@ If you already have a broad “cache everything” rule, add a **higher-priority
   starts_with(http.request.uri.path, "/app") or
   starts_with(http.request.uri.path, "/auth") or
   starts_with(http.request.uri.path, "/api") or
-  starts_with(http.request.uri.path, "/webhooks") or
-  starts_with(http.request.uri.path, "/proxy")
+  starts_with(http.request.uri.path, "/webhooks")
 ))
 ```
 
@@ -201,5 +199,3 @@ GET https://appbuilder.dreamzapps.com/cms/pages
 GET https://appbuilder.dreamzapps.com/cms/pages/{slug}
 GET https://appbuilder.dreamzapps.com/cms/settings
 ```
-
-Do not point the native app at `/proxy/pages` or `/proxy/settings` for this cache setup.

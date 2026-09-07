@@ -37,7 +37,7 @@ export function collectionProductsKey(
   return `${CATALOG_PREFIX}:${storeId}:collection:${handle}:products:${queryHash}`;
 }
 
-/** Re-export GraphQL cache key builder for existing proxy routes. */
+/** Re-export GraphQL cache key builder for existing GraphQL routes. */
 export { buildGraphqlCacheKey as buildGraphqlCacheKey };
 
 export function catalogCacheTtl(resource: "product" | "collection" | "list" | "search"): number {

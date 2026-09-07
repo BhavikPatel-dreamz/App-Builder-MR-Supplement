@@ -95,6 +95,9 @@ model ShopSettings {
   tabBackgroundColor               String           @default("#ffffff")
   bottomTabs                       Json             @default("[]")
   homePageSettings                 Json             @default("{}")
+  loginHtmlContent                 String           @default("") @db.Text
+  loginBackgroundColor             String           @default("#ffffff")
+  loginLogoUrl                     String           @default("")
   bundle_patches                   bundle_patches[]
   bundles                          bundles[]
 }

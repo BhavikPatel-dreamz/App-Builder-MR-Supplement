@@ -151,7 +151,7 @@ export function BottomTabsEditor({
       <s-stack direction="block" gap="base">
         <s-paragraph>
           Configure the native app tab bar. Saved tabs are served on GET
-          /cms/settings (and still on the App Proxy /proxy/settings).
+          /cms/settings.
         </s-paragraph>
 
         <ColorField

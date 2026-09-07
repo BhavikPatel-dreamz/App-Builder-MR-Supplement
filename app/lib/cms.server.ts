@@ -66,7 +66,7 @@ export type PageRecord = {
 };
 
 /**
- * Clean JSON shape consumed by the mobile app via the signed App Proxy.
+ * Clean JSON shape consumed by the mobile app via GET /cms/pages/{slug}.
  * Exposes parsed block trees (not raw HTML) plus the layout settings and the
  * resolved reusable header/footer records.
  */
@@ -150,7 +150,7 @@ function parseKeywords(value: string | null): string[] {
 /**
  * Parse the stored `json` string into a block array. The editor saves
  * `JSON.stringify(blocks)`; we also tolerate a `{ blocks: [...] }` wrapper and
- * malformed/empty values so a bad record never breaks the proxy response.
+ * malformed/empty values so a bad record never breaks the CMS response.
  */
 export function parseBlocks(json: string | null | undefined): Block[] {
   if (!json) return [];

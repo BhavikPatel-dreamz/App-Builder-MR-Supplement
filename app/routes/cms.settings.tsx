@@ -6,11 +6,11 @@ import {
 } from "../lib/settings-public.server";
 
 /**
- * Public shop settings for the native app — no App Proxy HMAC.
+ * Public shop settings for the native app.
  *
  *   GET https://appbuilder.dreamzapps.com/cms/settings
  *
- * Same payload as /proxy/settings, plus tabBackgroundColor + tabs.
+ * Includes tabBackgroundColor + tabs.
  * Redis L1/L2 + Cache-Control for Cloudflare GET.
  */
 export const loader = async ({ request }: LoaderFunctionArgs) => {

@@ -6,11 +6,11 @@ import {
 } from "../lib/cms-public.server";
 
 /**
- * Public CMS page list for the native app — no App Proxy HMAC.
+ * Public CMS page list for the native app.
  *
  *   GET https://appbuilder.dreamzapps.com/cms/pages
  *
- * Same JSON as /proxy/pages. Redis L1/L2 + Cache-Control for Cloudflare GET.
+ * Redis L1/L2 + Cache-Control for Cloudflare GET.
  * Optional: ?shop=example.myshopify.com  ?cache=default|bypass|refresh
  */
 export const loader = async ({ request }: LoaderFunctionArgs) => {
