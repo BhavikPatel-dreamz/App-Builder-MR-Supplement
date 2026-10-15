@@ -1,0 +1,2 @@
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "appstleLoyaltyToken" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "appstleLoyaltyApiUrl" TEXT NOT NULL DEFAULT '';

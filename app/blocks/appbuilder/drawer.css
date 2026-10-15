@@ -1,0 +1,280 @@
+.appbuilder-drawer-editor,
+.appbuilder-drawer {
+  width: 100%;
+  background: #0e1318;
+  color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.appbuilder-drawer-editor {
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.appbuilder-drawer .block-editor-inner-blocks,
+.appbuilder-drawer .block-editor-block-list__layout,
+.appbuilder-drawer-editor .block-editor-inner-blocks,
+.appbuilder-drawer-editor .block-editor-block-list__layout {
+  width: 100%;
+}
+
+.appbuilder-drawer .block-editor-block-list__layout,
+.appbuilder-drawer-editor .block-editor-block-list__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.appbuilder-drawer__item,
+.appbuilder-drawer__section,
+.appbuilder-drawer__sub-section {
+  position: relative;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appbuilder-drawer .block-list-appender,
+.appbuilder-drawer-editor .block-list-appender,
+.appbuilder-drawer__section .block-list-appender,
+.appbuilder-drawer__sub-section .block-list-appender,
+.appbuilder-drawer__card .block-list-appender {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.appbuilder-drawer .block-list-appender .components-button,
+.appbuilder-drawer-editor .block-list-appender .components-button,
+.appbuilder-drawer__section .block-list-appender .components-button,
+.appbuilder-drawer__sub-section .block-list-appender .components-button,
+.appbuilder-drawer__card .block-list-appender .components-button {
+  background: #0b0f13;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  box-shadow: none;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.appbuilder-drawer .block-list-appender .components-button:hover,
+.appbuilder-drawer-editor .block-list-appender .components-button:hover,
+.appbuilder-drawer__section .block-list-appender .components-button:hover,
+.appbuilder-drawer__sub-section .block-list-appender .components-button:hover,
+.appbuilder-drawer__card .block-list-appender .components-button:hover {
+  background: #121b21;
+  color: #ffffff;
+}
+
+.appbuilder-drawer__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 0 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.appbuilder-drawer__icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+.appbuilder-drawer__label {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.appbuilder-drawer__section {
+  padding: 0 0 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.appbuilder-drawer__section > .appbuilder-drawer__label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 18px;
+  font-size: 14px;
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+}
+
+.appbuilder-drawer__section > .appbuilder-drawer__label::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  border-radius: 4px;
+  background: rgba(42, 255, 147, 0.18);
+  border: 1px solid rgba(42, 255, 147, 0.8);
+  box-shadow: inset 0 0 0 5px rgba(42, 255, 147, 0.12);
+}
+
+.appbuilder-drawer__section > .appbuilder-drawer__view-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 36px);
+  margin: 0 18px 14px;
+  min-height: 52px;
+  border-radius: 10px;
+  background: #2ccf73;
+  color: #08150d;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-sizing: border-box;
+}
+
+.appbuilder-drawer__section-items,
+.appbuilder-drawer__sub-section-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 12px;
+  padding: 0 18px 12px;
+  box-sizing: border-box;
+}
+
+.appbuilder-drawer__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 180px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.appbuilder-drawer__card-image {
+  width: 100%;
+  height: 112px;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px 12px 0 0;
+  background: #1a2128;
+}
+
+.appbuilder-drawer__card-title {
+  display: block;
+  padding: 0 10px 0;
+  font-size: 15px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.appbuilder-drawer__card-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 10px 10px;
+  color: #2ccf73;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.appbuilder-drawer__sub-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0;
+}
+
+.appbuilder-drawer__sub-section > .appbuilder-drawer__label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 18px;
+  font-size: 14px;
+  line-height: 1.2;
+  letter-spacing: 0.03em;
+}
+
+.appbuilder-drawer__sub-section > .appbuilder-drawer__label::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  border-radius: 4px;
+  background: rgba(42, 255, 147, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.appbuilder-drawer__sub-section-button,
+.appbuilder-drawer__sub-section-button-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  margin: 0 18px 12px;
+  padding: 0 16px;
+  border: 1px solid #2ccf73;
+  color: #2ccf73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.appbuilder-drawer__arrow {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.appbuilder-drawer__item .appbuilder-drawer__label {
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.appbuilder-drawer__section .appbuilder-drawer__icon,
+.appbuilder-drawer__sub-section .appbuilder-drawer__icon,
+.appbuilder-drawer__item .appbuilder-drawer__icon {
+  width: 18px;
+  height: 18px;
+}
+
+.appbuilder-drawer__section > .appbuilder-drawer__icon,
+.appbuilder-drawer__sub-section > .appbuilder-drawer__icon,
+.appbuilder-drawer__item > .appbuilder-drawer__icon {
+  margin-left: 18px;
+}
+
+.appbuilder-drawer__section > .appbuilder-drawer__label,
+.appbuilder-drawer__sub-section > .appbuilder-drawer__label,
+.appbuilder-drawer__item > .appbuilder-drawer__label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.appbuilder-drawer__section > .appbuilder-drawer__view-all,
+.appbuilder-drawer__item > .appbuilder-drawer__label,
+.appbuilder-drawer__sub-section > .appbuilder-drawer__label {
+  text-transform: uppercase;
+}
+
+@media (max-width: 480px) {
+  .appbuilder-drawer__section-items,
+  .appbuilder-drawer__sub-section-items {
+    grid-template-columns: 1fr;
+  }
+}

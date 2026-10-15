@@ -1,0 +1,76 @@
+.appbuilder-story-section-editor {
+  --ss-green: #8bc53f;
+  display: block !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.appbuilder-ss-preview__image-wrap {
+  width: 100%;
+  height: 160px;
+  background: #ececec;
+  overflow: hidden;
+}
+
+.appbuilder-ss-preview__image {
+  display: block;
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+.appbuilder-ss-preview__placeholder {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appbuilder-ss-preview__body {
+  padding: 20px 18px 18px;
+  text-align: center;
+}
+
+.appbuilder-ss-preview__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: #111;
+}
+
+.appbuilder-ss-preview__highlight {
+  display: block;
+  margin-top: 4px;
+  color: var(--ss-green);
+}
+
+.appbuilder-ss-preview__description {
+  margin: 14px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b6b6b;
+}
+
+.appbuilder-ss-preview__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

@@ -1,0 +1,9 @@
+name = "React Router"
+roles = ["frontend", "backend"]
+webhooks_path = "/webhooks/app/uninstalled"
+
+[commands]
+# Shopify CLI spawn()s these without a shell, so env prefixes like
+# PRISMA_HIDE_UPDATE_MESSAGE=1 are treated as the executable and fail with ENOENT.
+predev = "npx prisma generate"
+dev = "npm run dev:web"

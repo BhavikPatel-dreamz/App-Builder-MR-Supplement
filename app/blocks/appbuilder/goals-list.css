@@ -1,0 +1,55 @@
+/* Goals List — 2-column (or columnCount) grid in the builder canvas. */
+.appbuilder-goals-list-editor {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.appbuilder-goals-list-editor > .block-editor-inner-blocks,
+.appbuilder-goals-list-editor .block-editor-inner-blocks {
+  width: 100%;
+}
+
+.appbuilder-goals-list-editor > .block-editor-inner-blocks > .block-editor-block-list__layout,
+.appbuilder-goals-list-editor .block-editor-block-list__layout {
+  display: grid !important;
+  grid-template-columns: repeat(
+    var(--appbuilder-goals-list-columns, 2),
+    minmax(0, 1fr)
+  ) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: stretch !important;
+}
+
+.appbuilder-goals-list-editor .block-editor-block-list__layout > .wp-block,
+.appbuilder-goals-list-editor .block-editor-block-list__layout > .block-editor-block-list-item {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.appbuilder-goals-list-editor .block-editor-block-list__layout > .block-list-appender {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  margin-top: 4px !important;
+}
+
+.appbuilder-goals-list-item-editor {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+}
+
+.appbuilder-goals-list {
+  display: grid;
+  grid-template-columns: repeat(
+    var(--appbuilder-goals-list-columns, 2),
+    minmax(0, 1fr)
+  );
+  gap: 12px;
+}

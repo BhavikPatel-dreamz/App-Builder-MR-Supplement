@@ -1,0 +1,326 @@
+/**
+ * Advanced Multimedia Scroller — editor & frontend styles.
+ * Identical carousel-wise layout & design as Hero Carousel (image-carousel).
+ */
+
+.appbuilder-multimedia-scroller {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  --appbuilder-multimedia-scroller-height: 320px;
+  --appbuilder-multimedia-scroller-pagination-active: rgba(255, 255, 255, 1);
+  --appbuilder-multimedia-scroller-pagination-inactive: rgba(255, 255, 255, 0.7);
+}
+
+.appbuilder-multimedia-scroller__track {
+  position: relative;
+  width: 100%;
+  height: var(--appbuilder-multimedia-scroller-height, 320px);
+}
+
+.appbuilder-multimedia-scroller__slide {
+  width: 100%;
+  height: var(--appbuilder-multimedia-scroller-height, 320px);
+  overflow: hidden;
+}
+
+.appbuilder-multimedia-scroller__slide img,
+.appbuilder-multimedia-scroller__slide .appbuilder-multimedia-scroller__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.appbuilder-multimedia-scroller__slide video,
+.appbuilder-multimedia-scroller__slide .appbuilder-multimedia-scroller__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ========================================================================== */
+/* Editor styles — hero carousel with one slide visible at a time */
+/* ========================================================================== */
+
+.appbuilder-multimedia-scroller-editor {
+  overflow: hidden;
+}
+
+/* Hero carousel editor: one full-width slide at a time (not horizontal scroll) */
+.appbuilder-multimedia-scroller-editor .appbuilder-multimedia-scroller__track {
+  overflow: hidden;
+}
+
+.appbuilder-multimedia-scroller-editor .appbuilder-multimedia-scroller__track .block-editor-inner-blocks,
+.appbuilder-multimedia-scroller-editor .appbuilder-multimedia-scroller__track .block-editor-block-list__layout {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  gap: 0 !important;
+}
+
+.appbuilder-multimedia-scroller-editor .appbuilder-multimedia-scroller__track .block-editor-block-list__layout > *,
+.appbuilder-multimedia-scroller-editor .appbuilder-multimedia-scroller__track .block-editor-block-list__block {
+  flex: none !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.appbuilder-multimedia-scroller-editor .appbuilder-multimedia-scroller__track .block-editor-block-list__layout > * {
+  display: none;
+}
+
+/* Show active slide in editor based on data-active-index */
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="0"]
+  .block-editor-block-list__layout
+  > :nth-child(1),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="1"]
+  .block-editor-block-list__layout
+  > :nth-child(2),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="2"]
+  .block-editor-block-list__layout
+  > :nth-child(3),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="3"]
+  .block-editor-block-list__layout
+  > :nth-child(4),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="4"]
+  .block-editor-block-list__layout
+  > :nth-child(5),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="5"]
+  .block-editor-block-list__layout
+  > :nth-child(6),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="6"]
+  .block-editor-block-list__layout
+  > :nth-child(7),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="7"]
+  .block-editor-block-list__layout
+  > :nth-child(8),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="8"]
+  .block-editor-block-list__layout
+  > :nth-child(9),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="9"]
+  .block-editor-block-list__layout
+  > :nth-child(10),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="10"]
+  .block-editor-block-list__layout
+  > :nth-child(11),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="11"]
+  .block-editor-block-list__layout
+  > :nth-child(12),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="12"]
+  .block-editor-block-list__layout
+  > :nth-child(13),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="13"]
+  .block-editor-block-list__layout
+  > :nth-child(14),
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track[data-active-index="14"]
+  .block-editor-block-list__layout
+  > :nth-child(15) {
+  display: block;
+}
+
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track
+  .block-editor-block-list__layout
+  > .is-selected,
+.appbuilder-multimedia-scroller-editor
+  .appbuilder-multimedia-scroller__track
+  .block-editor-block-list__layout
+  > :has(.is-selected) {
+  display: block;
+}
+
+.appbuilder-multimedia-scroller-item-editor {
+  position: relative;
+  height: var(--appbuilder-multimedia-scroller-height, 320px);
+  min-height: var(--appbuilder-multimedia-scroller-height, 320px);
+  max-height: var(--appbuilder-multimedia-scroller-height, 320px);
+  background: #1a1a2e;
+  width: 100%;
+  overflow: hidden;
+}
+
+.appbuilder-multimedia-scroller-item-editor__placeholder,
+.appbuilder-multimedia-scroller-item-editor__image,
+.appbuilder-multimedia-scroller-item-editor__video {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.appbuilder-multimedia-scroller-item-editor__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  background: #2a2a4a;
+}
+
+/* ========================================================================== */
+/* Arrow Navigation */
+/* ========================================================================== */
+
+.appbuilder-multimedia-scroller__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+.appbuilder-multimedia-scroller__arrow:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.appbuilder-multimedia-scroller__arrow:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.appbuilder-multimedia-scroller__arrow--prev {
+  left: 12px;
+}
+
+.appbuilder-multimedia-scroller__arrow--next {
+  right: 12px;
+}
+
+@media (max-width: 768px) {
+  .appbuilder-multimedia-scroller__arrow {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    min-height: 36px;
+    min-width: 36px;
+  }
+
+  .appbuilder-multimedia-scroller__arrow--prev {
+    left: 8px;
+  }
+
+  .appbuilder-multimedia-scroller__arrow--next {
+    right: 8px;
+  }
+}
+
+/* ========================================================================== */
+/* Dot Indicators / Pagination */
+/* ========================================================================== */
+
+.appbuilder-multimedia-scroller__pagination {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* Position options */
+.appbuilder-multimedia-scroller__pagination--bottom {
+  position: relative;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: transparent;
+}
+
+.appbuilder-multimedia-scroller__pagination--bottom-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  background: transparent;
+}
+
+.appbuilder-multimedia-scroller__pagination--top-overlay {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  background: transparent;
+}
+
+.appbuilder-multimedia-scroller__dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--appbuilder-multimedia-scroller-pagination-inactive, rgba(255, 255, 255, 0.7));
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.appbuilder-multimedia-scroller__dot:not(.is-active) {
+  border-radius: var(--appbuilder-multimedia-scroller-inactive-dot-radius, 50%);
+  border: 1px solid var(--appbuilder-multimedia-scroller-inactive-dot-border, transparent);
+}
+
+.appbuilder-multimedia-scroller__dot:hover:not(.is-active) {
+  opacity: 0.8;
+  transform: scale(1.2);
+}
+
+.appbuilder-multimedia-scroller__dot.is-active {
+  background-color: var(--appbuilder-multimedia-scroller-pagination-active, #ffffff);
+  width: 24px;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .appbuilder-multimedia-scroller__dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .appbuilder-multimedia-scroller__dot.is-active {
+    width: 18px;
+    border-radius: 3px;
+  }
+}

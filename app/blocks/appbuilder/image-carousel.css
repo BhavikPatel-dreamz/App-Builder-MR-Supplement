@@ -1,0 +1,143 @@
+.appbuilder-image-carousel {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  --appbuilder-pagination-active: rgba(255, 255, 255, 1);
+  --appbuilder-pagination-inactive: rgba(255, 255, 255, 0.7);
+}
+
+.appbuilder-image-carousel__track {
+  position: relative;
+  width: 100%;
+}
+
+.appbuilder-image-carousel__slide {
+  width: 100%;
+}
+
+.appbuilder-image-carousel__slide img,
+.appbuilder-image-carousel__slide .appbuilder-image-carousel__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.appbuilder-image-carousel__slide video,
+.appbuilder-image-carousel__slide .appbuilder-image-carousel__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.appbuilder-image-carousel-editor {
+  overflow: hidden;
+}
+
+/* Hero carousel editor: one full-width slide at a time (not horizontal scroll) */
+.appbuilder-image-carousel-editor .appbuilder-image-carousel__track {
+  overflow: hidden;
+}
+
+.appbuilder-image-carousel-editor .appbuilder-image-carousel__track .block-editor-inner-blocks,
+.appbuilder-image-carousel-editor .appbuilder-image-carousel__track .block-editor-block-list__layout {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  gap: 0 !important;
+}
+
+.appbuilder-image-carousel-editor .appbuilder-image-carousel__track .block-editor-block-list__layout > *,
+.appbuilder-image-carousel-editor .appbuilder-image-carousel__track .block-editor-block-list__block {
+  flex: none !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.appbuilder-image-carousel-editor .appbuilder-image-carousel__track .block-editor-block-list__layout > * {
+  display: none;
+}
+
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="0"]
+  .block-editor-block-list__layout
+  > :nth-child(1),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="1"]
+  .block-editor-block-list__layout
+  > :nth-child(2),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="2"]
+  .block-editor-block-list__layout
+  > :nth-child(3),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="3"]
+  .block-editor-block-list__layout
+  > :nth-child(4),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="4"]
+  .block-editor-block-list__layout
+  > :nth-child(5),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="5"]
+  .block-editor-block-list__layout
+  > :nth-child(6),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="6"]
+  .block-editor-block-list__layout
+  > :nth-child(7),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="7"]
+  .block-editor-block-list__layout
+  > :nth-child(8),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="8"]
+  .block-editor-block-list__layout
+  > :nth-child(9),
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track[data-active-index="9"]
+  .block-editor-block-list__layout
+  > :nth-child(10) {
+  display: block;
+}
+
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track
+  .block-editor-block-list__layout
+  > .is-selected,
+.appbuilder-image-carousel-editor
+  .appbuilder-image-carousel__track
+  .block-editor-block-list__layout
+  > :has(.is-selected) {
+  display: block !important;
+}
+
+.appbuilder-image-carousel-item-editor {
+  position: relative;
+  min-height: 280px;
+  background: #1a1a2e;
+  width: 100%;
+}
+
+.appbuilder-image-carousel-item-editor__placeholder,
+.appbuilder-image-carousel-item-editor__image,
+.appbuilder-image-carousel-item-editor__video {
+  width: 100%;
+  min-height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+.appbuilder-image-carousel-item-editor__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  background: #2a2a4a;
+}

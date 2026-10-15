@@ -1,0 +1,18 @@
+[Unit]
+Description=India catalog GET cache (GraphQL + CMS)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=CATALOG_ORIGIN=https://appbuilder.dreamzapps.com
+Environment=CATALOG_CACHE_PORT=8088
+Environment=CATALOG_CACHE_TTL_MS=1800000
+WorkingDirectory=/opt/catalog-cache
+ExecStart=/usr/bin/node /opt/catalog-cache/catalog-cache.mjs
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

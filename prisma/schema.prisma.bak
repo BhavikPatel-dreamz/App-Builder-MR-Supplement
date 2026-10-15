@@ -1,0 +1,290 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Media {
+  id            String   @id @default(cuid())
+  shop          String
+  shopifyFileId String?
+  url           String
+  alt           String?
+  title         String?
+  mimeType      String?
+  createdAt     DateTime @default(now())
+
+  @@index([shop])
+}
+
+model Page {
+  id              String   @id @default(cuid())
+  shop            String
+  title           String
+  slug            String
+  html            String
+  json            String
+  status          String   @default("draft")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  description     String?
+  keywords        String?
+  ogImage         String?
+  seoDescription  String?
+  seoTitle        String?
+  type            String   @default("page")
+  hideHeader      Boolean  @default(false)
+  showPageTitle   Boolean  @default(true)
+  backgroundColor String   @default("#ffffff")
+  renderingType   String   @default("normal")
+  headerId        String?
+  footerId        String?
+  stickyHeader    String   @default("[]")
+  stickyFooter    String   @default("[]")
+  stickyHeaderId  String?
+  stickyFooterId  String?
+
+  @@unique([shop, slug])
+  @@index([shop])
+  @@index([shop, type])
+}
+
+model Session {
+  id                  String    @id
+  shop                String
+  state               String
+  isOnline            Boolean   @default(false)
+  scope               String?
+  expires             DateTime?
+  accessToken         String
+  userId              BigInt?
+  firstName           String?
+  lastName            String?
+  email               String?
+  accountOwner        Boolean   @default(false)
+  locale              String?
+  collaborator        Boolean?  @default(false)
+  emailVerified       Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+model ShopSettings {
+  id                               String           @id @default(cuid())
+  shop                             String           @unique
+  androidAppVersion                String           @default("")
+  androidPlayStoreUrl              String           @default("")
+  androidForceUpdateEnabled        Boolean          @default(false)
+  iosAppVersion                    String           @default("")
+  iosAppStoreUrl                   String           @default("")
+  iosForceUpdateEnabled            Boolean          @default(false)
+  backgroundMusicFileUrl           String           @default("")
+  backgroundMusicUrl               String           @default("")
+  createdAt                        DateTime         @default(now())
+  updatedAt                        DateTime         @updatedAt
+  productsTabCollection            Json             @default("{}")
+  coursesTabCollection             Json             @default("{}")
+  yagnasTabCollection              Json             @default("{}")
+  yagnasTabProduct                 Json             @default("{}")
+  todaysMeditationDefaultImageUrl  String           @default("")
+  todaysMeditationEntries          Json             @default("[]")
+  todaysAffirmationDefaultImageUrl String           @default("")
+  todaysAffirmationEntries         Json             @default("[]")
+  tabBackgroundColor               String           @default("#ffffff")
+  bottomTabs                       Json             @default("[]")
+  homePageSettings                 Json             @default("{}")
+  loginHtmlContent                 String           @default("") @db.Text
+  loginBackgroundColor             String           @default("#ffffff")
+  loginLogoUrl                     String           @default("")
+  bundle_patches                   bundle_patches[]
+  bundles                          bundles[]
+
+  searchBarPlaceHoldersText        Json             @default("[\"Parka Jackets\", \"Boxers\", \"Vests\"]")
+
+  howToMeasure                     Json             @default("{}")
+  cartSettings                     Json             @default("{}")
+  searchSettings                   Json             @default("{}")
+  cacheSettings                    Json             @default("{}")
+
+  shippingNote                     String           @default("") @db.Text
+
+  appstleLoyaltyToken              String           @default("")
+  appstleLoyaltyApiUrl             String           @default("")
+  trustpilotApiKey                 String           @default("")
+  trustpilotBaseUrl                String           @default("")
+  writeReviewUrl                   String           @default("")
+  getReviewUrl                     String           @default("")
+
+  returnNote                       String           @default("") @db.Text
+  nonReturnNote                    String           @default("") @db.Text
+
+  sevaCollection                   Json             @default("{}")
+  productDetails                   Json             @default("{}")
+}
+
+/// Per-shop cache policy (separate from merchant app Settings JSON).
+model CacheStoreConfig {
+  id                     String     @id @default(cuid())
+  shop                   String     @unique
+  redisEnabled           Boolean    @default(true)
+  cdnEnabled             Boolean    @default(true)
+  ttlSeconds             Int        @default(1800)
+  swrSeconds             Int        @default(1800)
+  warmerEnabled          Boolean    @default(true)
+  refreshIntervalSeconds Int        @default(300)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  urls                   CacheUrl[]
+  logs                   CacheLog[]
+}
+
+/// One public URL (or GraphQL query) that can be warmed, counted, and cleared alone.
+model CacheUrl {
+  id           String           @id @default(cuid())
+  shop         String
+  configId     String
+  config       CacheStoreConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  label        String
+  url          String
+  kind         String           @default("custom")
+  sha256       String           @default("")
+  variablesJson String          @default("{}")
+  slug         String           @default("")
+  queryText    String           @default("")
+  enabled      Boolean          @default(true)
+  hitCount     Int              @default(0)
+  missCount    Int              @default(0)
+  lastWarmedAt DateTime?
+  lastClearedAt DateTime?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  logs         CacheLog[]
+
+  @@index([shop])
+  @@index([shop, enabled])
+}
+
+model CacheLog {
+  id         String           @id @default(cuid())
+  shop       String
+  configId   String
+  config     CacheStoreConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  urlId      String?
+  url        CacheUrl?        @relation(fields: [urlId], references: [id], onDelete: SetNull)
+  action     String
+  status     String           @default("ok")
+  durationMs Int              @default(0)
+  message    String           @default("")
+  createdAt  DateTime         @default(now())
+
+  @@index([shop, createdAt])
+}
+
+model TempUploadChunk {
+  id          String   @id
+  uploadId    String
+  shop        String
+  chunkIndex  Int
+  totalChunks Int
+  filename    String
+  mimeType    String
+  data        Bytes
+  createdAt   DateTime @default(now())
+
+  @@unique([uploadId, chunkIndex])
+  @@index([shop, createdAt])
+  @@index([uploadId])
+}
+
+model bundle_patches {
+  id                                                  String       @id @db.VarChar(255)
+  bundle_id                                           String       @db.Uuid
+  base_bundle_id                                      String       @db.Uuid
+  base_file_hash                                      String
+  patch_file_hash                                     String
+  patch_storage_uri                                   String
+  order_index                                         Int          @default(0)
+  shop                                                String       @default("")
+  bundles_bundle_patches_base_bundle_idTobundles      bundles      @relation("bundle_patches_base_bundle_idTobundles", fields: [base_bundle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bundle_patches_base_bundle_id_fk")
+  bundles_bundle_patches_bundle_idTobundles           bundles      @relation("bundle_patches_bundle_idTobundles", fields: [bundle_id], references: [id], onDelete: Cascade, onUpdate: Restrict, map: "bundle_patches_bundle_id_fk")
+  bundles_bundle_patches_shop_base_bundle_idTobundles bundles      @relation("bundle_patches_shop_base_bundle_idTobundles", fields: [shop, base_bundle_id], references: [shop, id], onDelete: Cascade)
+  bundles_bundle_patches_shop_bundle_idTobundles      bundles      @relation("bundle_patches_shop_bundle_idTobundles", fields: [shop, bundle_id], references: [shop, id], onDelete: Cascade)
+  ShopSettings                                        ShopSettings @relation(fields: [shop], references: [shop])
+
+  @@unique([shop, id])
+  @@index([base_bundle_id])
+  @@index([bundle_id])
+  @@index([shop])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model bundles {
+  id                                                         String           @id @db.Uuid
+  platform                                                   String
+  should_force_update                                        Boolean
+  enabled                                                    Boolean
+  file_hash                                                  String
+  git_commit_hash                                            String?
+  message                                                    String?
+  channel                                                    String           @default("production")
+  storage_uri                                                String
+  target_app_version                                         String?
+  fingerprint_hash                                           String?
+  metadata                                                   Json             @default("{}") @db.Json
+  rollout_cohort_count                                       Int              @default(1000)
+  target_cohorts                                             Json?            @db.Json
+  manifest_storage_uri                                       String?
+  manifest_file_hash                                         String?
+  asset_base_storage_uri                                     String?
+  shop                                                       String           @default("")
+  bundle_patches_bundle_patches_base_bundle_idTobundles      bundle_patches[] @relation("bundle_patches_base_bundle_idTobundles")
+  bundle_patches_bundle_patches_bundle_idTobundles           bundle_patches[] @relation("bundle_patches_bundle_idTobundles")
+  bundle_patches_bundle_patches_shop_base_bundle_idTobundles bundle_patches[] @relation("bundle_patches_shop_base_bundle_idTobundles")
+  bundle_patches_bundle_patches_shop_bundle_idTobundles      bundle_patches[] @relation("bundle_patches_shop_bundle_idTobundles")
+  ShopSettings                                               ShopSettings     @relation(fields: [shop], references: [shop])
+
+  @@unique([shop, id])
+  @@index([channel])
+  @@index([fingerprint_hash])
+  @@index([rollout_cohort_count], map: "bundles_rollout_idx")
+  @@index([shop])
+  @@index([target_app_version])
+}
+
+model force_update_config {
+  shop                        String   @id
+  android_app_version         String   @default("")
+  android_store_url           String   @default("")
+  android_enable_force_update Boolean  @default(false)
+  ios_app_version             String   @default("")
+  ios_store_url               String   @default("")
+  ios_enable_force_update     Boolean  @default(false)
+  created_at                  DateTime @default(now())
+  updated_at                  DateTime @default(now())
+}
+
+model private_hot_updater_settings {
+  key   String @id @db.VarChar(255)
+  value String @default("0.31.0")
+}
+
+model PushNotification {
+  id           String   @id @default(cuid())
+  shop         String
+  title        String
+  message      String
+  imageUrl     String?
+  imageName    String?
+  imageSize    Int?
+  deeplink     String?
+  status       String   @default("pending")
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  sentAt       DateTime?
+
+  @@index([shop])
+  @@index([shop, createdAt])
+  @@index([shop, status])
+}

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "returnNote" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "nonReturnNote" TEXT NOT NULL DEFAULT '';

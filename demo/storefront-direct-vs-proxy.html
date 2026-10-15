@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>App Builder MR-Supplement — Storefront cache demo</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --ink: #1a1d21;
+    --muted: #697586;
+    --line: #e3e8ef;
+    --accent: #2563eb;      /* direct               */
+    --accent-3: #0d9488;    /* gateway (dreamzapps)  */
+    --accent-4: #7c3aed;    /* gateway (vercel)      */
+    --accent-5: #c026d3;    /* gateway GET (edge)    */
+    --accent-6: #e11d48;    /* gateway GET (vercel)  */
+    --accent-7: #059669;    /* India nginx GET       */
+    --accent-8: #0891b2;    /* CMS settings          */
+    --accent-2: #b4530a;    /* proxy                 */
+    --good: #067647;
+    --bad: #b42318;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115; --card: #171a21; --ink: #e6e9ee; --muted: #97a0af;
+      --line: #262b34; --accent: #5b8bff; --accent-3: #2dd4bf; --accent-4: #a78bfa; --accent-5: #e879f9; --accent-6: #fb7185; --accent-7: #34d399; --accent-8: #22d3ee; --accent-2: #f59e42;
+      --good: #4ade80; --bad: #f87171;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    padding: 24px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header h1 { font-size: 22px; margin: 0 0 4px; }
+  header p { color: var(--muted); margin: 0 0 20px; }
+  .cfg {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 18px; font-family: var(--mono); font-size: 12.5px;
+    color: var(--muted); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px 20px;
+  }
+  .cfg b { color: var(--ink); font-weight: 600; }
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+  button {
+    background: var(--accent); color: #fff; border: 0; border-radius: 9px;
+    padding: 11px 20px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .55; cursor: not-allowed; }
+  .runs-input { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 13px; }
+  .runs-input input { width: 54px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 7px;
+    background: var(--card); color: var(--ink); font-family: var(--mono); }
+  .grid-lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .panel.direct  { border-top: 3px solid var(--accent); }
+  .panel.gateway { border-top: 3px solid var(--accent-3); }
+  .panel.vercel  { border-top: 3px solid var(--accent-4); }
+  .panel.get     { border-top: 3px solid var(--accent-5); }
+  .panel.getvercel { border-top: 3px solid var(--accent-6); }
+  .panel.getnative { border-top: 3px solid var(--accent-5); }
+  .dot.getnative { background: var(--accent-5); }
+  .big.getnative { color: var(--accent-5); }
+  .bar-fill.getnative { background: var(--accent-5); }
+  .panel.rest     { border-top: 3px solid var(--accent-7); }
+  .panel.health   { border-top: 3px solid var(--accent-8); }
+  .panel.proxy   { border-top: 3px solid var(--accent-2); }
+  .panel h2 { font-size: 14.5px; margin: 0 0 2px; display: flex; align-items: center; gap: 8px; }
+  .panel .sub { color: var(--muted); font-size: 11.5px; margin: 0 0 14px; word-break: break-all; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none; }
+  .dot.direct { background: var(--accent); } .dot.gateway { background: var(--accent-3); } .dot.vercel { background: var(--accent-4); } .dot.get { background: var(--accent-5); } .dot.getvercel { background: var(--accent-6); } .dot.rest { background: var(--accent-7); } .dot.health { background: var(--accent-8); } .dot.proxy { background: var(--accent-2); }
+  .stat-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed var(--line); font-size: 13px; }
+  .stat-row:last-child { border-bottom: 0; }
+  .stat-row .v { font-family: var(--mono); font-weight: 600; }
+  .big { font-family: var(--mono); font-size: 28px; font-weight: 700; margin: 6px 0 2px; }
+  .big.direct { color: var(--accent); } .big.gateway { color: var(--accent-3); } .big.vercel { color: var(--accent-4); } .big.get { color: var(--accent-5); } .big.getvercel { color: var(--accent-6); } .big.rest { color: var(--accent-7); } .big.health { color: var(--accent-8); } .big.proxy { color: var(--accent-2); }
+  .runlist { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+  .runlist span { display: inline-block; margin-right: 10px; }
+  .runlist .warmup { color: var(--accent-7); font-style: italic; }
+  .status { font-size: 12px; margin-top: 10px; padding: 8px 10px; border-radius: 7px; }
+  .status.ok { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
+  .status.err { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+  .status.info { background: color-mix(in srgb, var(--muted) 14%, transparent); color: var(--muted); }
+  .verdict { text-align: center; font-size: 16px; padding: 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--line); margin-bottom: 20px; }
+  .verdict b { color: var(--good); }
+  /* comparison bars */
+  .bars { margin: 4px 0 8px; }
+  .bar-track { height: 26px; background: color-mix(in srgb, var(--muted) 12%, transparent); border-radius: 6px; margin: 6px 0; position: relative; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; transition: width .5s ease; display: flex; align-items: center; padding: 0 8px; color: #fff; font-family: var(--mono); font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .bar-fill.direct { background: var(--accent); } .bar-fill.gateway { background: var(--accent-3); } .bar-fill.vercel { background: var(--accent-4); } .bar-fill.get { background: var(--accent-5); } .bar-fill.getvercel { background: var(--accent-6); } .bar-fill.rest { background: var(--accent-7); } .bar-fill.health { background: var(--accent-8); } .bar-fill.proxy { background: var(--accent-2); }
+  .bar-label { font-size: 12px; color: var(--muted); }
+  /* products */
+  .products h2 { font-size: 15px; margin: 4px 0 12px; }
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .pcard { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+  .pcard .img { aspect-ratio: 1/1; background: color-mix(in srgb, var(--muted) 10%, transparent); background-size: cover; background-position: center; }
+  .pcard .body { padding: 8px 10px; }
+  .pcard .t { font-size: 12.5px; font-weight: 600; line-height: 1.3; margin: 0 0 4px;
+    display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .pcard .price { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+  .pcard .oos { font-size: 10.5px; color: var(--bad); font-weight: 600; }
+  .note { color: var(--muted); font-size: 12.5px; margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .note code { font-family: var(--mono); background: color-mix(in srgb, var(--muted) 12%, transparent); padding: 1px 5px; border-radius: 4px; }
+  .baseline { font-family: var(--mono); font-size: 12px; }
+  .report-panel { margin-top: 20px; }
+  .report-panel h2 { font-size: 15px; margin: 0 0 8px; }
+  .report-actions { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .report-actions button.secondary { background: var(--card); color: var(--ink); border: 1px solid var(--line); }
+  #report-json {
+    width: 100%; min-height: 280px; font-family: var(--mono); font-size: 11.5px;
+    padding: 12px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--card); color: var(--ink); resize: vertical;
+  }
+  .source-tag { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+  .source-shopify { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); }
+  .source-redis-shopify { background: color-mix(in srgb, var(--accent-3) 18%, transparent); color: var(--accent-3); }
+  .source-postgresql { background: color-mix(in srgb, var(--accent-7) 18%, transparent); color: var(--accent-7); }
+  .source-health { background: color-mix(in srgb, var(--accent-8) 18%, transparent); color: var(--accent-8); }
+  .curl-panel { margin-top: 20px; }
+  .curl-panel h2 { font-size: 15px; margin: 0 0 6px; }
+  .curl-panel > p { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .curl-block { margin-bottom: 14px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .curl-head { display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 8px 12px; background: color-mix(in srgb, var(--muted) 8%, transparent); font-size: 13px; font-weight: 600; }
+  .curl-head button { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+  .curl-pre { margin: 0; padding: 12px; font-family: var(--mono); font-size: 11px; line-height: 1.45;
+    overflow-x: auto; white-space: pre-wrap; word-break: break-all; background: var(--card); color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Storefront API — cache paths + report</h1>
+    <p>Same collection query as Riyasat’s demo, pointed at <b>appbuilder.dreamzapps.com</b>: Shopify-direct, gateway POST/GET (Redis + Cloudflare), native-app sha256 GET, optional India nginx, and CMS settings. Run comparison, then copy the JSON report.</p>
+  </header>
+
+  <div class="cfg" id="cfg"></div>
+
+  <div class="controls">
+    <button id="run">▶ Run comparison</button>
+    <label class="runs-input">runs each: <input id="runs" type="number" min="1" max="10" value="4" /></label>
+    <span class="baseline" id="livehint" style="color:var(--muted)"></span>
+  </div>
+
+  <div class="verdict" id="verdict" style="display:none"></div>
+
+  <div class="grid-lanes" id="lanes"></div>
+
+  <div class="panel bars" id="barpanel" style="display:none"></div>
+
+  <div class="panel products" id="products" style="display:none">
+    <h2 id="products-title">Products</h2>
+    <div class="pgrid" id="pgrid"></div>
+  </div>
+
+  <div class="panel report-panel" id="report-panel" style="display:none">
+    <h2>Benchmark report (copy &amp; paste for review)</h2>
+    <div class="report-actions">
+      <button type="button" class="secondary" id="copy-report">Copy JSON report</button>
+      <button type="button" class="secondary" id="download-report">Download report.json</button>
+      <span id="copy-status" style="color:var(--muted);font-size:13px"></span>
+    </div>
+    <textarea id="report-json" readonly spellcheck="false"></textarea>
+  </div>
+
+  <div class="panel curl-panel" id="curl-panel">
+    <h2>Copy-paste curl — one per lane</h2>
+    <p>Lane <b>⑤</b> is the cacheable GET (repo hash). Lane <b>⑦</b> is the <b>native app hash</b>. Lane <b>⑧</b> is India nginx (10–20&nbsp;ms keep-alive HIT). Lane <b>⑨</b> is <code>/cms/settings</code>.</p>
+    <div id="curl-blocks"></div>
+  </div>
+
+  <div class="note">
+    <p><b>This project (App Builder MR-Supplement).</b> No REST v1 / PostgreSQL catalog. Cron pre-warms Redis + Cloudflare + India nginx so the first GET is a HIT.</p>
+    <p><b style="color:var(--accent-5)">App path:</b> <code>GET /graphql?sha256=…&amp;variables=…</code>.
+    Repo collection query hash: <code>daea17f2dba59c50c3242ec2587cb33aaaa3b0ef1aa18075b4a9a1ee56b2f8c2</code>.
+    Native app collection hash: <code>759dff3d67482d144ca62a01301eb3e214641c3ed0cf99b0e871495ce4db6611</code>.</p>
+    <p>⑧ <b style="color:var(--accent-7)">India nginx</b> — set <code>indiaUrl</code> (e.g. <code>http://127.0.0.1:8088/graphql</code>) after dd-106 is installed. Target 10–20&nbsp;ms keep-alive HIT.</p>
+    <p>⑨ <b style="color:var(--accent-8)">CMS settings</b> <code>GET /cms/settings</code>.</p>
+    <p><b>Data source tags</b>:
+    <span class="source-tag source-shopify">SHOPIFY</span> ·
+    <span class="source-tag source-redis-shopify">REDIS→SHOPIFY</span> ·
+    <span class="source-tag source-postgresql">INDIA NGINX</span> ·
+    <span class="source-tag source-health">CMS</span>.</p>
+    <p><b>The five GraphQL paths.</b></p>
+    <p>① <b style="color:var(--accent)">Direct → Storefront API</b>: the browser calls Shopify's Storefront
+    API with the public, read-only Storefront token. Shopify serves it with <code>access-control-allow-origin: *</code>.
+    No server of yours involved — the fast path.</p>
+    <p>② <b style="color:var(--accent-3)">Gateway — dreamzapps (<code>/graphql</code>)</b>: your app's lean direct
+    route on the <b>dreamzapps.com</b> host (behind Cloudflare, origin in the US). Calls the Storefront API
+    server-side (public token from env) with <b>no App Proxy HMAC and no per-request DB lookup</b>, CORS-open.</p>
+    <p>③ <b style="color:var(--accent-4)">Gateway — Vercel (<code>/graphql</code>)</b>: the <i>same route, same
+    code</i>, deployed on <b>Vercel</b>. Its <code>x-vercel-id</code> reads <code>bom1::iad1</code> — traffic enters
+    at Mumbai but the function executes in US-East (iad1), so it's <b>also US-hosted</b>. Compare ② and ③ to isolate
+    hosting/cold-start from code: the route is identical, so any gap is the platform, not your logic.</p>
+    <p>④ Unused in this app (no Shopify App Proxy). Direct Shopify is optional (shop + public token).</p>
+    <p>⑤ <b style="color:var(--accent-5)">Gateway GET — appbuilder (<code>?sha256=…</code>)</b>: cacheable GET + persisted-query hash of the query in this file. Until the hash is registered, the lane may show <code>PersistedQueryNotFound</code> then <i>reg</i> with the full query. GET and POST share Redis. Each run uses <code>cache:"no-store"</code> so the browser cache does not hide network time.</p>
+    <p>⑦ Native-app hash GET uses <code>759dff3d…</code> (exact document from the mobile app). Cron must have stored that body; this page cannot invent it.</p>
+    <p><b>If a panel says "opaque / CORS blocked":</b> POST lanes send <code>Content-Type: text/plain</code> to skip preflight. Direct Shopify is CORS-open with the public Storefront token.</p>
+    <p>Confirm edge with <code>curl -sI 'https://appbuilder.dreamzapps.com/graphql?sha256=&lt;hash&gt;'</code> → <code>cf-cache-status: HIT</code>. Browsers often cannot read <code>cf-cache-status</code> cross-origin.</p>
+    <p><b>Token note.</b> Optional Direct lane uses a <b>public Storefront access token</b> only. Never put an Admin API token here.</p>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────
+// CONFIG — edit these for another store / collection.
+// The Storefront token is PUBLIC + READ-ONLY: safe in client-side code.
+// ─────────────────────────────────────────────────────────────────────────
+const CONFIG = {
+  shop:            "", // e.g. your-store.myshopify.com — Direct lane hidden if empty
+  apiVersion:      "2026-07",
+  storefrontToken: "", // public Storefront token only; leave empty to skip Direct
+  collectionId:    "gid://shopify/Collection/375678697663",
+  first:           10,
+  gatewayUrl:      "https://appbuilder.dreamzapps.com/graphql",
+  vercelUrl:       "https://appbuilder-builder.vercel.app/graphql",
+  proxyUrl:        "", // no App Proxy in this app
+  indiaUrl:        "", // e.g. http://127.0.0.1:8088/graphql after nginx on dd-106
+  apiBaseUrl:      "https://appbuilder.dreamzapps.com",
+  nativeCollectionSha256:
+    "759dff3d67482d144ca62a01301eb3e214641c3ed0cf99b0e871495ce4db6611",
+};
+
+(function applyQueryOverrides() {
+  const qs = new URLSearchParams(location.search);
+  if (qs.get("shop")) CONFIG.shop = qs.get("shop");
+  if (qs.get("token")) CONFIG.storefrontToken = qs.get("token");
+  if (qs.get("collection")) CONFIG.collectionId = qs.get("collection");
+  if (qs.get("first")) CONFIG.first = Number(qs.get("first")) || CONFIG.first;
+  if (qs.get("gateway")) CONFIG.gatewayUrl = qs.get("gateway");
+  if (qs.get("vercel")) CONFIG.vercelUrl = qs.get("vercel");
+  if (qs.get("india")) {
+    let u = qs.get("india").replace(/\/$/, "");
+    CONFIG.indiaUrl = u.endsWith("/graphql") ? u : `${u}/graphql`;
+  }
+})();
+
+const QUERY = `query ProductsByCollectionId($id: ID!, $first: Int!) {
+  collection(id: $id) {
+    title
+    products(first: $first) {
+      edges { node {
+        id title handle availableForSale
+        featuredImage { url altText }
+        priceRange { minVariantPrice { amount currencyCode } }
+      } }
+    }
+  }
+}`;
+
+const VARIABLES = { id: CONFIG.collectionId, first: CONFIG.first };
+const $ = (id) => document.getElementById(id);
+
+const directEndpoint = `https://${CONFIG.shop}/api/${CONFIG.apiVersion}/graphql.json`;
+
+const ms  = (n) => `${n.toFixed(0)} ms`;
+const kb  = (n) => `${(n / 1024).toFixed(0)} KB`;
+const avg = (a) => a.reduce((s, x) => s + x, 0) / a.length;
+
+// "l2;dur=1, shopify;dur=118, total;dur=120" → { l2: 1, shopify: 118, total: 120 }
+function parseServerTiming(hdr) {
+  if (!hdr) return null;
+  const out = {};
+  for (const part of hdr.split(",")) {
+    const m = part.trim().match(/^([a-zA-Z0-9_-]+)\s*;\s*dur\s*=\s*([0-9.]+)/);
+    if (m) out[m[1].toLowerCase()] = Number(m[2]);
+  }
+  return out;
+}
+
+function fmtLayers(st) {
+  if (!st) return "—";
+  const bits = [];
+  if (st.l1 != null) bits.push(`L1 ${st.l1}`);
+  if (st.l2 != null) bits.push(`L2 ${st.l2}`);
+  if (st.shopify != null) bits.push(`SF ${st.shopify}`);
+  if (st.total != null) bits.push(`Σ ${st.total}ms`);
+  return bits.length ? bits.join(" · ") : "—";
+}
+
+// ── One call per lane. Each returns { ms, json, bytes, mode, cache?, status? } ──
+
+async function callDirect() {
+  if (!CONFIG.shop || !CONFIG.storefrontToken) {
+    throw new Error("Set shop + public Storefront token in CONFIG (or ?shop=&token=)");
+  }
+  const t0 = performance.now();
+  const res = await fetch(directEndpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-Shopify-Storefront-Access-Token": CONFIG.storefrontToken },
+    body: JSON.stringify({ query: QUERY, variables: VARIABLES }),
+  });
+  const text = await res.text();
+  const elapsed = performance.now() - t0;
+  return { ms: elapsed, json: JSON.parse(text), bytes: text.length, mode: "cors", status: res.status, dataSource: "shopify" };
+}
+
+// Both gateway lanes (② dreamzapps, ③ Vercel) run the SAME /graphql route —
+// same code, different host. CORS-open, exposes X-Cache. We POST as text/plain
+// (a CORS "simple" request) so there's no preflight: a reverse proxy in front of
+// the app (e.g. dreamzapps' origin) can answer OPTIONS itself without CORS
+// headers and block a JSON POST. The server parses the body as JSON regardless
+// of Content-Type. Falls back to opaque timing only if the host is unreachable.
+async function callGatewayUrl(url) {
+  try {
+    const t0 = performance.now();
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ query: QUERY, variables: VARIABLES, cache: "default" }),
+    });
+    const text = await res.text();
+    const elapsed = performance.now() - t0;
+    let json = null; try { json = JSON.parse(text); } catch {}
+    return { ms: elapsed, json, bytes: text.length, mode: "cors", cache: res.headers.get("X-Cache"), serverTiming: res.headers.get("Server-Timing"), status: res.status, dataSource: "redis+shopify" };
+  } catch {
+    const t0 = performance.now();
+    try { await fetch(url, { method: "POST", mode: "no-cors", body: JSON.stringify({ query: QUERY, variables: VARIABLES }) }); } catch {}
+    return { ms: performance.now() - t0, json: null, bytes: 0, mode: "opaque" };
+  }
+}
+const callGateway = () => callGatewayUrl(CONFIG.gatewayUrl);
+const callVercel  = () => callGatewayUrl(CONFIG.vercelUrl);
+
+// Lane ⑤ — cacheable GET + persisted-query hash (the edge-cacheable form).
+// The full URL is the CDN cache key, so the short ?sha256=<hex> form is preferred.
+// crypto.subtle needs a secure context (https / localhost / file://); if it's
+// missing we fall back to carrying the whole query in the URL (?query=…).
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function callGatewayGetUrl(url) {
+  const vars = encodeURIComponent(JSON.stringify(VARIABLES));
+  const read = async (u) => {
+    const t0 = performance.now();
+    const res = await fetch(u, { cache: "no-store" }); // measure the network path, not the browser's HTTP cache
+    const text = await res.text();
+    return { ms: performance.now() - t0, text, res };
+  };
+  try {
+    let hashForm = true, u;
+    try { u = `${url}?sha256=${await sha256Hex(QUERY)}&variables=${vars}`; }
+    catch { hashForm = false; u = `${url}?query=${encodeURIComponent(QUERY)}&variables=${vars}`; }
+
+    let r = await read(u);
+    let json = null; try { json = JSON.parse(r.text); } catch {}
+
+    // APQ flow: unknown hash → resend the full query once to register it (marked
+    // "reg" in the run list), then subsequent runs use the short hash again.
+    let registered = false;
+    if (hashForm && json?.errors?.some((e) => String(e.message).includes("PersistedQueryNotFound"))) {
+      registered = true;
+      r = await read(`${url}?query=${encodeURIComponent(QUERY)}&variables=${vars}`);
+      json = null; try { json = JSON.parse(r.text); } catch {}
+    }
+
+    return {
+      ms: r.ms, json, bytes: r.text.length, mode: "cors", registered,
+      cache: r.res.headers.get("X-Cache"),
+      serverTiming: r.res.headers.get("Server-Timing"),
+      cfStatus: r.res.headers.get("cf-cache-status"),
+      cfRay: r.res.headers.get("cf-ray"),
+      status: r.res.status,
+      dataSource: "redis+shopify",
+    };
+  } catch {
+    const t0 = performance.now();
+    try { await fetch(`${url}?query=${encodeURIComponent(QUERY)}&variables=${vars}`, { cache: "no-store" }); } catch {}
+    return { ms: performance.now() - t0, json: null, bytes: 0, mode: "opaque", dataSource: "redis+shopify" };
+  }
+}
+const callGatewayGet = () => callGatewayGetUrl(CONFIG.gatewayUrl);
+const callVercelGet  = () => callGatewayGetUrl(CONFIG.vercelUrl);
+
+async function callNativeGetUrl(url) {
+  const vars = encodeURIComponent(JSON.stringify(VARIABLES));
+  const u = `${url}?sha256=${CONFIG.nativeCollectionSha256}&variables=${vars}`;
+  const t0 = performance.now();
+  const res = await fetch(u, { cache: "no-store" });
+  const text = await res.text();
+  let json = null; try { json = JSON.parse(text); } catch {}
+  return {
+    ms: performance.now() - t0, json, bytes: text.length, mode: "cors",
+    cache: res.headers.get("X-Cache"),
+    india: res.headers.get("X-India-Cache"),
+    serverTiming: res.headers.get("Server-Timing"),
+    cfStatus: res.headers.get("cf-cache-status"),
+    cfRay: res.headers.get("cf-ray"),
+    status: res.status,
+    dataSource: "redis+shopify",
+    url: u,
+  };
+}
+
+async function callIndia() {
+  if (!CONFIG.indiaUrl) throw new Error("Set CONFIG.indiaUrl or ?india=http://127.0.0.1:8088");
+  const r = await callNativeGetUrl(CONFIG.indiaUrl);
+  r.dataSource = "india-nginx";
+  return r;
+}
+
+async function callCms() {
+  const url = `${CONFIG.apiBaseUrl}/cms/settings`;
+  const t0 = performance.now();
+  const res = await fetch(url, { cache: "no-store" });
+  const text = await res.text();
+  let json = null; try { json = JSON.parse(text); } catch {}
+  return {
+    ms: performance.now() - t0, json, bytes: text.length, mode: "cors",
+    cache: res.headers.get("X-Cache"),
+    cfStatus: res.headers.get("cf-cache-status"),
+    cfRay: res.headers.get("cf-ray"),
+    status: res.status,
+    dataSource: "cms",
+    url,
+  };
+}
+
+async function callNativeAppGet() {
+  return callNativeGetUrl(CONFIG.gatewayUrl);
+}
+
+// The App Proxy returns no CORS headers → readable only same-origin. Falls back
+// to an opaque no-cors round-trip so we still get a real timing.
+async function callProxy() {
+  try {
+    const t0 = performance.now();
+    const res = await fetch(CONFIG.proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: QUERY, variables: VARIABLES, cache: "default" }),
+    });
+    const text = await res.text();
+    const elapsed = performance.now() - t0;
+    return { ms: elapsed, json: JSON.parse(text), bytes: text.length, mode: "cors", cache: res.headers.get("X-Cache"), serverTiming: res.headers.get("Server-Timing"), status: res.status, dataSource: "redis+shopify" };
+  } catch {
+    const t0 = performance.now();
+    try { await fetch(CONFIG.proxyUrl, { method: "POST", mode: "no-cors", body: JSON.stringify({ query: QUERY, variables: VARIABLES }) }); } catch {}
+    return { ms: performance.now() - t0, json: null, bytes: 0, mode: "opaque", dataSource: "redis+shopify" };
+  }
+}
+
+// ⑦ India nginx GET (native sha256) — ⑧ CMS settings
+async function callRestV1Collection() {
+  return callIndia();
+}
+
+async function callRestV1Health() {
+  return callCms();
+}
+
+function callGetNative() {
+  return callNativeAppGet();
+}
+
+// ── Lanes (left → right) ──
+const LANES = [
+  ...(CONFIG.shop && CONFIG.storefrontToken ? [{ key: "direct",  short: "Direct",     label: "① Direct → Shopify",           dataSource: "shopify",        url: directEndpoint,    caller: callDirect  }] : []),
+  { key: "gateway", short: "dreamzapps", label: "② Gateway POST — appbuilder",  dataSource: "redis+shopify",  url: CONFIG.gatewayUrl, caller: callGateway },
+  { key: "vercel",  short: "Vercel",     label: "③ Gateway POST — Vercel",      dataSource: "redis+shopify",  url: CONFIG.vercelUrl,  caller: callVercel  },
+  { key: "get",     short: "GET (edge)", label: "⑤ Gateway GET — repo hash",    dataSource: "redis+shopify",  url: `${CONFIG.gatewayUrl}?sha256=daea17f2…`, caller: callGatewayGet },
+  { key: "getvercel", short: "GET — Vercel", label: "⑥ Gateway GET — Vercel",   dataSource: "redis+shopify",  url: `${CONFIG.vercelUrl}?sha256=…`, caller: callVercelGet },
+  { key: "getnative", short: "GET native", label: "⑦ GET native app hash 759dff3d", dataSource: "redis+shopify", url: `${CONFIG.gatewayUrl}?sha256=759dff3d…`, caller: callGetNative },
+  ...(CONFIG.indiaUrl ? [{ key: "rest", short: "India", label: "⑧ GET India nginx (10–20ms)", dataSource: "india-nginx", url: CONFIG.indiaUrl, caller: callIndia }] : []),
+  { key: "health",  short: "CMS",        label: "⑨ GET /cms/settings",          dataSource: "cms",            url: `${CONFIG.apiBaseUrl}/cms/settings`, caller: callCms },
+].filter((l) => l.url);
+
+// ── Build the config bar, panels and bars from LANES ──
+$("cfg").innerHTML = `
+  <div><b>Shop:</b> ${CONFIG.shop || "(Direct lane off — add shop + token)"}</div>
+  <div><b>Gateway:</b> ${CONFIG.gatewayUrl}</div>
+  <div><b>API version:</b> ${CONFIG.apiVersion}</div>
+  <div><b>Collection:</b> ${CONFIG.collectionId.split("/").pop()}</div>
+  <div><b>Products:</b> first ${CONFIG.first}</div>`;
+
+$("lanes").innerHTML = LANES.map((l) => `
+  <div class="panel ${l.key}">
+    <h2><span class="dot ${l.key}"></span> ${l.label}</h2>
+    <p class="sub" id="${l.key}-url"></p>
+    <div class="big ${l.key}" id="${l.key}-avg">—</div>
+    <div class="bar-label">warm average (production-like)</div>
+    <div class="stat-row"><span>Best (warm)</span><span class="v" id="${l.key}-min">—</span></div>
+    <div class="stat-row"><span>Warm avg</span><span class="v" id="${l.key}-warm">—</span></div>
+    <div class="stat-row"><span>Worst (cold)</span><span class="v" id="${l.key}-max">—</span></div>
+    <div class="stat-row"><span>Data source</span><span class="v" id="${l.key}-source">—</span></div>
+    <div class="stat-row"><span>Products</span><span class="v" id="${l.key}-count">—</span></div>
+    <div class="stat-row"><span>Payload</span><span class="v" id="${l.key}-bytes">—</span></div>
+    <div class="stat-row"><span>Layers (last)</span><span class="v" id="${l.key}-layers">—</span></div>
+    <div class="runlist" id="${l.key}-runs"></div>
+    <div class="status info" id="${l.key}-status">Idle.</div>
+  </div>`).join("");
+
+$("barpanel").innerHTML = LANES.map((l) => `
+  <div class="bar-label">${l.label}</div>
+  <div class="bar-track"><div class="bar-fill ${l.key}" id="bar-${l.key}" style="width:0"></div></div>`).join("");
+
+LANES.forEach((l) => { $(`${l.key}-url`).textContent = l.url; });
+
+function setStatus(key, cls, html) {
+  const el = $(`${key}-status`);
+  el.className = `status ${cls}`;
+  el.innerHTML = html;
+}
+
+function countProducts(json, key) {
+  if (!json) return null;
+  if (key === "health") return json.data ? Object.keys(json.data).length : null;
+  return json?.data?.collection?.products?.edges?.length ?? null;
+}
+
+function renderProducts(json, key) {
+  if (key === "health") return;
+  const edges = json?.data?.collection?.products?.edges || [];
+  const title = `${json?.data?.collection?.title || "Products"} — ${edges.length} products`;
+  if (!edges.length) return;
+  $("products-title").textContent = title;
+  const money = (p) => {
+    const m = p?.priceRange?.minVariantPrice;
+    if (!m) return "";
+    try { return new Intl.NumberFormat(undefined, { style: "currency", currency: m.currencyCode }).format(Number(m.amount)); }
+    catch { return `${m.amount} ${m.currencyCode}`; }
+  };
+  $("pgrid").innerHTML = edges.slice(0, 60).map((e) => {
+    const n = e.node;
+    const img = n.featuredImage?.url ? `background-image:url('${n.featuredImage.url}&width=300')` : "";
+    return `<div class="pcard">
+      <div class="img" style="${img}"></div>
+      <div class="body">
+        <p class="t">${(n.title || "").replace(/</g, "&lt;")}</p>
+        <span class="price">${money(n)}</span>
+        ${n.availableForSale ? "" : '<div class="oos">Sold out</div>'}
+      </div>
+    </div>`;
+  }).join("");
+  $("products").style.display = "block";
+}
+
+// Lanes that benefit from a discarded warmup (fills Cloudflare edge cache before timed runs).
+const EDGE_CACHE_LANES = new Set(["rest", "get", "getvercel", "getnative", "health"]);
+
+function warmAvg(times) {
+  if (times.length <= 1) return times.length ? times[0] : null;
+  const warm = times.slice(1);
+  return avg(warm);
+}
+
+// Run one lane N times, updating its run list as it goes.
+async function runLane(key, caller, N) {
+  const times = [];
+  let json = null, bytes = 0, mode = null, cacheHdr = null, err = null;
+  let serverTiming = null, cfStatus = null, cfRay = null, registered = false;
+  let dataSource = null, status = null, url = null, requestId = null;
+
+  if (EDGE_CACHE_LANES.has(key)) {
+    try {
+      await caller();
+      $(`${key}-runs`).innerHTML += `<span class="warmup">warmup (not counted)</span>`;
+    } catch { /* timing runs will surface errors */ }
+  }
+
+  for (let i = 0; i < N; i++) {
+    try {
+      const r = await caller();
+      times.push(r.ms);
+      if (r.json) json = r.json;
+      if (r.bytes) bytes = r.bytes;
+      mode = r.mode || mode;
+      if (r.cache != null) cacheHdr = r.cache;
+      if (r.serverTiming != null) serverTiming = r.serverTiming;
+      if (r.cfStatus != null) cfStatus = r.cfStatus;
+      if (r.cfRay != null) cfRay = r.cfRay;
+      if (r.registered) registered = true;
+      if (r.dataSource) dataSource = r.dataSource;
+      if (r.status != null) status = r.status;
+      if (r.url) url = r.url;
+      if (r.requestId) requestId = r.requestId;
+      $(`${key}-runs`).innerHTML += `<span>#${i + 1}: ${ms(r.ms)}${i === 0 ? " (1st timed)" : ""}${r.registered ? " (reg)" : ""}</span>`;
+    } catch (e) { err = e; break; }
+  }
+  return { times, json, bytes, mode, cacheHdr, serverTiming, cfStatus, cfRay, registered, err, dataSource, status, url, requestId };
+}
+
+function buildReport(results) {
+  const lanes = LANES.map((l) => {
+    const r = results[l.key];
+    const times = r?.times ?? [];
+    return {
+      lane: l.label,
+      key: l.key,
+      dataSource: r?.dataSource || l.dataSource,
+      url: r?.url || l.url,
+      runs: times.length,
+      timingMs: times.length ? {
+        avg: Math.round(avg(times)),
+        warmAvg: times.length > 1 ? Math.round(warmAvg(times)) : Math.round(avg(times)),
+        min: Math.round(Math.min(...times)),
+        max: Math.round(Math.max(...times)),
+        samples: times.map((t) => Math.round(t)),
+      } : null,
+      cache: r?.cacheHdr ?? null,
+      productCount: countProducts(r?.json, l.key),
+      httpStatus: r?.status ?? null,
+      requestId: r?.requestId ?? null,
+      mode: r?.mode ?? null,
+      note: r?.json?.meta?.note ?? r?.json?.error?.message ?? null,
+      responsePreview: r?.json ? (l.key === "health" ? r.json.data : {
+        meta: r.json.meta,
+        productCount: countProducts(r.json, l.key),
+        error: r.json.error ?? null,
+      }) : null,
+    };
+  }).filter((l) => l.timingMs);
+
+  const sorted = [...lanes].sort((a, b) => (a.timingMs.warmAvg ?? a.timingMs.avg) - (b.timingMs.warmAvg ?? b.timingMs.avg));
+  return {
+    reportVersion: "1.0",
+    generatedAt: new Date().toISOString(),
+    clientLocation: "browser",
+    config: {
+      shop: CONFIG.shop,
+      collectionId: CONFIG.collectionId,
+      first: CONFIG.first,
+      apiBaseUrl: CONFIG.apiBaseUrl,
+    },
+    summary: {
+      fastest: sorted[0] ? {
+        lane: sorted[0].lane,
+        avgMs: sorted[0].timingMs.warmAvg ?? sorted[0].timingMs.avg,
+        dataSource: sorted[0].dataSource,
+        note: "warmAvg excludes 1st timed run; REST/GET lanes also run a discarded edge warmup",
+      } : null,
+      byDataSource: {
+        shopify: lanes.filter((l) => l.dataSource === "shopify"),
+        redisShopify: lanes.filter((l) => l.dataSource === "redis+shopify"),
+        postgresql: lanes.filter((l) => l.dataSource === "india-nginx"),
+        health: lanes.filter((l) => l.dataSource === "cms"),
+      },
+    },
+    lanes,
+  };
+}
+
+function showReport(results) {
+  const report = buildReport(results);
+  const text = JSON.stringify(report, null, 2);
+  $("report-json").value = text;
+  $("report-panel").style.display = "block";
+  return report;
+}
+
+$("copy-report").addEventListener("click", async () => {
+  const text = $("report-json").value;
+  try {
+    await navigator.clipboard.writeText(text);
+    $("copy-status").textContent = "Copied!";
+    setTimeout(() => { $("copy-status").textContent = ""; }, 2000);
+  } catch {
+    $("report-json").select();
+    $("copy-status").textContent = "Select all and copy manually.";
+  }
+});
+
+$("download-report").addEventListener("click", () => {
+  const blob = new Blob([$("report-json").value], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `benchmark-report-${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+function sourceTagClass(ds) {
+  if (ds === "shopify") return "source-shopify";
+  if (ds === "india-nginx" || ds === "postgresql") return "source-postgresql";
+  if (ds === "cms" || ds === "health") return "source-health";
+  return "source-redis-shopify";
+}
+
+function renderLane(cfg, lane) {
+  const key = cfg.key;
+  if (!lane.times.length) {
+    $(`${key}-avg`).textContent = "✗";
+    setStatus(key, "err", `Failed: ${lane.err?.message || lane.err}`);
+    return;
+  }
+  $(`${key}-avg`).textContent = ms(warmAvg(lane.times) ?? avg(lane.times));
+  $(`${key}-min`).textContent = ms(Math.min(...lane.times));
+  $(`${key}-warm`).textContent = lane.times.length > 1 ? ms(warmAvg(lane.times)) : "—";
+  $(`${key}-max`).textContent = ms(Math.max(...lane.times));
+  const opaque = lane.mode === "opaque";
+  $(`${key}-bytes`).textContent = lane.bytes ? kb(lane.bytes) : (opaque ? "hidden (CORS)" : "—");
+  const ds = lane.dataSource || cfg.dataSource;
+  $(`${key}-source`).innerHTML = `<span class="source-tag ${sourceTagClass(ds)}">${ds.toUpperCase()}</span>`;
+  const cnt = countProducts(lane.json, key);
+  $(`${key}-count`).textContent = cnt ?? (opaque ? "hidden (CORS)" : "—");
+  $(`${key}-layers`).textContent = fmtLayers(parseServerTiming(lane.serverTiming));
+
+  if (opaque) {
+    setStatus(key, "info", "⚠ Cross-origin: body blocked by CORS. Timing is the raw network round-trip (opaque) — real time is <b>higher</b>.");
+  } else if (lane.json?.errors && !lane.json?.meta) {
+    setStatus(key, "err", `GraphQL error: ${lane.json.errors[0]?.message}`);
+  } else if (lane.json?.error) {
+    setStatus(key, lane.status === 404 ? "info" : "err", `${lane.json.error.code}: ${lane.json.error.message}${lane.json.meta?.note ? `<br><small>${lane.json.meta.note}</small>` : ""}`);
+  } else {
+    const cacheTxt = lane.cacheHdr ? ` · X-Cache: <b>${lane.cacheHdr}</b>` : "";
+    const cfBits = [lane.cfStatus, lane.cfRay ? lane.cfRay.split("-").pop() : null].filter(Boolean);
+    const cfTxt = cfBits.length ? ` · CF: ${cfBits.join("/")}` : "";
+    const note = lane.json?.meta?.note ? `<br><small>${lane.json.meta.note}</small>` : "";
+    setStatus(key, "ok", `✓ ${lane.times.length} run(s) · ${ds}${cacheTxt}${cfTxt}${note}`);
+  }
+}
+
+function renderVerdict(results) {
+  const lanes = LANES
+    .map((l) => {
+      const times = results[l.key].times;
+      const warm = times.length ? (warmAvg(times) ?? avg(times)) : null;
+      return { ...l, avg: warm, mode: results[l.key].mode };
+    })
+    .filter((l) => l.avg != null);
+  if (!lanes.length) return;
+
+  const max = Math.max(...lanes.map((l) => l.avg));
+  $("barpanel").style.display = "block";
+  lanes.forEach((l) => {
+    const bar = $(`bar-${l.key}`);
+    bar.style.width = `${(l.avg / max) * 100}%`;
+    bar.textContent = ms(l.avg);
+  });
+
+  const sorted = [...lanes].sort((a, b) => a.avg - b.avg);
+  const fastest = sorted[0];
+  const rest = sorted.slice(1).map((l) => `${l.short} <b>${(l.avg / fastest.avg).toFixed(1)}×</b>`).join(" · ");
+  const anyOpaque = lanes.some((l) => l.mode === "opaque");
+  $("verdict").style.display = "block";
+  $("verdict").innerHTML =
+    `Fastest (warm avg): <b>${fastest.short}</b> at ${ms(fastest.avg)}.` +
+    (rest ? ` &nbsp;vs&nbsp; ${rest}` : "") +
+    ` <span style="color:var(--muted)">(REST/GET lanes: edge warmup before timed runs.)</span>` +
+    (anyOpaque ? ` <span style="color:var(--muted)">(opaque lane timing is higher.)</span>` : "");
+}
+
+async function run() {
+  const N = Math.max(1, Math.min(10, parseInt($("runs").value, 10) || 4));
+  $("run").disabled = true;
+  $("verdict").style.display = "none";
+  LANES.forEach((l) => {
+    $(`${l.key}-runs`).innerHTML = "";
+    $(`${l.key}-avg`).textContent = "…";
+    ["min", "warm", "max", "count", "bytes", "layers"].forEach((s) => { $(`${l.key}-${s}`).textContent = "—"; });
+    setStatus(l.key, "info", "Running…");
+  });
+
+  const results = {};
+  let productJson = null;
+  let productLaneKey = null;
+  for (const l of LANES) {
+    const lane = await runLane(l.key, l.caller, N);
+    results[l.key] = lane;
+    renderLane(l, lane);
+    const cnt = countProducts(lane.json, l.key);
+    if (!productJson && cnt > 0) {
+      productJson = lane.json;
+      productLaneKey = l.key;
+    }
+  }
+  if (productJson) renderProducts(productJson, productLaneKey);
+  renderVerdict(results);
+  showReport(results);
+  $("run").disabled = false;
+}
+
+$("run").addEventListener("click", run);
+$("livehint").textContent = location.protocol === "file:"
+  ? "Opened as file:// — gateway CORS should work. India 127.0.0.1 may need python -m http.server in demo/."
+  : "";
+
+// ── Copy-paste curl commands (generated from CONFIG) ──
+function shellQuote(s) {
+  return `'${String(s).replace(/'/g, "'\\''")}'`;
+}
+
+function buildCurlCommands(queryHash) {
+  const varsJson = JSON.stringify(VARIABLES);
+  const bodyJson = JSON.stringify({ query: QUERY, variables: VARIABLES, cache: "default" });
+  const bodyPlain = JSON.stringify({ query: QUERY, variables: VARIABLES });
+  const varsEnc = encodeURIComponent(varsJson);
+  const getQs = queryHash
+    ? `sha256=${queryHash}&variables=${varsEnc}`
+    : `query=${encodeURIComponent(QUERY)}&variables=${varsEnc}`;
+  const nativeQs = `sha256=${CONFIG.nativeCollectionSha256}&variables=${varsEnc}`;
+  const cmsUrl = `${CONFIG.apiBaseUrl}/cms/settings`;
+  const cmds = [];
+  if (CONFIG.shop && CONFIG.storefrontToken) {
+    cmds.push({
+      key: "direct",
+      label: "① Direct → Shopify (public Storefront token)",
+      cmd: `curl -s ${shellQuote(directEndpoint)} \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-Shopify-Storefront-Access-Token: ${CONFIG.storefrontToken}' \\\n  -d ${shellQuote(bodyPlain)}`,
+    });
+  }
+  cmds.push(
+    {
+      key: "gateway",
+      label: "② Gateway POST — appbuilder (Redis → Shopify)",
+      cmd: `curl -s ${shellQuote(CONFIG.gatewayUrl)} \\\n  -H 'Content-Type: text/plain' \\\n  -d ${shellQuote(bodyJson)}`,
+    },
+    {
+      key: "vercel",
+      label: "③ Gateway POST — Vercel",
+      cmd: `curl -s ${shellQuote(CONFIG.vercelUrl)} \\\n  -H 'Content-Type: text/plain' \\\n  -d ${shellQuote(bodyJson)}`,
+    },
+    {
+      key: "get",
+      label: "⑤ Gateway GET — repo hash (daea17f2)",
+      cmd: `curl -s ${shellQuote(`${CONFIG.gatewayUrl}?${getQs}`)}\n\ncurl -sI ${shellQuote(`${CONFIG.gatewayUrl}?${getQs}`)} | grep -iE 'cf-cache-status|cf-ray|x-cache'`,
+    },
+    {
+      key: "getvercel",
+      label: "⑥ Gateway GET — Vercel",
+      cmd: `curl -s ${shellQuote(`${CONFIG.vercelUrl}?${getQs}`)}`,
+    },
+    {
+      key: "getnative",
+      label: "⑦ GET native app hash 759dff3d",
+      cmd: `curl -sS -D - -o /dev/null --http2 ${shellQuote(`${CONFIG.gatewayUrl}?${nativeQs}`)} | grep -iE 'HTTP/|x-cache|cf-cache|server-timing'`,
+    },
+  );
+  if (CONFIG.indiaUrl) {
+    cmds.push({
+      key: "rest",
+      label: "⑧ GET India nginx (keep-alive HIT ~10–20ms)",
+      cmd: `curl -sS -D - -o /dev/null --http2 ${shellQuote(`${CONFIG.indiaUrl}?${nativeQs}`)} | grep -iE 'HTTP/|x-india-cache|x-cache'`,
+    });
+  }
+  cmds.push({
+    key: "health",
+    label: "⑨ GET /cms/settings",
+    cmd: `curl -sI ${shellQuote(cmsUrl)} | grep -iE 'cf-cache-status|x-cache'`,
+  });
+  return cmds;
+}
+
+function renderCurlBlocks(commands) {
+  $("curl-blocks").innerHTML = commands.map((c) => `
+    <div class="curl-block" data-curl-key="${c.key}">
+      <div class="curl-head">
+        <span>${c.label}</span>
+        <button type="button" class="secondary curl-copy" data-curl-key="${c.key}">Copy</button>
+      </div>
+      <pre class="curl-pre" id="curl-${c.key}">${c.cmd.replace(/</g, "&lt;")}</pre>
+    </div>`).join("");
+
+  document.querySelectorAll(".curl-copy").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const key = btn.getAttribute("data-curl-key");
+      const text = commands.find((c) => c.key === key)?.cmd ?? "";
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied!";
+        setTimeout(() => { btn.textContent = "Copy"; }, 1500);
+      } catch {
+        btn.textContent = "Select & copy";
+      }
+    });
+  });
+}
+
+(async function initCurlPanel() {
+  let hash = null;
+  try { hash = await sha256Hex(QUERY); } catch {}
+  renderCurlBlocks(buildCurlCommands(hash));
+})();
+</script>
+</body>
+</html>

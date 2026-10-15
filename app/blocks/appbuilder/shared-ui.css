@@ -1,0 +1,189 @@
+/* Shared Appbuilder UI tokens */
+:root {
+  --appbuilder-accent: #6b6b6b;
+  --appbuilder-accent-hover: #555555;
+  --appbuilder-field-border: #9ca3af;
+  --appbuilder-pagination-active: #b3024a;
+  --appbuilder-pagination-inactive: rgba(179, 2, 74, 0.28);
+}
+
+/* Horizontal scroll tracks — hide scrollbar, smooth snap scroll like Product Scroller */
+/* .appbuilder-product-scroller__track,
+.appbuilder-image-slider__track,
+.appbuilder-categories-scroller__track {
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.appbuilder-product-scroller__track::-webkit-scrollbar,
+.appbuilder-image-slider__track::-webkit-scrollbar,
+.appbuilder-categories-scroller__track::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+} */
+
+/* InnerBlocks editor tracks — same flex + snap layout as Product Scroller */
+[class$="-editor"]:not(.appbuilder-image-carousel-editor):not(.appbuilder-multimedia-scroller-editor) [class*="__track"] .block-editor-inner-blocks {
+  min-width: 0;
+}
+
+[class$="-editor"]:not(.appbuilder-image-carousel-editor):not(.appbuilder-multimedia-scroller-editor) [class*="__track"] .block-editor-block-list__layout {
+  display: flex !important;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 20px;
+  width: max-content;
+  min-width: 100%;
+  align-items: stretch;
+}
+
+[class$="-editor"]:not(.appbuilder-image-carousel-editor):not(.appbuilder-multimedia-scroller-editor) [class*="__track"] .block-editor-block-list__layout > *,
+[class$="-editor"]:not(.appbuilder-image-carousel-editor):not(.appbuilder-multimedia-scroller-editor) [class*="__track"] .block-editor-block-list__block {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.appbuilder-product-scroller__card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Pagination row */
+.appbuilder-pagination,
+.appbuilder-image-slider__pagination,
+.appbuilder-product-scroller__pagination,
+.appbuilder-image-carousel__pagination,
+.appbuilder-categories-scroller__pagination {
+  display: flex;
+  gap: 0;
+  justify-content: center;
+  align-items: center;
+  margin-top: 16px;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
+}
+
+.appbuilder-pagination--left,
+.appbuilder-image-slider__pagination--left,
+.appbuilder-product-scroller__pagination--left,
+.appbuilder-image-carousel__pagination--left,
+.appbuilder-categories-scroller__pagination--left,
+.appbuilder-multimedia-scroller__pagination--left {
+  justify-content: flex-start !important;
+  padding-left: 16px;
+}
+
+.appbuilder-pagination--center,
+.appbuilder-image-slider__pagination--center,
+.appbuilder-product-scroller__pagination--center,
+.appbuilder-image-carousel__pagination--center,
+.appbuilder-categories-scroller__pagination--center,
+.appbuilder-multimedia-scroller__pagination--center {
+  justify-content: center !important;
+}
+
+.appbuilder-pagination--right,
+.appbuilder-image-slider__pagination--right,
+.appbuilder-product-scroller__pagination--right,
+.appbuilder-image-carousel__pagination--right,
+.appbuilder-categories-scroller__pagination--right,
+.appbuilder-multimedia-scroller__pagination--right {
+  justify-content: flex-end !important;
+  padding-right: 16px;
+}
+
+/* Dot buttons — inactive circle, active pill (see reference design) */
+.appbuilder-pagination__dot,
+.appbuilder-image-slider__dot,
+.appbuilder-product-scroller__pagination-dot,
+.appbuilder-image-carousel__dot,
+.appbuilder-categories-scroller__dot {
+  cursor: pointer;
+  border: none;
+  padding: 9px 4px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  flex-shrink: 0;
+  width: auto;
+  height: auto;
+}
+
+.appbuilder-pagination__dot::after,
+.appbuilder-image-slider__dot::after,
+.appbuilder-product-scroller__pagination-dot::after,
+.appbuilder-image-carousel__dot::after,
+.appbuilder-categories-scroller__dot::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--appbuilder-pagination-inactive);
+  transition:
+    width 0.25s ease,
+    border-radius 0.25s ease,
+    background 0.25s ease;
+}
+
+.appbuilder-pagination__dot.is-active::after,
+.appbuilder-image-slider__dot.is-active::after,
+.appbuilder-product-scroller__pagination-dot.is-active::after,
+.appbuilder-image-carousel__dot.is-active::after,
+.appbuilder-categories-scroller__dot.is-active::after {
+  width: 22px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--appbuilder-pagination-active);
+}
+
+/* Hero carousel editor — dots sit over the slide */
+.appbuilder-image-carousel__pagination {
+  margin-top: 0;
+}
+
+.appbuilder-image-carousel__pagination--preview {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  pointer-events: auto;
+  width: calc(100% - 32px);
+}
+
+.appbuilder-image-carousel__pagination--preview.appbuilder-image-carousel__pagination--left {
+  left: 16px;
+  transform: none;
+}
+
+.appbuilder-image-carousel__pagination--preview.appbuilder-image-carousel__pagination--center {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.appbuilder-image-carousel__pagination--preview.appbuilder-image-carousel__pagination--right {
+  left: auto;
+  right: 16px;
+  transform: none;
+}
+
+/* Editor field underlines (was Gutenberg blue) */
+.appbuilder-image-slider-item-editor__label {
+  border-bottom-color: var(--appbuilder-field-border) !important;
+}
+
+.builder-wrapper .editor-canvas-wrapper .block-editor-block-list__layout {
+  overflow-x: hidden !important;
+}
