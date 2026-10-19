@@ -30,7 +30,7 @@ export function cmsPageSlugCacheKey(shop: string, slug: string): string {
 }
 
 export function cmsSettingsCacheKey(shop: string): string {
-  return `cms:settings:v4:${normalizeShopDomain(shop)}`;
+  return `cms:settings:v5:${normalizeShopDomain(shop)}`;
 }
 
 function publicCmsOrigin(): string {

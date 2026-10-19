@@ -64,6 +64,19 @@ export const env = {
   // scopes to the authenticated session's shop; CLI uploads and device
   // update-checks (which have no session) use this value instead.
   otaShop: (process.env.OTA_SHOP ?? "").trim(),
+  // Used when the matching Settings field is blank.
+  get trustpilotApiKey() {
+    return readEnv("TRUSTPILOT_API_KEY");
+  },
+  get trustpilotBaseUrl() {
+    return readEnv("TRUSTPILOT_BASE_URL");
+  },
+  get trustpilotBusinessUnitId() {
+    return readEnv("TRUSTPILOT_BUSINESS_UNIT_ID");
+  },
+  get reviewProductHost() {
+    return readEnv("REVIEW_PRODUCT_HOST");
+  },
 };
 
 if (!env.managementToken) {

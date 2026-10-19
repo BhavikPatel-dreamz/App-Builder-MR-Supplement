@@ -466,8 +466,10 @@ export default function AppSettings() {
       <s-section heading="Trustpilot Credentials">
         <s-stack direction="block" gap="base">
           <s-paragraph>
-            Trustpilot credentials for the native app. Saved on GET /cms/settings as
-            trustpilot.
+            Save these here, or set them on the server. A value saved here overrides
+            the environment variable. Environment names: TRUSTPILOT_API_KEY,
+            TRUSTPILOT_BASE_URL, TRUSTPILOT_BUSINESS_UNIT_ID. Product site host is
+            on the Reviews tab, or REVIEW_PRODUCT_HOST.
           </s-paragraph>
           <s-box padding="base" border="base" borderRadius="base">
             <s-stack direction="block" gap="base">
@@ -488,6 +490,14 @@ export default function AppSettings() {
                   setField("trustpilotBaseUrl", event.currentTarget.value)
                 }
               ></s-text-field>
+              <s-text-field
+                label="Trustpilot business unit ID"
+                name="trustpilotBusinessUnitId"
+                value={settings.trustpilotBusinessUnitId || ""}
+                onChange={(event) =>
+                  setField("trustpilotBusinessUnitId", event.currentTarget.value)
+                }
+              ></s-text-field>
             </s-stack>
           </s-box>
         </s-stack>
@@ -498,10 +508,23 @@ export default function AppSettings() {
       <s-section heading="Reviews">
         <s-stack direction="block" gap="base">
           <s-paragraph>
-            Review links for the native app. Saved on GET /cms/settings as reviews.
+            Native review APIs on this server. Get reviews:
+            https://appbuilder.dreamzapps.com/reviews/get?product_id=PRODUCT_ID
+            Write a review: POST https://appbuilder.dreamzapps.com/reviews/write
+            with JSON product_id, variant_id, name, email, review, and rating.
+            Trustpilot API key and business unit ID are on the Trustpilot tab.
           </s-paragraph>
           <s-box padding="base" border="base" borderRadius="base">
             <s-stack direction="block" gap="base">
+            <s-text-field
+              label="Product site host"
+              name="reviewProductHost"
+              placeholder="www.mrsupplement.com.au"
+              value={settings.reviewProductHost || ""}
+              onChange={(event) =>
+                setField("reviewProductHost", event.currentTarget.value)
+              }
+            ></s-text-field>
             <s-text-field
               label="Write Review URL"
               name="writeReviewUrl"

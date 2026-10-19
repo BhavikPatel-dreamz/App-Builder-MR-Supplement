@@ -1,0 +1,2 @@
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "trustpilotBusinessUnitId" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "ShopSettings" ADD COLUMN IF NOT EXISTS "reviewProductHost" TEXT NOT NULL DEFAULT '';

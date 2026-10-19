@@ -1,6 +1,7 @@
 import type { ShopSettings } from "@prisma/client";
 
 import db from "../db.server";
+import { env } from "./ota/env.server";
 import {
   EMPTY_COLLECTION_REF,
   EMPTY_PRODUCT_REF,
@@ -72,6 +73,8 @@ export type ShopSettingsInput = {
   appstleLoyaltyApiUrl: string;
   trustpilotApiKey: string;
   trustpilotBaseUrl: string;
+  trustpilotBusinessUnitId: string;
+  reviewProductHost: string;
   writeReviewUrl: string;
   getReviewUrl: string;
 };
@@ -84,11 +87,13 @@ export type PublicAppstleSettings = {
 export type PublicTrustpilotSettings = {
   trustpilotApiKey: string;
   trustpilotBaseUrl: string;
+  trustpilotBusinessUnitId: string;
 };
 
 export type PublicReviewsSettings = {
   writeReviewUrl: string;
   getReviewUrl: string;
+  productHost: string;
 };
 
 export const DEFAULT_SHOP_SETTINGS: ShopSettingsInput = {
@@ -134,6 +139,8 @@ export const DEFAULT_SHOP_SETTINGS: ShopSettingsInput = {
   appstleLoyaltyApiUrl: "",
   trustpilotApiKey: "",
   trustpilotBaseUrl: "",
+  trustpilotBusinessUnitId: "",
+  reviewProductHost: "",
   writeReviewUrl: "",
   getReviewUrl: "",
 };
@@ -188,6 +195,14 @@ function serializeShopSettings(row: ShopSettings): ShopSettingsInput {
     ),
     trustpilotBaseUrl: String(
       (row as ShopSettings & { trustpilotBaseUrl?: string }).trustpilotBaseUrl || "",
+    ),
+    trustpilotBusinessUnitId: String(
+      (row as ShopSettings & { trustpilotBusinessUnitId?: string })
+        .trustpilotBusinessUnitId || "",
+    ),
+    reviewProductHost: String(
+      (row as ShopSettings & { reviewProductHost?: string }).reviewProductHost ||
+        "",
     ),
     writeReviewUrl: String(
       (row as ShopSettings & { writeReviewUrl?: string }).writeReviewUrl || "",
@@ -303,12 +318,42 @@ export function buildTodaysAffirmationPublicPayload(
   };
 }
 
+function preferSetting(saved: string, fromEnv: string, fallback = ""): string {
+  const value = saved.trim();
+  if (value) return value;
+  const envValue = fromEnv.trim();
+  if (envValue) return envValue;
+  return fallback;
+}
+
+/** Settings win. Blank fields fall back to TRUSTPILOT_* and REVIEW_PRODUCT_HOST. */
+export function effectiveTrustpilot(settings: ShopSettingsInput) {
+  return {
+    apiKey: preferSetting(settings.trustpilotApiKey, env.trustpilotApiKey),
+    baseUrl: preferSetting(
+      settings.trustpilotBaseUrl,
+      env.trustpilotBaseUrl,
+      "https://api.trustpilot.com",
+    ),
+    businessUnitId: preferSetting(
+      settings.trustpilotBusinessUnitId,
+      env.trustpilotBusinessUnitId,
+    ),
+    productHost: preferSetting(
+      settings.reviewProductHost,
+      env.reviewProductHost,
+      "www.mrsupplement.com.au",
+    ),
+  };
+}
+
 export function toPublicShopSettings(
   settings: ShopSettingsInput,
 ): PublicShopSettings {
   const uploaded = settings.backgroundMusicFileUrl.trim();
   const external = settings.backgroundMusicUrl.trim();
   const resolvedUrl = resolveBackgroundMusicUrl(settings);
+  const trustpilot = effectiveTrustpilot(settings);
 
   return {
     forceUpdate: {
@@ -356,12 +401,14 @@ export function toPublicShopSettings(
       appstleLoyaltyApiUrl: settings.appstleLoyaltyApiUrl.trim(),
     },
     trustpilot: {
-      trustpilotApiKey: settings.trustpilotApiKey.trim(),
-      trustpilotBaseUrl: settings.trustpilotBaseUrl.trim(),
+      trustpilotApiKey: trustpilot.apiKey,
+      trustpilotBaseUrl: trustpilot.baseUrl,
+      trustpilotBusinessUnitId: trustpilot.businessUnitId,
     },
     reviews: {
       writeReviewUrl: settings.writeReviewUrl.trim(),
       getReviewUrl: settings.getReviewUrl.trim(),
+      productHost: trustpilot.productHost,
     },
   };
 }

@@ -87,6 +87,17 @@ function parseSettingsBody(body: unknown): ShopSettingsInput | null {
           ?.trustpilotBaseUrl ??
         "",
     ),
+    trustpilotBusinessUnitId: String(
+      input.trustpilotBusinessUnitId ??
+        (input.trustpilot as { trustpilotBusinessUnitId?: unknown } | undefined)
+          ?.trustpilotBusinessUnitId ??
+        "",
+    ),
+    reviewProductHost: String(
+      input.reviewProductHost ??
+        (input.reviews as { productHost?: unknown } | undefined)?.productHost ??
+        "",
+    ),
     writeReviewUrl: String(
       input.writeReviewUrl ??
         (input.reviews as { writeReviewUrl?: unknown } | undefined)

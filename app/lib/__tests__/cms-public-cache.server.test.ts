@@ -42,7 +42,7 @@ describe("CMS public cache keys", () => {
 
   it("builds a settings key", () => {
     expect(cmsSettingsCacheKey("https://XYXX.myshopify.com")).toBe(
-      "cms:settings:v4:xyxx.myshopify.com",
+      "cms:settings:v5:xyxx.myshopify.com",
     );
   });
 

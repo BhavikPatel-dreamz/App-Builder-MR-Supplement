@@ -114,6 +114,8 @@ model ShopSettings {
   appstleLoyaltyApiUrl             String           @default("")
   trustpilotApiKey                 String           @default("")
   trustpilotBaseUrl                String           @default("")
+  trustpilotBusinessUnitId         String           @default("")
+  reviewProductHost                String           @default("")
   writeReviewUrl                   String           @default("")
   getReviewUrl                     String           @default("")
 
