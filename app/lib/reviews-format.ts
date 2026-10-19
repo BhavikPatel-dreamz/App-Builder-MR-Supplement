@@ -68,6 +68,14 @@ function reviewPoints(value: unknown): number {
   return Number.isFinite(points) ? points : 0;
 }
 
+/** Always a finite number. A text rating counts as 0, matching the old PHP sum. */
+export function averageStar(reviews: Array<{ rPoints?: unknown }>): number {
+  if (reviews.length === 0) return 0;
+  const total = reviews.reduce((sum, review) => sum + reviewPoints(review.rPoints), 0);
+  const average = Math.round((total / reviews.length) * 10) / 10;
+  return Number.isFinite(average) ? average : 0;
+}
+
 export function oldIdFromTags(tags: string[]): string {
   for (const tag of tags) {
     const match = /^old_(.+)_id$/.exec(tag);
@@ -167,11 +175,9 @@ export function mergeReviews(
     (a, b) => reviewTime(b) - reviewTime(a),
   );
   const reviews = combined.map(mapPublicReview);
-  const total = reviews.reduce((sum, review) => sum + reviewPoints(review.rPoints), 0);
-  const average = reviews.length > 0 ? Math.round((total / reviews.length) * 10) / 10 : 0;
   return {
     reviews,
     reviews_counts: reviews.length,
-    average_star: average,
+    average_star: averageStar(reviews),
   };
 }

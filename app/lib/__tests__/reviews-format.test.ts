@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  averageStar,
   mergeReviews,
   paginateReviews,
   oldIdFromTags,
@@ -88,6 +89,12 @@ describe("review formatting", () => {
     expect(merged.reviews_counts).toBe(2);
     expect(merged.average_star).toBe(2.5);
     expect(Number.isFinite(merged.average_star)).toBe(true);
+    expect(
+      averageStar([
+        { rPoints: "5.0000" },
+        { rPoints: " something which caused the intensity of my workout to falter" },
+      ]),
+    ).toBe(2.5);
   });
 
   it("does not append a second /v1 when the Trustpilot base already has one", () => {

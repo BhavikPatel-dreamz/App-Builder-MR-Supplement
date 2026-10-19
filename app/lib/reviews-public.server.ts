@@ -6,7 +6,7 @@ import {
   publicCachedJson,
 } from "./cms-public.server";
 import { withCache } from "./redis-cache.server";
-import { paginateReviews, parseReviewPage } from "./reviews-format";
+import { averageStar, paginateReviews, parseReviewPage } from "./reviews-format";
 import {
   getProductReviews,
   readReviewFields,
@@ -94,20 +94,22 @@ export async function serveProductReviews(request: Request): Promise<Response> {
       );
     }
     const requestedPage = parseReviewPage(fields.page);
+    const reviews = Array.isArray(data.reviews) ? data.reviews : [];
+    const average_star = averageStar(reviews as Array<{ rPoints?: unknown }>);
     const body =
       requestedPage === null
         ? {
             success: true as const,
-            reviews_counts: data.reviews_counts,
-            average_star: data.average_star,
-            reviews: data.reviews,
+            reviews_counts: reviews.length,
+            average_star,
+            reviews,
           }
         : (() => {
-            const page = paginateReviews(data.reviews, requestedPage);
+            const page = paginateReviews(reviews, requestedPage);
             return {
               success: true as const,
-              reviews_counts: data.reviews_counts,
-              average_star: data.average_star,
+              reviews_counts: reviews.length,
+              average_star,
               page: page.page,
               per_page: page.per_page,
               total_pages: page.total_pages,
