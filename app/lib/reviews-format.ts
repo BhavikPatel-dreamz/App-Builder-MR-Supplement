@@ -54,6 +54,20 @@ export function oldProductUrl(host: string, handle: string): string {
   return `https://${productHostFromSetting(host)}/${handle}`;
 }
 
+/** Settings often store https://api.trustpilot.com/v1/. The review path adds /v1 itself. */
+export function trustpilotApiRoot(baseUrl: string): string {
+  const fallback = "https://api.trustpilot.com";
+  let root = baseUrl.trim().replace(/\/+$/, "");
+  if (!root) return fallback;
+  root = root.replace(/\/v1$/i, "");
+  return root || fallback;
+}
+
+function reviewPoints(value: unknown): number {
+  const points = typeof value === "number" ? value : Number(String(value ?? "").trim());
+  return Number.isFinite(points) ? points : 0;
+}
+
 export function oldIdFromTags(tags: string[]): string {
   for (const tag of tags) {
     const match = /^old_(.+)_id$/.exec(tag);
@@ -121,8 +135,10 @@ function reviewTime(review: InternalReview): number {
 
 export const REVIEWS_PER_PAGE = 20;
 
-export function parseReviewPage(value: unknown): number {
-  const page = Number.parseInt(String(value ?? ""), 10);
+/** Blank page means the full list, matching the old get_reviews.php response. */
+export function parseReviewPage(value: unknown): number | null {
+  if (value === undefined || value === null || String(value).trim() === "") return null;
+  const page = Number.parseInt(String(value), 10);
   if (!Number.isFinite(page) || page < 1) return 1;
   return page;
 }
@@ -151,7 +167,7 @@ export function mergeReviews(
     (a, b) => reviewTime(b) - reviewTime(a),
   );
   const reviews = combined.map(mapPublicReview);
-  const total = reviews.reduce((sum, review) => sum + Number(review.rPoints || 0), 0);
+  const total = reviews.reduce((sum, review) => sum + reviewPoints(review.rPoints), 0);
   const average = reviews.length > 0 ? Math.round((total / reviews.length) * 10) / 10 : 0;
   return {
     reviews,

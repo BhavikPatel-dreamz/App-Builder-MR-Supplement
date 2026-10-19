@@ -7,6 +7,7 @@ import {
   oldProductUrl,
   reviewProductCacheId,
   toProductGid,
+  trustpilotApiRoot,
   variantLabel,
 } from "../reviews-format";
 
@@ -69,6 +70,31 @@ describe("review formatting", () => {
     expect(merged.reviews[0]).toMatchObject({ rSource: "trustpilot", rName: "Alex", rPoints: 5 });
     expect(merged.reviews[1]).toMatchObject({ rSource: "internal", rName: "Sam" });
     expect(merged.average_star).toBe(4.5);
+  });
+
+  it("ignores a text rating when averaging, the way the old PHP sum did", () => {
+    const merged = mergeReviews(
+      [
+        { rSource: "internal", rName: "A", rCreated: "2024-01-01", rPoints: "5.0000" },
+        {
+          rSource: "internal",
+          rName: "B",
+          rCreated: "2024-01-02",
+          rPoints: "not a number",
+        },
+      ],
+      [],
+    );
+    expect(merged.reviews_counts).toBe(2);
+    expect(merged.average_star).toBe(2.5);
+    expect(Number.isFinite(merged.average_star)).toBe(true);
+  });
+
+  it("does not append a second /v1 when the Trustpilot base already has one", () => {
+    expect(trustpilotApiRoot("https://api.trustpilot.com/v1/")).toBe(
+      "https://api.trustpilot.com",
+    );
+    expect(trustpilotApiRoot("")).toBe("https://api.trustpilot.com");
   });
 
   it("returns 20 reviews per page and keeps the total count", () => {

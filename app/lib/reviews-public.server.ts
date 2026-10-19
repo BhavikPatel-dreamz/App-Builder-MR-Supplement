@@ -25,7 +25,8 @@ type ReviewsGetBody = {
 /**
  * GET /reviews/get — Redis L1/L2 plus Cache-Control for Vercel/Cloudflare.
  * Optional: ?shop= ?product_id= ?page= ?cache=default|bypass|refresh
- * The full list is cached once per product. Each response returns 20 reviews.
+ * The full list is cached once per product. Omit page for the old full response.
+ * Pass page to return 20 reviews.
  */
 export async function serveProductReviews(request: Request): Promise<Response> {
   if (request.method === "OPTIONS") return reviewOptions();
@@ -92,17 +93,29 @@ export async function serveProductReviews(request: Request): Promise<Response> {
         timings,
       );
     }
-    const page = paginateReviews(data.reviews, parseReviewPage(fields.page));
+    const requestedPage = parseReviewPage(fields.page);
+    const body =
+      requestedPage === null
+        ? {
+            success: true as const,
+            reviews_counts: data.reviews_counts,
+            average_star: data.average_star,
+            reviews: data.reviews,
+          }
+        : (() => {
+            const page = paginateReviews(data.reviews, requestedPage);
+            return {
+              success: true as const,
+              reviews_counts: data.reviews_counts,
+              average_star: data.average_star,
+              page: page.page,
+              per_page: page.per_page,
+              total_pages: page.total_pages,
+              reviews: page.reviews,
+            };
+          })();
     return publicCachedJson(
-      {
-        success: true,
-        reviews_counts: data.reviews_counts,
-        average_star: data.average_star,
-        page: page.page,
-        per_page: page.per_page,
-        total_pages: page.total_pages,
-        reviews: page.reviews,
-      },
+      body,
       200,
       edgeCacheable && mode === "default",
       cacheStatus,

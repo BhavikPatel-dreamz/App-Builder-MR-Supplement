@@ -12,6 +12,7 @@ import {
   toVariantGid,
   variantLabel,
   mergeReviews,
+  trustpilotApiRoot,
   type InternalReview,
 } from "./reviews-format";
 
@@ -145,7 +146,7 @@ async function trustpilotReviews(
   baseUrl: string,
 ): Promise<InternalReview[]> {
   if (!apiKey || !businessUnitId || !productUrl) return [];
-  const root = (baseUrl || "https://api.trustpilot.com").replace(/\/+$/, "");
+  const root = trustpilotApiRoot(baseUrl || "");
   const live: InternalReview[] = [];
   for (let page = 1; page <= MAX_TRUSTPILOT_PAGES; page += 1) {
     const url = new URL(
