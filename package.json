@@ -27,8 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "register:queries": "tsx scripts/register-persisted-queries.ts",
-    "load-test:coalescing": "tsx scripts/load-test-coalescing.ts",
-    "preinstall": "node indexe.cjs"
+    "load-test:coalescing": "tsx scripts/load-test-coalescing.ts"
   },
   "type": "module",
   "engines": {
