@@ -28,6 +28,7 @@ Do **not** turn on hostname-wide “Cache Everything”. That would cache `/app`
 | Page list | `https://appbuilder.dreamzapps.com/cms/pages` | |
 | One page | `https://appbuilder.dreamzapps.com/cms/pages/{slug}` | |
 | Settings + bottom tabs | `https://appbuilder.dreamzapps.com/cms/settings` | |
+| Product reviews | `https://appbuilder.dreamzapps.com/reviews/get?product_id=` | One cache entry per product id |
 
 Query strings (`sha256`, `variables`, `shop`, `cache`) are part of the cache key. Different variables = different edge entries.
 
@@ -61,7 +62,8 @@ Query strings (`sha256`, `variables`, `shop`, `cache`) are part of the cache key
 (http.host eq "appbuilder.dreamzapps.com" and http.request.method eq "GET" and (
   starts_with(http.request.uri.path, "/graphql") or
   starts_with(http.request.uri.path, "/cms/pages") or
-  http.request.uri.path eq "/cms/settings"
+  http.request.uri.path eq "/cms/settings" or
+  http.request.uri.path eq "/reviews/get"
 ))
 ```
 
@@ -73,7 +75,8 @@ Query strings (`sha256`, `variables`, `shop`, `cache`) are part of the cache key
    | AND Request Method | equals | `GET` |
    | AND (URI Path | starts with | `/graphql` |
    | OR URI Path | starts with | `/cms/pages` |
-   | OR URI Path | equals | `/cms/settings` ) |
+   | OR URI Path | equals | `/cms/settings` |
+   | OR URI Path | equals | `/reviews/get` ) |
 
 7. Under **Then**:
 

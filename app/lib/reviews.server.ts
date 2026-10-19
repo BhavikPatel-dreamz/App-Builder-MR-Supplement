@@ -1,6 +1,9 @@
+import {
+  invalidateProductReviewsCache,
+  normalizeShopDomain,
+} from "./cms-public-cache.server";
 import { effectiveTrustpilot, getShopSettings } from "./settings.server";
 import { unauthenticated } from "../shopify.server";
-import { normalizeShopDomain } from "./cms-public-cache.server";
 import {
   oldIdFromTags,
   oldProductUrl,
@@ -304,6 +307,8 @@ export async function writeProductReview(
       errors: userErrors.length > 0 ? userErrors : saved.errors,
     };
   }
+
+  await invalidateProductReviewsCache(shop, productId);
 
   return {
     notFound: false as const,

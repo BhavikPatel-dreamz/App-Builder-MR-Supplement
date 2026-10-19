@@ -1,5 +1,6 @@
 import { cacheDel, cacheDelByPrefix, withCache, getCacheTTL } from "./redis-cache.server";
-import { purgeAndWarmIndiaEdge } from "./india-edge.server";
+import { purgeIndiaEdge, purgeAndWarmIndiaEdge } from "./india-edge.server";
+import { reviewProductCacheId } from "./reviews-format";
 
 /**
  * Redis/L1 keys for public CMS JSON (native GET /cms/pages).
@@ -31,6 +32,48 @@ export function cmsPageSlugCacheKey(shop: string, slug: string): string {
 
 export function cmsSettingsCacheKey(shop: string): string {
   return `cms:settings:v5:${normalizeShopDomain(shop)}`;
+}
+
+export function reviewsGetCachePrefix(shop: string): string {
+  return `reviews:get:v1:${normalizeShopDomain(shop)}:`;
+}
+
+export function reviewsGetCacheKey(shop: string, productId: string): string {
+  return `${reviewsGetCachePrefix(shop)}${reviewProductCacheId(productId)}`;
+}
+
+export function reviewsGetPublicUrls(shop: string, productId: string): string[] {
+  const origin = publicCmsOrigin();
+  const ids = new Set(
+    [reviewProductCacheId(productId), productId.trim()].filter(Boolean),
+  );
+  const shopDomain = normalizeShopDomain(shop);
+  const urls: string[] = [];
+  for (const id of ids) {
+    const base = `${origin}/reviews/get?product_id=${encodeURIComponent(id)}`;
+    urls.push(base);
+    if (shopDomain) urls.push(`${base}&shop=${encodeURIComponent(shopDomain)}`);
+  }
+  return urls;
+}
+
+/** Drop the Redis entry and the CDN/India copies for one product. */
+export async function invalidateProductReviewsCache(
+  shop: string,
+  productId: string,
+): Promise<void> {
+  try {
+    await cacheDel(reviewsGetCacheKey(shop, productId));
+    const urls = reviewsGetPublicUrls(shop, productId);
+    const { getCdnProvider } = await import("./protection/cdn-provider.server");
+    await getCdnProvider().purge({ urls });
+    await purgeIndiaEdge(urls);
+  } catch (err) {
+    console.error(
+      "[reviews-cache] invalidate failed:",
+      err instanceof Error ? err.message : err,
+    );
+  }
 }
 
 function publicCmsOrigin(): string {

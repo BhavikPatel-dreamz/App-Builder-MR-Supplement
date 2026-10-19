@@ -18,6 +18,7 @@ import {
 import {
   buildCacheKey,
   cacheDel,
+  cacheDelByPrefix,
   canonicalGraphqlGetPath,
   canonicalizeGraphqlVariables,
   getCacheTTL,
@@ -34,10 +35,13 @@ import {
   invalidateCmsPublicCache,
   invalidateCmsSettingsCache,
   normalizeShopDomain,
+  reviewsGetCacheKey,
+  reviewsGetCachePrefix,
 } from "./cms-public-cache.server";
 import { tryAcquireCacheLock, releaseCacheLock } from "./protection/distributed-lock.server";
 import { invalidateStorefrontGraphqlCache } from "./protection/cache-invalidation.server";
 import { getCdnProvider } from "./protection/cdn-provider.server";
+import { reviewProductCacheId } from "./reviews-format";
 import { getPublishedPageBySlug, listPublishedPages } from "./cms.server";
 import { getShopSettings, toPublicShopSettings } from "./settings.server";
 
@@ -93,6 +97,7 @@ export function parseCacheUrlInput(rawUrl: string): {
   let kind = "custom";
   if (sha256 || parsed.pathname.includes("/graphql")) kind = "graphql";
   else if (/\/cms\/settings\/?$/.test(parsed.pathname)) kind = "cms_settings";
+  else if (/\/reviews\/get\/?$/.test(parsed.pathname)) kind = "reviews_get";
   else if (/\/cms\/pages\/?$/.test(parsed.pathname)) kind = "cms_pages";
   else if (slug) kind = "cms_slug";
   return { url: pathAndQuery, sha256, variablesJson, slug, kind };
@@ -106,6 +111,17 @@ export function uniqueCacheUrlKey(row: {
 }): string {
   if (row.kind === "graphql" || row.sha256) {
     return `graphql:${row.sha256}:${row.variablesJson}`;
+  }
+  if (row.kind === "reviews_get") {
+    let productId = "";
+    try {
+      productId = new URL(row.url, "https://appbuilder.dreamzapps.com").searchParams.get(
+        "product_id",
+      ) || "";
+    } catch {
+      productId = "";
+    }
+    return `reviews_get:${reviewProductCacheId(productId)}`;
   }
   return `${row.kind}:${row.url.split("?")[0]}`;
 }
@@ -501,6 +517,14 @@ export function urlMatchesRequest(
     const slug = requestUrl.pathname.split("/").filter(Boolean).pop() || "";
     return slug === (row.slug || parsed.slug);
   }
+  if (row.kind === "reviews_get" || parsed.kind === "reviews_get") {
+    return (
+      reviewProductCacheId(requestUrl.searchParams.get("product_id") || "") ===
+      reviewProductCacheId(
+        new URL(row.url, requestUrl.origin).searchParams.get("product_id") || "",
+      )
+    );
+  }
   return true;
 }
 
@@ -575,6 +599,8 @@ export async function clearOneCacheUrl(shop: string, id: string) {
   } else if (row.kind === "cms_slug") {
     const slug = row.slug || parseCacheUrlInput(row.url).slug;
     await cacheDel(cmsPageSlugCacheKey(config.shop, slug));
+  } else if (row.kind === "reviews_get") {
+    await clearReviewsGetCache(config.shop, row.url);
   } else if (row.kind === "graphql") {
     const query = await resolveGraphqlQuery(row);
     if (query) {
@@ -634,10 +660,11 @@ export async function clearAllPublicCache(shop: string) {
   }
   const cmsPages = await invalidateCmsPublicCache(config.shop);
   const cmsSettings = await invalidateCmsSettingsCache(config.shop);
+  const reviewKeys = await cacheDelByPrefix(reviewsGetCachePrefix(config.shop));
 
   const origin = (process.env.SHOPIFY_APP_URL || "").replace(/\/$/, "");
   const extra = origin
-    ? [`${origin}/cms/pages`, `${origin}/cms/settings`]
+    ? [`${origin}/cms/pages`, `${origin}/cms/settings`, `${origin}/reviews/get`]
     : [];
   const registered = await listEnabledCacheUrlStrings(config.shop);
   await getCdnProvider().purge({ urls: [...registered, ...extra] });
@@ -647,7 +674,7 @@ export async function clearAllPublicCache(shop: string) {
   await writeLog(config.shop, config.id, {
     action: "clear_all",
     durationMs,
-    message: `graphql=${graphqlKeys + graphqlKeysAlias} cmsPages=${cmsPages} cmsSettings=${cmsSettings} india=${india.skipped ? "skipped" : india.cleared ?? 0}`,
+    message: `graphql=${graphqlKeys + graphqlKeysAlias} cmsPages=${cmsPages} cmsSettings=${cmsSettings} reviews=${reviewKeys} india=${india.skipped ? "skipped" : india.cleared ?? 0}`,
   });
   return {
     ok: true,
@@ -814,6 +841,9 @@ export async function clearPublicCacheForKey(
     } else if (parsed.kind === "cms_slug") {
       await cacheDel(cmsPageSlugCacheKey(config.shop, parsed.slug));
       clearedKeys.push(`cms:slug:${parsed.slug}`);
+    } else if (parsed.kind === "reviews_get") {
+      await clearReviewsGetCache(config.shop, parsed.url);
+      clearedKeys.push("reviews:get");
     } else if (parsed.kind === "graphql") {
       const query = await resolveGraphqlQuery({ sha256: parsed.sha256 });
       if (query) {
@@ -865,6 +895,17 @@ export async function clearPublicCacheForKey(
   };
 }
 
+async function clearReviewsGetCache(shop: string, rawUrl: string): Promise<void> {
+  const productId = reviewProductCacheId(
+    new URL(rawUrl, "https://appbuilder.dreamzapps.com").searchParams.get("product_id") || "",
+  );
+  if (!productId) {
+    await cacheDelByPrefix(reviewsGetCachePrefix(shop));
+    return;
+  }
+  await cacheDel(reviewsGetCacheKey(shop, productId));
+}
+
 async function warmRow(
   shop: string,
   row: {
@@ -876,6 +917,30 @@ async function warmRow(
     queryText?: string;
   },
 ) {
+  if (row.kind === "reviews_get") {
+    const productId = reviewProductCacheId(
+      new URL(row.url, "https://appbuilder.dreamzapps.com").searchParams.get("product_id") ||
+        "",
+    );
+    if (!productId) return;
+    const { getProductReviews } = await import("./reviews.server");
+    await withCache(
+      reviewsGetCacheKey(shop, productId),
+      "refresh",
+      async () => {
+        const result = await getProductReviews(shop, productId);
+        if (result.notFound) return null;
+        return {
+          success: true as const,
+          reviews_counts: result.reviews_counts,
+          average_star: result.average_star,
+          reviews: result.reviews,
+        };
+      },
+      { shouldCache: (body) => body !== null },
+    );
+    return;
+  }
   if (row.kind === "cms_pages") {
     await withCache(cmsPagesListCacheKey(shop), "refresh", async () => {
       const pages = await listPublishedPages(shop);

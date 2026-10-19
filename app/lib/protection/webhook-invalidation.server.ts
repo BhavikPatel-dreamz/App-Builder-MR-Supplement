@@ -9,6 +9,7 @@ import { getRedisClient } from "../redis-cache.server";
 import { CATALOG_CDN_CACHE_TAG } from "../cache-policy.server";
 import { getCdnProvider } from "./cdn-provider.server";
 import { purgeIndiaEdge, warmIndiaEdge } from "../india-edge.server";
+import { invalidateProductReviewsCache } from "../cms-public-cache.server";
 
 const WEBHOOK_STATUS_KEY = "webhook:last-status";
 
@@ -81,6 +82,13 @@ export async function handleCatalogWebhook(
       warmed: "warmed" in result ? result.warmed : undefined,
       purged: "purged" in result ? result.purged : undefined,
     });
+    if (topic.startsWith("products/")) {
+      const row = payload as { admin_graphql_api_id?: string; id?: number | string };
+      const productId =
+        (typeof row?.admin_graphql_api_id === "string" && row.admin_graphql_api_id) ||
+        (row?.id != null ? String(row.id) : "");
+      if (productId) await invalidateProductReviewsCache(shop, productId);
+    }
     const origin = (process.env.SHOPIFY_APP_URL ?? "").replace(/\/$/, "");
     const registered = await listEnabledCacheUrlStrings(shop);
     const extra = origin

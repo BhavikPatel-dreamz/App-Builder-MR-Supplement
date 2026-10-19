@@ -24,6 +24,13 @@ export type PublicReview = {
   variant_name: string;
 };
 
+/** Numeric Shopify product id, so `123` and `gid://shopify/Product/123` share one cache entry. */
+export function reviewProductCacheId(productId: string): string {
+  const id = productId.trim();
+  const fromGid = /\/Product\/([^/]+)$/.exec(id);
+  return fromGid?.[1] || id;
+}
+
 export function toProductGid(productId: string): string {
   const id = productId.trim();
   if (!id) return "";
@@ -110,6 +117,29 @@ function reviewTime(review: InternalReview): number {
   const raw = String(review.createdAt ?? review.rCreated ?? "");
   const time = Date.parse(raw);
   return Number.isNaN(time) ? 0 : time;
+}
+
+export const REVIEWS_PER_PAGE = 20;
+
+export function parseReviewPage(value: unknown): number {
+  const page = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(page) || page < 1) return 1;
+  return page;
+}
+
+/** Slice a cached full list. Totals stay on the whole list; `reviews` is one page. */
+export function paginateReviews<T>(reviews: T[], page: number, perPage = REVIEWS_PER_PAGE) {
+  const size = perPage > 0 ? perPage : REVIEWS_PER_PAGE;
+  const current = page < 1 ? 1 : page;
+  const start = (current - 1) * size;
+  const total = reviews.length;
+  return {
+    reviews: reviews.slice(start, start + size),
+    page: current,
+    per_page: size,
+    total_pages: total === 0 ? 0 : Math.ceil(total / size),
+    reviews_counts: total,
+  };
 }
 
 export function mergeReviews(

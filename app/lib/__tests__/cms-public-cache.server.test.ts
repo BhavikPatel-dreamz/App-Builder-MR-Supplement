@@ -7,6 +7,7 @@ import {
   cmsPagesListCacheKey,
   cmsSettingsCacheKey,
   normalizeShopDomain,
+  reviewsGetCacheKey,
 } from "../cms-public-cache.server";
 
 describe("normalizeShopDomain", () => {
@@ -43,6 +44,15 @@ describe("CMS public cache keys", () => {
   it("builds a settings key", () => {
     expect(cmsSettingsCacheKey("https://XYXX.myshopify.com")).toBe(
       "cms:settings:v5:xyxx.myshopify.com",
+    );
+  });
+
+  it("builds one reviews key for a numeric id and its gid", () => {
+    expect(reviewsGetCacheKey("XYXX.myshopify.com", "42")).toBe(
+      "reviews:get:v1:xyxx.myshopify.com:42",
+    );
+    expect(reviewsGetCacheKey("xyxx.myshopify.com", "gid://shopify/Product/42")).toBe(
+      reviewsGetCacheKey("xyxx.myshopify.com", "42"),
     );
   });
 

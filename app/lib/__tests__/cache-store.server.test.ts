@@ -13,6 +13,17 @@ describe("parseCacheUrlInput", () => {
     expect(parseCacheUrlInput("/cms/pages").kind).toBe("cms_pages");
   });
 
+  it("keeps review cache keys separate per product", () => {
+    const a = parseCacheUrlInput("/reviews/get?product_id=111");
+    const b = parseCacheUrlInput(
+      "/reviews/get?product_id=gid%3A%2F%2Fshopify%2FProduct%2F222",
+    );
+    expect(a.kind).toBe("reviews_get");
+    expect(uniqueCacheUrlKey(a)).toBe("reviews_get:111");
+    expect(uniqueCacheUrlKey(b)).toBe("reviews_get:222");
+    expect(uniqueCacheUrlKey(a)).not.toBe(uniqueCacheUrlKey(b));
+  });
+
   it("detects graphql sha256", () => {
     const parsed = parseCacheUrlInput(
       "/graphql?sha256=abc&variables=%7B%22id%22%3A%221%22%7D",

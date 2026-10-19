@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   mergeReviews,
+  paginateReviews,
   oldIdFromTags,
   oldProductUrl,
+  reviewProductCacheId,
   toProductGid,
   variantLabel,
 } from "../reviews-format";
@@ -12,6 +14,8 @@ describe("review formatting", () => {
   it("prefixes numeric product ids", () => {
     expect(toProductGid("42")).toBe("gid://shopify/Product/42");
     expect(toProductGid("gid://shopify/Product/42")).toBe("gid://shopify/Product/42");
+    expect(reviewProductCacheId("gid://shopify/Product/42")).toBe("42");
+    expect(reviewProductCacheId("42")).toBe("42");
   });
 
   it("builds the legacy product url and reads old ids from tags", () => {
@@ -65,5 +69,21 @@ describe("review formatting", () => {
     expect(merged.reviews[0]).toMatchObject({ rSource: "trustpilot", rName: "Alex", rPoints: 5 });
     expect(merged.reviews[1]).toMatchObject({ rSource: "internal", rName: "Sam" });
     expect(merged.average_star).toBe(4.5);
+  });
+
+  it("returns 20 reviews per page and keeps the total count", () => {
+    const reviews = Array.from({ length: 45 }, (_, index) => index + 1);
+    const first = paginateReviews(reviews, 1);
+    const second = paginateReviews(reviews, 2);
+    const last = paginateReviews(reviews, 3);
+    const beyond = paginateReviews(reviews, 4);
+
+    expect(first.per_page).toBe(20);
+    expect(first.reviews).toEqual(reviews.slice(0, 20));
+    expect(first.reviews_counts).toBe(45);
+    expect(first.total_pages).toBe(3);
+    expect(second.reviews).toEqual(reviews.slice(20, 40));
+    expect(last.reviews).toHaveLength(5);
+    expect(beyond.reviews).toEqual([]);
   });
 });
