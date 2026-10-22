@@ -1,0 +1,48 @@
+# Host Postgres (127.0.0.1:5432). App, Redis, and Caddy use the host network
+# so they share that localhost and are not published on 0.0.0.0.
+
+services:
+  app:
+    build: .
+    image: appbuilder:prod
+    container_name: appbuilder
+    network_mode: host
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ota-data:/app/data/ota
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    network_mode: host
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --bind
+      - 127.0.0.1
+      - --protected-mode
+      - "yes"
+      - --port
+      - "6379"
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN:-appbuilder.dreamzapps.com}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  ota-data:
+  caddy_data:
+  caddy_config:

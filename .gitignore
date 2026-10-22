@@ -12,10 +12,10 @@ node_modules
 /prisma/dev.sqlite
 /prisma/dev.sqlite-journal
 database.sqlite
-docker-compose.yml
 
 .env
 .env.*
+!.env.example
 
 # Firebase / Google service-account keys (never commit)
 secrets/
