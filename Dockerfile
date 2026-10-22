@@ -15,7 +15,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN PRISMA_HIDE_UPDATE_MESSAGE=1 npx prisma generate
-RUN pnpm build
+RUN pnpm build:ci
 
 # --- runner ---
 FROM node:22-alpine AS runner
