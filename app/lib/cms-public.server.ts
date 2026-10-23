@@ -79,6 +79,8 @@ export function publicCachedJson(
   cacheStatus: CacheStatus,
   durationMs: number,
   timings?: CacheTimings,
+  /** Pages and settings: the app must revalidate. Redis still keeps the long TTL. */
+  revalidateClient = false,
 ): Response {
   const headers: Record<string, string> = {
     ...corsHeaders(cacheable),
@@ -86,7 +88,9 @@ export function publicCachedJson(
     "X-Cache": cacheStatus,
     "X-Proxy-Duration-Ms": String(durationMs),
   };
-  if (cacheable) {
+  if (cacheable && revalidateClient) {
+    headers["Cache-Control"] = "public, max-age=0, must-revalidate";
+  } else if (cacheable) {
     headers["Cache-Control"] = publicCacheControlValue();
     applyCdnCacheHeaders(headers);
   } else {
@@ -134,6 +138,7 @@ export async function servePublicPageList(request: Request): Promise<Response> {
     cacheStatus,
     Date.now() - started,
     timings,
+    true,
   );
 }
 
@@ -193,5 +198,6 @@ export async function servePublicPageBySlug(
     cacheStatus,
     Date.now() - started,
     timings,
+    true,
   );
 }

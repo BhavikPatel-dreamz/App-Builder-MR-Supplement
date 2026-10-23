@@ -173,17 +173,29 @@ async function rewarmAndPropagateSettings(shop: string): Promise<void> {
 }
 
 /** Drop list + all slugs for a shop (publish, unpublish, header/footer edits). */
+function shopsToInvalidate(shop: string): string[] {
+  const shops = new Set<string>([normalizeShopDomain(shop)]);
+  const storefront = process.env.SHOPIFY_STOREFRONT_DOMAIN;
+  if (storefront) shops.add(normalizeShopDomain(storefront));
+  return [...shops];
+}
+
 export async function invalidateCmsPublicCache(
   shop: string,
   slug?: string,
 ): Promise<number> {
-  const n = await cacheDelByPrefix(cmsPagesCachePrefix(shop));
-  await rewarmAndPropagatePages(shop, slug);
+  let n = 0;
+  for (const domain of shopsToInvalidate(shop)) {
+    n += await cacheDelByPrefix(cmsPagesCachePrefix(domain));
+    await rewarmAndPropagatePages(domain, slug);
+  }
   return n;
 }
 
 export async function invalidateCmsSettingsCache(shop: string): Promise<number> {
-  await cacheDel(cmsSettingsCacheKey(shop));
-  await rewarmAndPropagateSettings(shop);
+  for (const domain of shopsToInvalidate(shop)) {
+    await cacheDel(cmsSettingsCacheKey(domain));
+    await rewarmAndPropagateSettings(domain);
+  }
   return 1;
 }

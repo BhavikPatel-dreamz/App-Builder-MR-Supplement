@@ -62,5 +62,6 @@ export async function servePublicSettings(request: Request): Promise<Response> {
     cacheStatus,
     Date.now() - started,
     timings,
+    true,
   );
 }
