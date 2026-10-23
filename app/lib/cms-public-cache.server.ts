@@ -162,6 +162,8 @@ async function rewarmAndPropagateSettings(shop: string): Promise<void> {
     });
     await purgePublicCmsCdn([`${publicCmsOrigin()}/cms/settings`]);
     await purgeAndWarmIndiaEdge([`${publicCmsOrigin()}/cms/settings`]);
+    const { recordCmsSettingsRefresh } = await import("./cache-store.server");
+    await recordCmsSettingsRefresh(shop);
   } catch (err) {
     console.error(
       "[cms-cache] settings propagate failed:",

@@ -1021,6 +1021,26 @@ async function fillEdgeCache(pathAndQuery: string): Promise<void> {
   }
 }
 
+/** After shop settings are saved: refill /cms/settings and show it on the cache timeline. */
+export async function recordCmsSettingsRefresh(shop: string): Promise<void> {
+  const config = await getOrCreateCacheConfig(shop);
+  const row = config.urls.find((item) => item.kind === "cms_settings");
+  const started = Date.now();
+  await fillEdgeCache("/cms/settings");
+  if (row) {
+    await db.cacheUrl.update({
+      where: { id: row.id },
+      data: { lastWarmedAt: new Date() },
+    });
+  }
+  await writeLog(config.shop, config.id, {
+    action: "warm",
+    urlId: row?.id,
+    durationMs: Date.now() - started,
+    message: row?.label || "CMS settings",
+  });
+}
+
 export async function warmOneCacheUrl(shop: string, id: string) {
   const config = await getOrCreateCacheConfig(shop);
   const row = config.urls.find((item) => item.id === id);
