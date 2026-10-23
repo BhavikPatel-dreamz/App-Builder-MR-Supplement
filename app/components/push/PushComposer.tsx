@@ -61,6 +61,24 @@ function newIdempotencyKey(): string {
   return `idem-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function parseSendResponse(raw: string): {
+  ok?: boolean;
+  status?: string;
+  error?: string;
+  fields?: PushFieldErrors;
+} {
+  try {
+    return JSON.parse(raw) as {
+      ok?: boolean;
+      status?: string;
+      error?: string;
+      fields?: PushFieldErrors;
+    };
+  } catch {
+    return {};
+  }
+}
+
 export const PushComposer = forwardRef<
   PushComposerHandle,
   {
@@ -270,7 +288,10 @@ export const PushComposer = forwardRef<
     try {
       const response = await fetch(pushPageActionUrl(), {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
         body: JSON.stringify({
           intent: "send",
           title: title.trim(),
@@ -283,13 +304,13 @@ export const PushComposer = forwardRef<
           idempotencyKey: idemKeyRef.current || "",
         }),
       });
-      const json = (await response.json().catch(() => ({}))) as {
-        ok?: boolean;
-        status?: string;
-        error?: string;
-        fields?: PushFieldErrors;
-      };
-      if (response.ok && json.ok) {
+      const raw = await response.text();
+      const json = parseSendResponse(raw);
+      // The page route runs the send, then sometimes returns the app HTML
+      // instead of the JSON result. A 2xx HTML body still means the action ran.
+      const htmlDocument =
+        response.ok && /^\s*</.test(raw) && !json.ok && !json.error;
+      if ((response.ok && json.ok) || htmlDocument) {
         idemKeyRef.current = null;
         setShowSendModal(false);
         fillForm({});
