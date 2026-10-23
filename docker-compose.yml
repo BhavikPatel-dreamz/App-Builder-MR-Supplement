@@ -11,6 +11,7 @@ services:
     restart: unless-stopped
     volumes:
       - ota-data:/app/data/ota
+      - ./secrets/firebase-adminsdk.json:/app/secrets/firebase-adminsdk.json:ro
     depends_on:
       - redis
 
