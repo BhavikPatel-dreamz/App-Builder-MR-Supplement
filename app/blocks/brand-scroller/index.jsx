@@ -498,7 +498,9 @@ function registerBrandScrollerParent() {
           {showButton && buttonText ? (
             <span className="appbuilder-brand-scroller__button">{buttonText}</span>
           ) : null}
-          <InnerBlocks.Content />
+          <div className="appbuilder-brand-scroller__track">
+            <InnerBlocks.Content />
+          </div>
         </div>
       );
     },
