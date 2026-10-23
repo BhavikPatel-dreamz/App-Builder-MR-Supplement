@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { useState } from "gutenberg-block-kit/wp/element";
 import { registerBlockType, createBlock } from "gutenberg-block-kit/wp/blocks";
 import {
   useBlockProps,
@@ -20,6 +21,8 @@ import {
   imageAttributesFromMedia,
   clearImageAttributes,
   useChildBlocks,
+  useSliderPagination,
+  SliderPaginationDots,
 } from "../inspector-shared";
 import {
   BRAND_SCROLLER_BLOCK,
@@ -220,6 +223,12 @@ function registerBrandScrollerParent() {
         0,
       );
       const radius = toNumber(ImageBorderRadius, DEFAULT_RADIUS);
+      const [activeIndex, setActiveIndex] = useState(0);
+      const { trackRef, slideCount, goToSlide } = useSliderPagination(
+        clientId,
+        activeIndex,
+        setActiveIndex,
+      );
       const blockProps = useBlockProps({
         className: "appbuilder-brand-scroller-editor",
         style: {
@@ -405,12 +414,7 @@ function registerBrandScrollerParent() {
                 </p>
               ) : null}
             </div>
-            <div
-              className="appbuilder-bs-preview__track"
-              style={{
-                "--bs-card-radius": `${radius}px`,
-              }}
-            >
+            <div className="appbuilder-brand-scroller__track" ref={trackRef}>
               <InnerBlocks
                 allowedBlocks={[BRAND_SCROLLER_ITEM_BLOCK]}
                 template={[
@@ -423,6 +427,14 @@ function registerBrandScrollerParent() {
                 renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
               />
             </div>
+            <SliderPaginationDots
+              count={slideCount}
+              activeIndex={activeIndex}
+              onSelect={goToSlide}
+              className="appbuilder-brand-scroller__pagination"
+              dotClassName="appbuilder-brand-scroller__dot"
+              ariaLabelPrefix="Go to brand"
+            />
             {showButton ? (
               <div className="appbuilder-bs-preview__footer">
                 <span
@@ -485,7 +497,10 @@ function registerBrandScrollerParent() {
         "data-background-color": backgroundColor || DEFAULT_BG,
         "data-show-arrow": String(!!showArrow),
         "data-action": JSON.stringify(action ?? {}),
-        style: { background: backgroundColor || DEFAULT_BG },
+        style: {
+          background: backgroundColor || DEFAULT_BG,
+          "--bs-card-radius": `${radius}px`,
+        },
       });
       return (
         <div {...blockProps}>
