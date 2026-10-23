@@ -31,8 +31,6 @@ export type PushSendResult = {
   error?: string;
 };
 
-const TIMEOUT_MS = 8_000;
-
 function env(name: string): string {
   return (process.env[name] || "").trim();
 }
@@ -154,14 +152,7 @@ export async function sendPush(payload: PushPayload): Promise<PushSendResult> {
   }
 
   try {
-    const messageId = await Promise.race([
-      messaging.send(buildMessage(payload)),
-      new Promise<never>((_, reject) => {
-        const err = new Error("Push API timed out after 10s.");
-        err.name = "TimeoutError";
-        setTimeout(() => reject(err), TIMEOUT_MS);
-      }),
-    ]);
+    const messageId = await messaging.send(buildMessage(payload));
     return { ok: true, providerId: messageId };
   } catch (error) {
     return { ok: false, error: fcmErrorMessage(error) };
