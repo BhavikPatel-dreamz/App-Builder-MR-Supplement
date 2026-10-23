@@ -123,6 +123,29 @@ export type SendOutcome =
       recorded?: boolean;
     };
 
+function imagePath(url: string): string {
+  try {
+    const parsed = new URL(url);
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return url.split("?")[0];
+  }
+}
+
+async function shopOwnsImage(shop: string, imageUrl: string): Promise<boolean> {
+  const exact = await db.media.findFirst({
+    where: { shop, url: imageUrl },
+    select: { id: true },
+  });
+  if (exact) return true;
+  const path = imagePath(imageUrl);
+  const sameFile = await db.media.findFirst({
+    where: { shop, url: { startsWith: path } },
+    select: { id: true },
+  });
+  return Boolean(sameFile);
+}
+
 function logSendAttempt(
   shop: string,
   id: string,
@@ -180,19 +203,15 @@ export async function createAndSendPushNotification(
   }
 
   // The image must be one this shop uploaded — never an arbitrary https URL.
-  if (trimmed.imageUrl) {
-    const owned = await db.media.findFirst({
-      where: { shop, url: trimmed.imageUrl },
-      select: { id: true },
-    });
-    if (!owned) {
-      return {
-        ok: false,
-        status: "invalid",
-        error: "Upload the image again before sending.",
-        fields: { imageUrl: "This image isn’t from an upload on this store." },
-      };
-    }
+  // Shopify adds or changes ?v= after upload, so match the file path, not the
+  // full string saved at upload time.
+  if (trimmed.imageUrl && !(await shopOwnsImage(shop, trimmed.imageUrl))) {
+    return {
+      ok: false,
+      status: "invalid",
+      error: "Upload the image again before sending.",
+      fields: { imageUrl: "This image isn’t from an upload on this store." },
+    };
   }
 
   // 3. Rate limit — before creating any rows.
