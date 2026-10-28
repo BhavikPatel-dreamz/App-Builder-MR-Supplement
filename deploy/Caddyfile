@@ -1,3 +1,5 @@
-{$APP_DOMAIN:appbuilder.dreamzapps.com} {
+# Comma-separated hosts work (e.g. primary + temporary alias).
+# Default is the temporary production host until ab.mrsupplement.com.au DNS is DNS-only.
+{$APP_DOMAINS:mrsupplement.dreamzapps.com} {
 	reverse_proxy 127.0.0.1:3000
 }
