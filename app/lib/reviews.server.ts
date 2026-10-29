@@ -22,13 +22,11 @@ const PRODUCT_QUERY = `#graphql
       id
       handle
       tags
-      metafields(first: 250) {
-        edges {
-          node {
-            key
-            value
-          }
-        }
+      importedReviews: metafield(namespace: "reviews", key: "imported_reviews") {
+        value
+      }
+      oldUrl: metafield(namespace: "custom", key: "old_url") {
+        value
       }
     }
   }
@@ -129,16 +127,6 @@ async function adminGraphql<T>(
   return (await response.json()) as T;
 }
 
-function metafieldValue(
-  edges: Array<{ node?: { key?: string; value?: string } }> | undefined,
-  key: string,
-): string {
-  for (const edge of edges ?? []) {
-    if (edge.node?.key === key) return edge.node.value ?? "";
-  }
-  return "";
-}
-
 async function trustpilotReviews(
   productUrl: string,
   apiKey: string,
@@ -173,7 +161,8 @@ export async function getProductReviews(shop: string, productId: string) {
     data?: {
       product?: {
         handle?: string;
-        metafields?: { edges?: Array<{ node?: { key?: string; value?: string } }> };
+        importedReviews?: { value?: string | null } | null;
+        oldUrl?: { value?: string | null } | null;
       } | null;
     };
     errors?: Array<{ message?: string }>;
@@ -187,9 +176,8 @@ export async function getProductReviews(shop: string, productId: string) {
     return { notFound: true as const };
   }
 
-  const edges = product.metafields?.edges;
-  const stored = parseStoredReviews(metafieldValue(edges, "imported_reviews"));
-  let productUrl = metafieldValue(edges, "old_url");
+  const stored = parseStoredReviews(product.importedReviews?.value);
+  let productUrl = product.oldUrl?.value?.trim() || "";
   if (!productUrl && product.handle) {
     productUrl = oldProductUrl(trustpilot.productHost, product.handle);
   }

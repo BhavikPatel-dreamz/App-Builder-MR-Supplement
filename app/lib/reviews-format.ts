@@ -4,7 +4,12 @@ export type InternalReview = {
   rLocation?: string;
   rContent?: string;
   rCreated?: string;
+  /** Legacy Magento/import dumps use these instead of rCreated / rPoints. */
+  rCreatedDate?: string;
+  rUpdatedDate?: string;
   rPoints?: number | string;
+  rraRating?: number | string;
+  rating?: number | string;
   variant_name?: string;
   createdAt?: string;
   id?: string;
@@ -112,6 +117,29 @@ export function parseStoredReviews(value: string | null | undefined): InternalRe
   return [];
 }
 
+/** Prefer canonical fields, then legacy import keys (rraRating / rCreatedDate). */
+export function internalReviewPoints(review: InternalReview): number | string {
+  for (const value of [review.rPoints, review.rraRating, review.rating, review.stars]) {
+    if (value === undefined || value === null || value === "") continue;
+    return value;
+  }
+  return 0;
+}
+
+export function internalReviewCreated(review: InternalReview): string {
+  for (const value of [
+    review.rCreated,
+    review.rCreatedDate,
+    review.createdAt,
+    review.rUpdatedDate,
+  ]) {
+    if (value === undefined || value === null) continue;
+    const text = String(value).trim();
+    if (text) return text;
+  }
+  return "";
+}
+
 export function mapPublicReview(review: InternalReview): PublicReview {
   if (review.id) {
     return {
@@ -129,15 +157,16 @@ export function mapPublicReview(review: InternalReview): PublicReview {
     rName: String(review.rName ?? ""),
     rLocation: String(review.rLocation ?? ""),
     rContent: String(review.rContent ?? ""),
-    rCreated: String(review.rCreated ?? ""),
-    rPoints: review.rPoints ?? 0,
+    rCreated: internalReviewCreated(review),
+    rPoints: internalReviewPoints(review),
     variant_name: String(review.variant_name ?? ""),
   };
 }
 
 function reviewTime(review: InternalReview): number {
-  const raw = String(review.createdAt ?? review.rCreated ?? "");
-  const time = Date.parse(raw);
+  const raw = internalReviewCreated(review);
+  // "2011-01-11 00:00:00" is not always ISO; Date.parse handles it in V8.
+  const time = Date.parse(raw.includes("T") ? raw : raw.replace(" ", "T") + "Z");
   return Number.isNaN(time) ? 0 : time;
 }
 

@@ -73,6 +73,28 @@ describe("review formatting", () => {
     expect(merged.average_star).toBe(4.5);
   });
 
+  it("maps legacy Magento import keys rraRating and rCreatedDate", () => {
+    const merged = mergeReviews(
+      [
+        {
+          rSource: "internal",
+          rName: "Vijay K",
+          rContent: "Great whey",
+          rraRating: "4.0000",
+          rCreatedDate: "2011-01-11 00:00:00",
+        },
+      ],
+      [],
+    );
+    expect(merged.reviews[0]).toMatchObject({
+      rSource: "internal",
+      rName: "Vijay K",
+      rPoints: "4.0000",
+      rCreated: "2011-01-11 00:00:00",
+    });
+    expect(merged.average_star).toBe(4);
+  });
+
   it("ignores a text rating when averaging, the way the old PHP sum did", () => {
     const merged = mergeReviews(
       [
