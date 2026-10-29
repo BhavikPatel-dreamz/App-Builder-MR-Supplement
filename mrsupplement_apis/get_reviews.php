@@ -139,13 +139,15 @@ $allReviews = array_map(function ($review) {
           ];
      }
 
+     $points = $review['rPoints'] ?? $review['rraRating'] ?? $review['rating'] ?? 0;
+     $created = $review['rCreated'] ?? $review['rCreatedDate'] ?? $review['createdAt'] ?? '';
      return [
           'rSource' => 'internal',
           'rName' => $review['rName'] ?? '',
           'rLocation' => $review['rLocation'] ?? '',
           'rContent' => $review['rContent'] ?? '',
-          'rCreated' => $review['rCreated'] ?? '',
-          'rPoints' => $review['rPoints'] ?? 0,
+          'rCreated' => $created,
+          'rPoints' => is_numeric($points) ? (0 + $points) : 0,
           'variant_name' => $review['variant_name'] ?? '',
      ];
 }, $allReviews);

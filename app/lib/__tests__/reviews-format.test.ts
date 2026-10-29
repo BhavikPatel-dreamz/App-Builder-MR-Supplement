@@ -89,7 +89,7 @@ describe("review formatting", () => {
     expect(merged.reviews[0]).toMatchObject({
       rSource: "internal",
       rName: "Vijay K",
-      rPoints: "4.0000",
+      rPoints: 4,
       rCreated: "2011-01-11 00:00:00",
     });
     expect(merged.average_star).toBe(4);

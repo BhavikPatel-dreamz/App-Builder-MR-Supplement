@@ -118,10 +118,11 @@ export function parseStoredReviews(value: string | null | undefined): InternalRe
 }
 
 /** Prefer canonical fields, then legacy import keys (rraRating / rCreatedDate). */
-export function internalReviewPoints(review: InternalReview): number | string {
+export function internalReviewPoints(review: InternalReview): number {
   for (const value of [review.rPoints, review.rraRating, review.rating, review.stars]) {
     if (value === undefined || value === null || value === "") continue;
-    return value;
+    const points = typeof value === "number" ? value : Number(String(value).trim());
+    if (Number.isFinite(points)) return points;
   }
   return 0;
 }
