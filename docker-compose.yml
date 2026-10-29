@@ -8,12 +8,29 @@ services:
     container_name: appbuilder
     network_mode: host
     env_file: .env
+    environment:
+      # Live slot. deploy/deploy.sh may temporarily run a second container on 3001.
+      PORT: ${APP_PORT:-3000}
     restart: unless-stopped
     volumes:
       - ota-data:/app/data/ota
       - ./secrets/firebase-adminsdk.json:/app/secrets/firebase-adminsdk.json:ro
     depends_on:
       - redis
+
+  # Second slot for zero-downtime deploys (profile "next" — started only by deploy.sh).
+  app_next:
+    profiles: ["next"]
+    image: appbuilder:prod
+    container_name: appbuilder-next
+    network_mode: host
+    env_file: .env
+    environment:
+      PORT: ${APP_NEXT_PORT:-3001}
+    restart: "no"
+    volumes:
+      - ota-data:/app/data/ota
+      - ./secrets/firebase-adminsdk.json:/app/secrets/firebase-adminsdk.json:ro
 
   redis:
     image: redis:7-alpine
@@ -37,6 +54,7 @@ services:
     environment:
       # Prefer APP_DOMAINS (comma-separated). Falls back to APP_DOMAIN for older .env files.
       APP_DOMAINS: ${APP_DOMAINS:-${APP_DOMAIN:-ab.mrsupplement.com.au}}
+      APP_UPSTREAM: ${APP_UPSTREAM:-127.0.0.1:3000}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

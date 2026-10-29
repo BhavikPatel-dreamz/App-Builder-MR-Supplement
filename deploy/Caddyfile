@@ -1,5 +1,6 @@
 # Comma-separated hosts work (primary + optional temporary alias).
 # ab must be DNS-only (grey cloud) → AWS IP or Shopify Admin iframe will fail.
+# APP_UPSTREAM flips between 127.0.0.1:3000 and :3001 during zero-downtime deploys.
 {$APP_DOMAINS:ab.mrsupplement.com.au} {
-	reverse_proxy 127.0.0.1:3000
+	reverse_proxy {$APP_UPSTREAM:127.0.0.1:3000}
 }

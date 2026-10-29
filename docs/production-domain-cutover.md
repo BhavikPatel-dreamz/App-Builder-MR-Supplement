@@ -198,12 +198,29 @@ Use this when `ab.mrsupplement.com.au` is blocked (Cloudflare proxy / challenge)
 - [ ] Mobile / RN base URL updated
 - [ ] Old domain retired or left as temporary alias
 
+## Deploys without multi-minute downtime
+
+`docker compose build` does **not** need to stop the live container. Downtime only happens if you recreate `app` before the new image is ready.
+
+From the repo root on the server:
+
+```bash
+# Preferred — build while live, then blue/green swap via Caddy (ports 3000 ↔ 3001)
+./deploy/deploy.sh
+
+# Fallback — build while live, then one short recreate (~15–45s)
+./deploy/deploy.sh --simple
+```
+
+Do **not** use `docker compose up --force-recreate app` until the build has finished, or the site is down for the whole build.
+
 ## Related files
 
 | File | Role |
 |---|---|
-| `.env` / `.env.example` | `SHOPIFY_APP_URL`, `APP_DOMAIN` |
+| `.env` / `.env.example` | `SHOPIFY_APP_URL`, `APP_DOMAIN`, `APP_UPSTREAM` |
 | `shopify.app.toml` | Partners application + auth URLs |
-| `deploy/Caddyfile` | Uses `{$APP_DOMAIN:...}` |
-| `docker-compose.yml` | Passes `APP_DOMAIN` into Caddy |
+| `deploy/Caddyfile` | Uses `APP_DOMAINS` + `APP_UPSTREAM` |
+| `deploy/deploy.sh` | Zero-downtime-ish production deploy |
+| `docker-compose.yml` | App / app_next / Caddy |
 | `docs/mobile-graphql-api.md` | Mobile GraphQL base URL |
