@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
     environment:
       # Prefer APP_DOMAINS (comma-separated). Falls back to APP_DOMAIN for older .env files.
-      APP_DOMAINS: ${APP_DOMAINS:-${APP_DOMAIN:-mrsupplement.dreamzapps.com}}
+      APP_DOMAINS: ${APP_DOMAINS:-${APP_DOMAIN:-ab.mrsupplement.com.au}}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data

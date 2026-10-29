@@ -1,5 +1,5 @@
-# Comma-separated hosts work (e.g. primary + temporary alias).
-# Default is the temporary production host until ab.mrsupplement.com.au DNS is DNS-only.
-{$APP_DOMAINS:mrsupplement.dreamzapps.com} {
+# Comma-separated hosts work (primary + optional temporary alias).
+# ab must be DNS-only (grey cloud) → AWS IP or Shopify Admin iframe will fail.
+{$APP_DOMAINS:ab.mrsupplement.com.au} {
 	reverse_proxy 127.0.0.1:3000
 }

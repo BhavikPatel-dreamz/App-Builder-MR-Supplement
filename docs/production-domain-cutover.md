@@ -120,6 +120,42 @@ Ship an app build (or remote config) that uses the new base URL. Old installs th
 
 Shopify Partners should list only the production App URL once cutover is done.
 
+## Cut over live to `ab.mrsupplement.com.au`
+
+Prerequisite: DNS for `ab` is **DNS only** (grey cloud) → AWS IP (`3.87.24.231`). Proxied Cloudflare breaks the Admin iframe.
+
+1. **`shopify.app.toml`**
+   ```toml
+   application_url = "https://ab.mrsupplement.com.au"
+   redirect_urls = [ "https://ab.mrsupplement.com.au/api/auth" ]
+   ```
+   Then: `pnpm deploy`
+
+2. **Server `.env`**
+   ```bash
+   SHOPIFY_APP_URL=https://ab.mrsupplement.com.au
+   APP_DOMAINS=ab.mrsupplement.com.au
+   APP_DOMAIN=ab.mrsupplement.com.au
+   ```
+   Optional alias while dreamzapps is still needed:
+   ```bash
+   APP_DOMAINS=ab.mrsupplement.com.au,mrsupplement.dreamzapps.com
+   ```
+
+3. **Recreate Caddy + app** (issues / loads TLS for `ab`)
+   ```bash
+   docker compose up -d --force-recreate caddy app
+   ```
+
+4. **Verify**
+   ```bash
+   dig +short ab.mrsupplement.com.au   # expect ONLY 3.87.24.231
+   curl -I https://ab.mrsupplement.com.au/
+   # expect 200/302 via Caddy — not TLS alert, not Cloudflare challenge
+   ```
+
+5. Open the app from Shopify Admin again (hard refresh). Update mobile base URLs to `https://ab.mrsupplement.com.au`.
+
 ## Temporary revert to `mrsupplement.dreamzapps.com`
 
 Use this when `ab.mrsupplement.com.au` is blocked (Cloudflare proxy / challenge) and Admin must work again on the old host.
@@ -138,25 +174,16 @@ Use this when `ab.mrsupplement.com.au` is blocked (Cloudflare proxy / challenge)
    APP_DOMAIN=mrsupplement.dreamzapps.com
    ```
 
-3. **Recreate Caddy + app** (so the TLS cert matches the dreamzapps host again)
+3. **Recreate Caddy + app**
    ```bash
    docker compose up -d --force-recreate caddy app
    ```
 
 4. **Verify**
    ```bash
-   dig +short mrsupplement.dreamzapps.com   # expect AWS IP, e.g. 3.87.24.231
+   dig +short mrsupplement.dreamzapps.com   # expect AWS IP
    curl -I https://mrsupplement.dreamzapps.com/
-   # expect 200/302 via Caddy — not TLS alert, not Cloudflare challenge
    ```
-
-5. Open the app from Shopify Admin again (hard refresh).
-
-Optional: keep both certs while Cloudflare is fixed:
-```bash
-APP_DOMAINS=mrsupplement.dreamzapps.com,ab.mrsupplement.com.au
-```
-Only add `ab.mrsupplement.com.au` after that DNS record is **DNS only** (grey cloud) → `3.87.24.231`. Orange-cloud Cloudflare will still break the Admin iframe for `ab`.
 
 ## Quick checklist
 

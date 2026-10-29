@@ -2,7 +2,7 @@
 
 client_id = "10c2ab08d8b0e48ea49842bb978146fa"
 name = "App Builder MR-Supplement"
-application_url = "https://mrsupplement.dreamzapps.com"
+application_url = "https://ab.mrsupplement.com.au"
 embedded = true
 
 [build]
@@ -50,4 +50,4 @@ api_version = "2026-07"
 scopes = "read_mobile_platform_applications,write_mobile_platform_applications,write_metaobject_definitions,write_metaobjects,write_products,read_files,write_files"
 
 [auth]
-redirect_urls = [ "https://mrsupplement.dreamzapps.com/api/auth" ]
+redirect_urls = [ "https://ab.mrsupplement.com.au/api/auth" ]
