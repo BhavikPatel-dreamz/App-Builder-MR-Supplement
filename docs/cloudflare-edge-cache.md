@@ -1,5 +1,8 @@
 # Cloudflare cache setup — all public GET APIs
 
+**Production host `ab.mrsupplement.com.au`:** use the subdomain-only guide  
+[cloudflare-mobile-cache-ab.md](./cloudflare-mobile-cache-ab.md) (expressions locked to `http.host eq "ab.mrsupplement.com.au"`).
+
 **Today `appbuilder.dreamzapps.com` is served by Vercel** (`server: Vercel`, `x-vercel-cache`). There is **no** `cf-cache-status` until DNS for that hostname is orange-cloud **proxied** through Cloudflare.
 
 A **first GET after deploy** is a CDN **MISS** at that PoP. Cron `/api/cron/cache-refresh` every **5 minutes** rebuilds Redis and GETs each public URL so Cloudflare/Vercel can refill. Also run `scripts/warm-edge.sh` on dd-106 so **Mumbai** is primed.

@@ -224,3 +224,4 @@ Do **not** use `docker compose up --force-recreate app` until the build has fini
 | `deploy/deploy.sh` | Zero-downtime-ish production deploy |
 | `docker-compose.yml` | App / app_next / Caddy |
 | `docs/mobile-graphql-api.md` | Mobile GraphQL base URL |
+| `docs/cloudflare-mobile-cache-ab.md` | Cloudflare cache rules for `ab.mrsupplement.com.au` only |
