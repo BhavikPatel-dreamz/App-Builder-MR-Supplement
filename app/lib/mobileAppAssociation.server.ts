@@ -319,13 +319,14 @@ const LIST_QUERY = `#graphql
       edges {
         node {
           __typename
-          id
           ... on AndroidApplication {
+            id
             applicationId
             sha256CertFingerprints
             appLinksEnabled
           }
           ... on AppleApplication {
+            id
             appId
             universalLinksEnabled
             sharedWebCredentialsEnabled
@@ -342,13 +343,14 @@ const CREATE_MUTATION = `#graphql
     mobilePlatformApplicationCreate(input: $input) {
       mobilePlatformApplication {
         __typename
-        id
         ... on AndroidApplication {
+          id
           applicationId
           sha256CertFingerprints
           appLinksEnabled
         }
         ... on AppleApplication {
+          id
           appId
           universalLinksEnabled
           sharedWebCredentialsEnabled
@@ -369,13 +371,14 @@ const UPDATE_MUTATION = `#graphql
     mobilePlatformApplicationUpdate(id: $id, input: $input) {
       mobilePlatformApplication {
         __typename
-        id
         ... on AndroidApplication {
+          id
           applicationId
           sha256CertFingerprints
           appLinksEnabled
         }
         ... on AppleApplication {
+          id
           appId
           universalLinksEnabled
           sharedWebCredentialsEnabled
