@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "au.com.mrsupplement.app.android",
+      "sha256_cert_fingerprints": ["07:5D:60:A8:7C:35:96:64:44:6E:3D:84:1E:5F:39:DC:3F:A4:51:C5:BA:51:64:5D:3F:70:1B:7B:5E:87:9D:DF"]
+    }
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "L66T97PY5L.au.com.mrsupplement.app.ios",
+        "paths": ["*"]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["L66T97PY5L.au.com.mrsupplement.app.ios"]
+  }
+}
