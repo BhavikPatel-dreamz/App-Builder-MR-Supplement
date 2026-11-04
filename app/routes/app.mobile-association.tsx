@@ -88,19 +88,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     form: {
       android: {
         id: registeredAndroid?.id ?? "",
-        applicationId: config.packageName || registeredAndroid?.applicationId || "",
-        fingerprints: config.fingerprints.length
-          ? config.fingerprints
-          : registeredAndroid?.sha256CertFingerprints?.length
-            ? registeredAndroid.sha256CertFingerprints
+        applicationId: registeredAndroid?.applicationId || config.packageName || "",
+        fingerprints: registeredAndroid?.sha256CertFingerprints?.length
+          ? registeredAndroid.sha256CertFingerprints
+          : config.fingerprints.length
+            ? config.fingerprints
             : [""],
         appLinksEnabled: registeredAndroid?.appLinksEnabled ?? true,
         registeredApplicationId: registeredAndroid?.applicationId ?? "",
       },
       apple: {
         id: registeredApple?.id ?? "",
-        teamId: config.teamId || appleParts.teamId,
-        bundleId: config.bundleId || appleParts.bundleId,
+        teamId: appleParts.teamId || config.teamId,
+        bundleId: appleParts.bundleId || config.bundleId,
         universalLinksEnabled: registeredApple?.universalLinksEnabled ?? true,
         sharedWebCredentialsEnabled: registeredApple?.sharedWebCredentialsEnabled ?? true,
         registeredAppId: registeredApple?.appId ?? "",
