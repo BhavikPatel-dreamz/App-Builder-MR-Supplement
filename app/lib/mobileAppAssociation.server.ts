@@ -604,16 +604,27 @@ export function expectedFromConfig(
   const registeredAndroid = apps?.android[0];
   const registeredApple = apps?.apple[0];
 
+  const hasRegisteredAndroid = registeredAndroid?.applicationId && registeredAndroid.sha256CertFingerprints?.length;
+  const hasRegisteredApple = registeredApple?.appId;
+
   return {
-    applicationId: androidReady
-      ? config.packageName
-      : (registeredAndroid?.applicationId ?? ""),
-    sha256CertFingerprints: androidReady
-      ? config.fingerprints.filter(isSha256Fingerprint)
-      : (registeredAndroid?.sha256CertFingerprints ?? []),
-    appId: appleReady ? config.appId : (registeredApple?.appId ?? ""),
-    androidSource: androidReady ? "environment" : registeredAndroid ? "shopify" : "incomplete",
-    appleSource: appleReady ? "environment" : registeredApple ? "shopify" : "incomplete",
+    applicationId: hasRegisteredAndroid
+      ? registeredAndroid.applicationId
+      : androidReady
+        ? config.packageName
+        : "",
+    sha256CertFingerprints: hasRegisteredAndroid
+      ? registeredAndroid.sha256CertFingerprints
+      : androidReady
+        ? config.fingerprints.filter(isSha256Fingerprint)
+        : [],
+    appId: hasRegisteredApple
+      ? registeredApple.appId
+      : appleReady
+        ? config.appId
+        : "",
+    androidSource: hasRegisteredAndroid ? "shopify" : androidReady ? "environment" : "incomplete",
+    appleSource: hasRegisteredApple ? "shopify" : appleReady ? "environment" : "incomplete",
   };
 }
 
