@@ -29,7 +29,7 @@ const DEFAULT_DIVIDER_COLOR = "#30353A";
 const DEFAULT_ICON_SIZE = 40;
 const DEFAULT_FONT_SIZE = 28;
 
-function MediaPicker({ label, value, onChange, allowVideo = false }) {
+function MediaPicker({ label, value, onChange }) {
   return (
     <MediaUploadCheck>
       <MediaUpload
@@ -38,7 +38,7 @@ function MediaPicker({ label, value, onChange, allowVideo = false }) {
           const nextUrl = item?.url || item?.source_url || "";
           onChange(nextUrl);
         }}
-        allowedTypes={allowVideo ? ["image", "video"] : ["image"]}
+        allowedTypes={["image"]}
         render={({ open }) => (
           <div style={{ marginBottom: "12px" }}>
             <p style={{ fontSize: "12px", fontWeight: 600, margin: "0 0 8px" }}>
@@ -104,10 +104,9 @@ function registerDrawerCard() {
       title: { type: "string", default: "" },
       imageUrl: { type: "string", default: "" },
       action: { type: "object", default: {} },
-      showArrow: { type: "boolean", default: true },
     },
     edit: ({ attributes, setAttributes }) => {
-      const { title, imageUrl, action, showArrow } = attributes;
+      const { title, imageUrl, action } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-drawer-card-editor",
       });
@@ -139,18 +138,16 @@ function registerDrawerCard() {
             <div style={{ fontSize: "14px", fontWeight: 600, marginTop: imageUrl ? "8px" : 0 }}>
               {title || "Drawer card"}
             </div>
-            {showArrow ? <div style={{ marginTop: "8px", color: "#2CCF73", fontWeight: 700 }}>›</div> : null}
           </div>
         </>
       );
     },
     save: ({ attributes }) => {
-      const { title, imageUrl, action, showArrow } = attributes;
+      const { title, imageUrl, action } = attributes;
       const blockProps = useBlockProps.save({
         className: "appbuilder-drawer__card",
         "data-title": title || "",
         "data-image-url": imageUrl || "",
-        "data-show-arrow": showArrow ? "true" : "false",
         "data-action": JSON.stringify(action ?? {}),
       });
 
@@ -158,7 +155,6 @@ function registerDrawerCard() {
         <div {...blockProps}>
           {imageUrl ? <img src={imageUrl} alt="" className="appbuilder-drawer__card-image" /> : null}
           {title ? <span className="appbuilder-drawer__card-title">{title}</span> : null}
-          {showArrow ? <span className="appbuilder-drawer__card-arrow" aria-hidden="true">›</span> : null}
         </div>
       );
     },
@@ -176,12 +172,10 @@ function registerDrawerSubSection() {
     attributes: {
       title: { type: "string", default: "" },
       iconUrl: { type: "string", default: "" },
-      showArrow: { type: "boolean", default: true },
-      buttonText: { type: "string", default: "" },
-      action: { type: "object", default: {} },
+      viewAllText: { type: "string", default: "VIEW ALL" },
     },
     edit: ({ attributes, setAttributes }) => {
-      const { title, iconUrl, showArrow, buttonText, action } = attributes;
+      const { title, iconUrl, viewAllText } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-drawer-sub-section-editor",
       });
@@ -201,14 +195,9 @@ function registerDrawerSubSection() {
                 onChange={(value) => setAttributes({ iconUrl: value })}
               />
               <TextControl
-                label="Button text"
-                value={buttonText}
-                onChange={(value) => setAttributes({ buttonText: value })}
-              />
-              <ActionBuilder
-                label="Action"
-                value={action ?? {}}
-                onChange={(next) => setAttributes({ action: next })}
+                label="View all label"
+                value={viewAllText}
+                onChange={(value) => setAttributes({ viewAllText: value })}
               />
             </PanelBody>
           </InspectorControls>
@@ -217,11 +206,10 @@ function registerDrawerSubSection() {
             <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 600 }}>
               {iconUrl ? <img src={iconUrl} alt="" style={{ width: "24px", height: "24px" }} /> : <span style={{ width: "24px", height: "24px", display: "inline-block", borderRadius: "4px", background: "#f0f0f1" }} />}
               <span>{title || "Sub section"}</span>
-              {showArrow ? <span aria-hidden="true">›</span> : null}
             </div>
-            {buttonText ? (
+            {viewAllText ? (
               <div className="appbuilder-drawer__sub-section-button-preview">
-                {buttonText}
+                {viewAllText}
               </div>
             ) : null}
             <div style={{ marginTop: "10px" }}>
@@ -240,23 +228,20 @@ function registerDrawerSubSection() {
       );
     },
     save: ({ attributes }) => {
-      const { title, iconUrl, showArrow, buttonText, action } = attributes;
+      const { title, iconUrl, viewAllText } = attributes;
       const blockProps = useBlockProps.save({
         className: "appbuilder-drawer__sub-section",
         "data-title": title || "",
         "data-icon-url": iconUrl || "",
-        "data-show-arrow": showArrow ? "true" : "false",
-        "data-button-text": buttonText || "",
-        "data-action": JSON.stringify(action ?? {}),
+        "data-view-all-text": viewAllText || "",
       });
 
       return (
         <div {...blockProps}>
           {iconUrl ? <img src={iconUrl} alt="" className="appbuilder-drawer__icon" /> : null}
           {title ? <span className="appbuilder-drawer__label">{title}</span> : null}
-          {showArrow ? <span className="appbuilder-drawer__arrow" aria-hidden="true">›</span> : null}
-          {buttonText ? (
-            <span className="appbuilder-drawer__sub-section-button">{buttonText}</span>
+          {viewAllText ? (
+            <span className="appbuilder-drawer__sub-section-button">{viewAllText}</span>
           ) : null}
           <div className="appbuilder-drawer__sub-section-items">
             <InnerBlocks.Content />
@@ -325,7 +310,7 @@ function registerDrawerSection() {
             <div style={{ marginTop: "12px" }}>
               <InnerBlocks
                 allowedBlocks={[DRAWER_SUB_SECTION_BLOCK, DRAWER_CARD_BLOCK]}
-                template={[[DRAWER_SUB_SECTION_BLOCK, { title: "Protein", showArrow: true }]]}
+                template={[[DRAWER_SUB_SECTION_BLOCK, { title: "Protein", viewAllText: "VIEW ALL" }]]}
                 templateLock={false}
                 renderAppender={InnerBlocks.ButtonBlockAppender}
               />
@@ -372,11 +357,10 @@ function registerDrawerItem() {
     attributes: {
       title: { type: "string", default: "" },
       iconUrl: { type: "string", default: "" },
-      iconType: { type: "string", default: "image" },
       action: { type: "object", default: {} },
     },
     edit: ({ attributes, setAttributes }) => {
-      const { title, iconUrl, iconType, action } = attributes;
+      const { title, iconUrl, action } = attributes;
       const blockProps = useBlockProps({
         className: "appbuilder-drawer-item-editor",
       });
@@ -385,9 +369,16 @@ function registerDrawerItem() {
         <>
           <InspectorControls>
             <PanelBody title="Item" initialOpen>
-              <TextControl label="Title" value={title} onChange={(value) => setAttributes({ title: value })} />
-              <MediaPicker label="Icon" value={iconUrl} onChange={(value) => setAttributes({ iconUrl: value })} />
-              <TextControl label="Icon type" value={iconType} onChange={(value) => setAttributes({ iconType: value || "image" })} />
+              <TextControl
+                label="Title"
+                value={title}
+                onChange={(value) => setAttributes({ title: value })}
+              />
+              <MediaPicker
+                label="Icon"
+                value={iconUrl}
+                onChange={(value) => setAttributes({ iconUrl: value })}
+              />
               <ActionBuilder
                 label="Action"
                 value={action ?? {}}
@@ -406,12 +397,11 @@ function registerDrawerItem() {
       );
     },
     save: ({ attributes }) => {
-      const { title, iconUrl, iconType, action } = attributes;
+      const { title, iconUrl, action } = attributes;
       const blockProps = useBlockProps.save({
         className: "appbuilder-drawer__item",
         "data-title": title || "",
         "data-icon-url": iconUrl || "",
-        "data-icon-type": iconType || "image",
         "data-action": JSON.stringify(action ?? {}),
       });
 
